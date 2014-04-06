@@ -12,7 +12,6 @@ import net.sf.javailp.Solver;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
-import edu.uci.eecs.wukong.energy.mapper.Mapper.MapType;
 
 public class HybridMapper extends DistanceUnawareSelectionBasedMapper {
 
@@ -70,9 +69,7 @@ public class HybridMapper extends DistanceUnawareSelectionBasedMapper {
 			BufferedReader systemConfigReader = new BufferedReader(new FileReader(systemConfig));
 			WukongSystem system = new WukongSystem();
 			
-			try {
-
-				
+			try {	
 				fbp.initialize(fbpConfigReader);
 				system.initialize(systemConfigReader);
 				

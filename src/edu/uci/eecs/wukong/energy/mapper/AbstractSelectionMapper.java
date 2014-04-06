@@ -6,6 +6,9 @@ import java.util.List;
 import net.sf.javailp.Linear;
 import net.sf.javailp.Problem;
 import net.sf.javailp.Result;
+import net.sf.javailp.Solver;
+import net.sf.javailp.SolverFactory;
+import net.sf.javailp.SolverFactoryLpSolve;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -20,19 +23,74 @@ import edu.uci.eecs.wukong.util.Util;
 public abstract class AbstractSelectionMapper extends AbstractMapper {
 	
 	protected HashMap<String, String> variables;
+	protected SolverFactory factory;
 
 	public AbstractSelectionMapper(WukongSystem system, FlowBasedProcess fbp,
-			MapType type) {
+			MapType type, int timeout) {
 		super(system, fbp, type);
-		variables = new HashMap<String, String>();
-		// TODO Auto-generated constructor stub
+		this.variables = new HashMap<String, String>();
+		this.factory = new SolverFactoryLpSolve();
+		this.factory.setParameter(Solver.VERBOSE, 0);
+		this.factory.setParameter(Solver.TIMEOUT, timeout);
 	}
 
-	public abstract void map();
+	@Override
+	public void map() {
+		
+		if (system == null || fbp == null) {
+			System.out.println("Wukong System or FBP is null.");
+			return;
+		}
+		
+		if (system.getDeviceNumber() == 0 || system.getWuClassNunber() == 0 ) {
+			System.out.println("There is no device or wuclass within the wuclass system.");
+			return;
+		}
+		
+		if (fbp.getEdgeNumber() == 0) {
+			System.out.println("There is no edge within the fbp.");
+		}
+		
+
+		Problem problem = buildProblem();
+		Solver solver = factory.get(); // you should use this solver only once for one problem
+		Result result = solver.solve(problem);
+		
+		//System.out.println(result);
+		applyResult(result);
+		//System.out.println("System total energy consumption is:" + system.getTotalEnergyConsumption());
+	}
 	
 	protected abstract Problem buildProblem();
 
 	protected abstract void applyResult(Result result);
+	
+	
+	/***
+	 * It is constraints can be used for energy harvesting, so that devices can have a
+	 * upper bound for energy usage.
+	 * 
+	 * 
+	 * @param problem
+	 */
+	protected void applyWuDeviceEnergyConstraints(Problem problem) {
+		
+		ImmutableList<WuDevice> wuDevices= system.getDevices();
+		
+		for(WuDevice device : wuDevices) {
+			ImmutableList<Integer> classIds= device.getAllWuObjectId();
+			
+			Linear linear = new Linear();
+			for(Integer classId : classIds) {
+				Double energyCost = fbp.getWuClassEnergyConsumption(classId);
+				String varName = Util.generateVariableId(classId, device.getWuDeviceId());
+				linear.add(energyCost,  varName);
+				variables.put(varName, varName);
+			}
+
+			problem.add(linear, "<=", device.getEnergyConstraint());
+		}
+	}
 	
 	
 	/**
@@ -62,33 +120,6 @@ public abstract class AbstractSelectionMapper extends AbstractMapper {
 				}
 			}
 		}
-	}
-	
-	/**
-	 * Each wudevice's energy consumption should be less than y.
-	 * Then we minimize y. It is a solution to resolve the
-	 * min(max(E(device)))
-	 * 
-	 */
-	protected void applyUpperBoundConstraints(Problem problem) {
-		ImmutableList<WuDevice> wuDevices= system.getDevices();
-		
-		for(WuDevice device : wuDevices) {
-			ImmutableList<Integer> classIds= device.getAllWuObjectId();
-			
-			Linear linear = new Linear();
-			for(Integer classId : classIds) {
-				Double energyCost = fbp.getWuClassEnergyConsumption(classId);
-				if(energyCost != null) {
-					String varName = Util.generateVariableId(classId, device.getWuDeviceId());
-					linear.add(energyCost,  varName);
-					variables.put(varName, varName);
-				}
-			}
-			linear.add(-1, 'y');
-			problem.add(linear, "<=", 0);
-		}
-		
 	}
 	
 	/**

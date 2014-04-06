@@ -20,7 +20,6 @@ import net.sf.javailp.Solver;
 import net.sf.javailp.SolverFactory;
 import net.sf.javailp.SolverFactoryLpSolve;
 import net.sf.javailp.VarType;
-
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
@@ -31,40 +30,8 @@ import edu.uci.eecs.wukong.util.Util;
 
 public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper{
 	
-	protected SolverFactory factory;
-	
 	public DistanceUnawareSelectionBasedMapper(WukongSystem system, FlowBasedProcess fbp, MapType type, int timeout) {
-		super(system, fbp, type);
-		this.factory = new SolverFactoryLpSolve();
-		this.factory.setParameter(Solver.VERBOSE, 0);
-		this.factory.setParameter(Solver.TIMEOUT, timeout);
-	}
-	
-	@Override
-	public void map() {
-		
-		if (system == null || fbp == null) {
-			System.out.println("Wukong System or FBP is null.");
-			return;
-		}
-		
-		if (system.getDeviceNumber() == 0 || system.getWuClassNunber() == 0 ) {
-			System.out.println("There is no device or wuclass within the wuclass system.");
-			return;
-		}
-		
-		if (fbp.getEdgeNumber() == 0) {
-			System.out.println("There is no edge within the fbp.");
-		}
-		
-
-		Problem problem = buildProblem();
-		Solver solver = factory.get(); // you should use this solver only once for one problem
-		Result result = solver.solve(problem);
-		
-		//System.out.println(result);
-		applyResult(result);
-		//System.out.println("System total energy consumption is:" + system.getTotalEnergyConsumption());
+		super(system, fbp, type, timeout);
 	}
 	
 	@Override
@@ -122,8 +89,13 @@ public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper
 		return problem;
 	}
 	
-	private void applyWuDeviceEnergyConstraints(Problem problem) {
-		
+	/**
+	 * Each wudevice's energy consumption should be less than y.
+	 * Then we minimize y. It is a solution to resolve the
+	 * min(max(E(device)))
+	 * 
+	 */
+	protected void applyUpperBoundConstraints(Problem problem) {
 		ImmutableList<WuDevice> wuDevices= system.getDevices();
 		
 		for(WuDevice device : wuDevices) {
@@ -132,13 +104,16 @@ public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper
 			Linear linear = new Linear();
 			for(Integer classId : classIds) {
 				Double energyCost = fbp.getWuClassEnergyConsumption(classId);
-				String varName = Util.generateVariableId(classId, device.getWuDeviceId());
-				linear.add(energyCost,  varName);
-				variables.put(varName, varName);
+				if(energyCost != null) {
+					String varName = Util.generateVariableId(classId, device.getWuDeviceId());
+					linear.add(energyCost,  varName);
+					variables.put(varName, varName);
+				}
 			}
-
-			problem.add(linear, "<=", device.getEnergyConstraint());
+			linear.add(-1, 'y');
+			problem.add(linear, "<=", 0);
 		}
+		
 	}
 	
 	/**
