@@ -3,7 +3,7 @@ package edu.uci.eecs.wukong.energy;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
-import edu.uci.eecs.wukong.energy.mapper.SelectionBasedMapper;
+import edu.uci.eecs.wukong.energy.mapper.DistanceUnawareSelectionBasedMapper;
 import edu.uci.eecs.wukong.energy.mapper.HybridMapper;
 import edu.uci.eecs.wukong.energy.mapper.GreedyBasedMapper;
 import edu.uci.eecs.wukong.energy.mapper.Mapper.MapType;
@@ -75,7 +75,7 @@ public class WukongEnergySimulator {
 			//System.out.println("After reset!");
 			//System.out.println(fbp.getTotalEnergyConsumption());
 			//System.out.println(system.getTotalEnergyConsumption());
-			SelectionBasedMapper mapper = new SelectionBasedMapper(system, fbp, MapType.ONLY_LOCATION, 200);
+			DistanceUnawareSelectionBasedMapper mapper = new DistanceUnawareSelectionBasedMapper(system, fbp, MapType.ONLY_LOCATION, 200);
 			mapper.map();
 			System.out.println("After Selection Map!");
 			//System.out.println(fbp.getTotalEnergyConsumption());

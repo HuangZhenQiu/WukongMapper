@@ -29,19 +29,18 @@ import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.util.Util;
 
-public class SelectionBasedMapper extends AbstractMapper{
+public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper{
 	
 	protected SolverFactory factory;
-	protected HashMap<String, String> variables;
 	
-	public SelectionBasedMapper(WukongSystem system, FlowBasedProcess fbp, MapType type, int timeout) {
+	public DistanceUnawareSelectionBasedMapper(WukongSystem system, FlowBasedProcess fbp, MapType type, int timeout) {
 		super(system, fbp, type);
 		this.factory = new SolverFactoryLpSolve();
 		this.factory.setParameter(Solver.VERBOSE, 0);
 		this.factory.setParameter(Solver.TIMEOUT, timeout);
-		this.variables = new HashMap<String, String>();
 	}
 	
+	@Override
 	public void map() {
 		
 		if (system == null || fbp == null) {
@@ -68,6 +67,7 @@ public class SelectionBasedMapper extends AbstractMapper{
 		//System.out.println("System total energy consumption is:" + system.getTotalEnergyConsumption());
 	}
 	
+	@Override
 	protected void applyResult(Result result) {
 
 		Set<String> variableIds= variables.keySet();
@@ -88,7 +88,7 @@ public class SelectionBasedMapper extends AbstractMapper{
 		fbp.merge();
 	}
 
-	
+	@Override
 	protected Problem buildProblem() {
 		
 		Problem problem = new Problem();
@@ -120,83 +120,6 @@ public class SelectionBasedMapper extends AbstractMapper{
 		//System.out.println(problem.toString());
 		
 		return problem;
-	}
-
-	
-	/**
-	 * 
-	 * Each Object selected for the functionality of particular wuclass in the fbp should 
-	 * confirm to the location constraints like below:
-	 *    djk * x_i_j <= Dik
-	 *    
-	 * djk is the distance between the device j and landmark k. Dik is the distance constraint
-	 * from the wuclass i to landmark k;
-	 */
-	private void applyLocationConstraints(Problem problem) {
-		ImmutableList<WuDevice> wuDevices= system.getDevices();
-		
-		for(WuDevice device : wuDevices) {
-			ImmutableList<Integer> classIds= device.getAllWuObjectId();
-
-			for(Integer classId : classIds) {
-				Linear linear =  new Linear();
-				LocationConstraint constraint = fbp.getLocationConstraintByWuClassId(classId);
-				if(constraint != null) {
-					Double distance = device.getDistance(constraint.getLandMarkId());
-					String varName = Util.generateVariableId(classId, device.getWuDeviceId());
-					linear.add(distance, varName);
-					variables.put(varName, varName);
-					problem.add(linear, "<=", constraint.getDistance());
-				}
-			}
-		}
-	}
-	
-	/* *
-	 * Each wudevice's energy consumption should be less than y.
-	 * Then we minimize y. It is a solution to resolve the
-	 * min(max(E(device)))
-	 * 
-	 */
-	private void applyUpperBoundConstraints(Problem problem) {
-		ImmutableList<WuDevice> wuDevices= system.getDevices();
-		
-		for(WuDevice device : wuDevices) {
-			ImmutableList<Integer> classIds= device.getAllWuObjectId();
-			
-			Linear linear = new Linear();
-			for(Integer classId : classIds) {
-				Double energyCost = fbp.getWuClassEnergyConsumption(classId);
-				if(energyCost != null) {
-					String varName = Util.generateVariableId(classId, device.getWuDeviceId());
-					linear.add(energyCost,  varName);
-					variables.put(varName, varName);
-				}
-			}
-			linear.add(-1, 'y');
-			problem.add(linear, "<=", 0);
-		}
-		
-	}
-	
-	/**
-	 * Each WuClass can only be selected only.
-	 * @param problem
-	 */
-	private void applyWuClassConstraints(Problem problem) {
-		
-		ImmutableMap<Integer, List<WuDevice>> classDeviceMap = system.getWuClassDeviceMap();
-		ImmutableSet<Integer> classes = classDeviceMap.keySet();
-		for(Integer classId : classes) {
-			List<WuDevice> devices = classDeviceMap.get(classId);
-			Linear linear = new Linear();
-			for(WuDevice device : devices) {
-				String varName = Util.generateVariableId(classId, device.getWuDeviceId());
-				linear.add(1, varName);
-				variables.put(varName, varName);
-			}
-			problem.add(linear, "=", 1);
-		}
 	}
 	
 	private void applyWuDeviceEnergyConstraints(Problem problem) {
@@ -260,12 +183,10 @@ public class SelectionBasedMapper extends AbstractMapper{
 			WukongSystem system = new WukongSystem();
 			
 			try {
-
-				
 				fbp.initialize(fbpConfigReader);
 				system.initialize(systemConfigReader);
 				
-				SelectionBasedMapper mapper = new SelectionBasedMapper(system, fbp, MapType.ONLY_LOCATION, 200);
+				DistanceUnawareSelectionBasedMapper mapper = new DistanceUnawareSelectionBasedMapper(system, fbp, MapType.ONLY_LOCATION, 200);
 				mapper.map();
 				
 			} finally {

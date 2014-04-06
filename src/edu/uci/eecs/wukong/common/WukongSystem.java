@@ -24,11 +24,15 @@ public class WukongSystem {
 
 	private List<WuDevice> devices;
 	
+	private Double[][] distances;
+	
 	private HashMap<Integer, WuDevice> deviceMap;
 	
 	private HashMap<Integer, List<WuDevice>> wuClassDeviceMap;
 	
 	private FlowBasedProcess currentFBP;
+	
+	private Integer deviceNumber;
 	
 	private Integer wuClassNumber;
 	
@@ -45,30 +49,22 @@ public class WukongSystem {
 		this.wuClassNumber = wuClassNumber;
 		this.landmarkNumber = landmarkNumber;
 		this.devices = devices;
+		this.distances = new Double[this.devices.size()][this.devices.size()];
 		this.deviceMap = new HashMap<Integer, WuDevice>();
 		this.wuClassDeviceMap = new HashMap<Integer, List<WuDevice>>();
-		Iterator<WuDevice> iterator =  devices.iterator();
-		while(iterator.hasNext()) {
-			WuDevice device = iterator.next();
-			deviceMap.put(device.getWuDeviceId(), device);
-			ImmutableList<Integer> classes= device.getAllWuObjectId();
-			for (int i=0; i < classes.size(); i ++) {
-				if(wuClassDeviceMap.containsKey(classes.get(i))) {
-					wuClassDeviceMap.get(classes.get(i)).add(device);
-				} else {
-					List<WuDevice> devList = new ArrayList<WuDevice>();
-					devList.add(device);
-					wuClassDeviceMap.put(classes.get(i), devList);
-				}
-			}
-			
-		}
+		initializeMap(this.devices);
 	}
 	
 	public void initialize(List<WuDevice> devices, int wuClassNumber, int landmarkNumber) {
 		this.wuClassNumber = wuClassNumber;
 		this.landmarkNumber = landmarkNumber;
 		this.devices.addAll(devices);
+		this.distances = new Double[this.devices.size()][this.devices.size()];
+		initializeMap(this.devices);
+	}
+	
+	
+	private void initializeMap(List<WuDevice> devices) {
 		Iterator<WuDevice> iterator =  devices.iterator();
 		while(iterator.hasNext()) {
 			WuDevice device = iterator.next();
@@ -105,7 +101,7 @@ public class WukongSystem {
 			//begin initialization
 			StringTokenizer tokenizer = new StringTokenizer(content);
 			this.wuClassNumber = Integer.parseInt(tokenizer.nextToken());
-			Integer deviceNumber = Integer.parseInt(tokenizer.nextToken());
+			this.deviceNumber = Integer.parseInt(tokenizer.nextToken());
 			this.landmarkNumber = Integer.parseInt(tokenizer.nextToken());
 			
 			for(int i=0; i<deviceNumber; i++) {
@@ -140,6 +136,17 @@ public class WukongSystem {
 		}
 		
 		return device;
+	}
+	
+	public ImmutableList<WuDevice> findWudevice(int wuClassId) {
+		ImmutableList.Builder<WuDevice> builder = ImmutableList.<WuDevice>builder();
+		for(WuDevice device : this.devices) {
+			if (device.hasWuObject(wuClassId)) {
+				builder.add(device);
+			}
+		}
+		
+		return builder.build();
 	}
 	
 	public void reset() {

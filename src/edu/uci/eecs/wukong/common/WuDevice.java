@@ -231,6 +231,16 @@ public class WuDevice implements Comparable<WuDevice>{
 		return false;
 	}
 	
+	public boolean hasWuObject(int wuClassId) {
+		for(WuObject object : wuObjects) {
+			if(object.getWuClassId().equals(wuClassId)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	public void updateEnergyConsumption() {
 		currentConsumption = getAfterDeploymentEngeryConsumption(null);
 	}

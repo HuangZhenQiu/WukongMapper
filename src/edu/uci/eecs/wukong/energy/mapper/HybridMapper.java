@@ -14,7 +14,7 @@ import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.energy.mapper.Mapper.MapType;
 
-public class HybridMapper extends SelectionBasedMapper {
+public class HybridMapper extends DistanceUnawareSelectionBasedMapper {
 
 	public HybridMapper(WukongSystem system, FlowBasedProcess fbp, MapType type, int timeout) {
 		super(system, fbp, type, timeout);
