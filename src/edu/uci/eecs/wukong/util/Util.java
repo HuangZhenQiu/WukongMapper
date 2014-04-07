@@ -1,10 +1,25 @@
 package edu.uci.eecs.wukong.util;
 
+import java.lang.StringBuilder;
+
 public class Util {
 	
 	public static String generateVariableId(Integer classId, Integer deviceId) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("x_").append(classId.toString())
+			   .append("_").append(deviceId.toString());
 		
-		return "x_" + classId.toString() + "_" + deviceId.toString();
+		return builder.toString();
+	}
+	
+	public static String generateTransformedVariableId(Integer sourceClassId, Integer sourceDeviceId,
+			Integer destClassId, Integer destDeviceId) {
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append("y_").append(sourceClassId.toString()).append("_").append(sourceDeviceId.toString())
+				.append("_").append(destClassId.toString()).append("_").append(destDeviceId.toString());
+		
+		return builder.toString();
 	}
 	
 	public static Integer getWuClassIdFromVariableId(String variableId) {

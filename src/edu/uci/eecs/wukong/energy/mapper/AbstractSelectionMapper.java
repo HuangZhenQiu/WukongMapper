@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.sf.javailp.Linear;
+import net.sf.javailp.Operator;
 import net.sf.javailp.Problem;
 import net.sf.javailp.Result;
 import net.sf.javailp.Solver;
@@ -88,7 +89,7 @@ public abstract class AbstractSelectionMapper extends AbstractMapper {
 				variables.put(varName, varName);
 			}
 
-			problem.add(linear, "<=", device.getEnergyConstraint());
+			problem.add(linear, Operator.LE, device.getEnergyConstraint());
 		}
 	}
 	
@@ -116,7 +117,7 @@ public abstract class AbstractSelectionMapper extends AbstractMapper {
 					String varName = Util.generateVariableId(classId, device.getWuDeviceId());
 					linear.add(distance, varName);
 					variables.put(varName, varName);
-					problem.add(linear, "<=", constraint.getDistance());
+					problem.add(linear, Operator.LE, constraint.getDistance());
 				}
 			}
 		}
@@ -138,7 +139,7 @@ public abstract class AbstractSelectionMapper extends AbstractMapper {
 				linear.add(1, varName);
 				variables.put(varName, varName);
 			}
-			problem.add(linear, "=", 1);
+			problem.add(linear, Operator.EQ, 1);
 		}
 	}
 

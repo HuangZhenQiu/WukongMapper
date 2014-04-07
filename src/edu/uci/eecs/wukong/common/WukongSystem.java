@@ -138,6 +138,16 @@ public class WukongSystem {
 		return device;
 	}
 	
+	/**
+	 * 
+	 * @param source
+	 * @param dest
+	 * @return
+	 */
+	public Double getDistance(WuDevice source, WuDevice dest) {
+		return distances[source.getWuDeviceId() - 1][dest.getWuDeviceId() - 1]; // Ids start from 1
+	}
+	
 	public ImmutableList<WuDevice> findWudevice(int wuClassId) {
 		ImmutableList.Builder<WuDevice> builder = ImmutableList.<WuDevice>builder();
 		for(WuDevice device : this.devices) {

@@ -4,26 +4,19 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
-import java.util.HashMap;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 import net.sf.javailp.Linear;
+import net.sf.javailp.Operator;
 import net.sf.javailp.OptType;
 import net.sf.javailp.Problem;
 import net.sf.javailp.Result;
-import net.sf.javailp.Solver;
-import net.sf.javailp.SolverFactory;
-import net.sf.javailp.SolverFactoryLpSolve;
 import net.sf.javailp.VarType;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.LocationConstraint;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.util.Util;
@@ -111,7 +104,7 @@ public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper
 				}
 			}
 			linear.add(-1, 'y');
-			problem.add(linear, "<=", 0);
+			problem.add(linear, Operator.LE, 0);
 		}
 		
 	}
@@ -130,13 +123,13 @@ public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper
 			String varName = Util.generateVariableId(edge.getInWuClass().getWuClassId(), edge.getInWuClass().getDeviceId());
 			inNodeLinear.add(1, varName);
 			variables.put(varName, varName);
-			problem.add(inNodeLinear, "=", 1);
+			problem.add(inNodeLinear, Operator.EQ, 1);
 			
 			Linear outNodeLinear = new Linear();
 			varName = Util.generateVariableId(edge.getOutWuClass().getWuClassId(), edge.getOutWuClass().getDeviceId());
 			outNodeLinear.add(1, varName);
 			variables.put(varName, varName);
-			problem.add(outNodeLinear, "=", 1);
+			problem.add(outNodeLinear, Operator.EQ, 1);
 		}
 	}
 	
