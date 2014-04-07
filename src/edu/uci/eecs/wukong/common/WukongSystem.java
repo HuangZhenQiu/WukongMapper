@@ -9,6 +9,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
+import edu.uci.eecs.wukong.common.FlowBasedProcess.WuClass;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -216,6 +218,17 @@ public class WukongSystem {
 	public int getWuClassNunber () {
 		
 		return this.wuClassNumber;
+	}
+	
+	public boolean isMergable(WuClass source, WuClass dest) {
+		for(WuDevice device: devices) {
+			if(device.hasWuObject(source.getWuClassId()) 
+					&& device.hasWuObject(dest.getWuClassId())){
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public boolean merge(FlowBasedProcess fbp) {

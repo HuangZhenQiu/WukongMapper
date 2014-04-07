@@ -536,5 +536,18 @@ public class FlowBasedProcess {
 			return wuClass.getEnergyCost();
 		}
 	}
+	
+	public ImmutableList<Edge> getMergableEdges(WukongSystem system) 
+	{
+		ImmutableList.Builder<Edge> builder = ImmutableList.<Edge>builder();
+		for(Edge edge :this.edges) {
+			if(system.isMergable(edge.getInWuClass(), edge.getOutWuClass())) {
+				builder.add(edge);
+			}
+		}
+		
+		return builder.build();
+		
+	}
 
 }
