@@ -10,6 +10,45 @@ import java.util.HashSet;
 
 public class FlowGraph {
 	
+	public static class EdgeNode {
+		protected static int currentId = 0;
+		private int id;
+		private Edge edge;
+		private double weight;
+		
+		public EdgeNode(Edge edge) {
+			this.id = currentId++;
+			this.edge = edge;
+			this.weight = edge.getWeight();
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public void setId(int id) {
+			this.id = id;
+		}
+
+		public Edge getEdge() {
+			return edge;
+		}
+
+		public void setEdge(Edge edge) {
+			this.edge = edge;
+		}
+
+		public double getWeight() {
+			return weight;
+		}
+
+		public void setWeight(double weight) {
+			this.weight = weight;
+		}
+		
+		
+	}
+	
 	private Set<Integer> wuClassSet;
 	private List<Edge> edges;
 	
@@ -26,7 +65,7 @@ public class FlowGraph {
 		}
 	}
 	
-	public boolean isConnect(WuClass wuClass) {
+	private boolean isConnect(WuClass wuClass) {
 		if(wuClassSet.contains(wuClass.getWuClassId())){
 			return true;
 		}
@@ -34,7 +73,7 @@ public class FlowGraph {
 		return false;
 	}
 	
-	private boolean isConnect(Edge edge) {
+	public boolean isConnect(Edge edge) {
 		if(isConnect(edge.getInWuClass()) || isConnect(edge.getOutWuClass())) {
 			return true;
 		}
@@ -46,6 +85,4 @@ public class FlowGraph {
 		wuClassSet.addAll(newGraph.wuClassSet);
 		edges.addAll(newGraph.edges);
 	}
-	
-
 }

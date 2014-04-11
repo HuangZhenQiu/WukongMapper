@@ -2,12 +2,15 @@ package edu.uci.eecs.wukong.energy.mapper;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
+import edu.uci.eecs.wukong.common.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 
 import java.util.List;
+import java.util.LinkedList;
 import java.util.ArrayList;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 
 /**
  * It is the algorithm for TETS Journal which is using the optimal greedy algorithm
@@ -37,9 +40,46 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 	
 	private ImmutableList<Edge> merge() {
 		ImmutableList<Edge> mergableEdges = this.fbp.getMergableEdges(this.system);
-		//TODO select mergeable set
+		ImmutableList<FlowGraph> graphs = split(mergableEdges);
+		
+		
 		
 		return mergableEdges;
+	}
+	
+	private ImmutableList<FlowGraph> split(ImmutableList<Edge> mergableEdges) {
+		List<FlowGraph> graphs= new LinkedList<FlowGraph>();
+		graphs.add(new FlowGraph());
+		
+		for(Edge edge : mergableEdges) {
+			FlowGraph first = null;
+			FlowGraph second = null;
+			for(FlowGraph graph : graphs) {
+				if(graph.isConnect(edge)) {
+					if(first == null) {
+						first = graph;
+					} else if (second == null){
+						second = graph;
+					}
+				}
+			}
+			
+			if(first == null) {
+				//create a new graph
+				FlowGraph graph = new FlowGraph();
+				graph.addEdge(edge);
+				graphs.add(graph);
+			} else if (second == null) {
+				first.addEdge(edge);
+			} else {
+				// merge two graph
+				first.addEdge(edge);
+				first.merge(second);
+				graphs.remove(second);
+			}
+		}
+	
+		return ImmutableList.<FlowGraph>builder().addAll(graphs).build();
 	}
 
 }
