@@ -89,8 +89,19 @@ public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 		
 	}
 	
+	@Override
+	protected void applyWuDeviceEnergyConstraints(Problem problem) {
+		
+	}
+
+	
 	private void applyOptimizationGoal(Problem problem) {
+		
 		Linear linear = new Linear();
+
+		//add optimization target function
+		linear.add(1, 'y');
+		problem.setObjective(linear, OptType.MIN);
 		
 		//Go through every link of the FBP
 		for(Edge edge : this.fbp.getEdges()) {
@@ -116,8 +127,6 @@ public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 				}
 			}
 		}
-		
-		problem.setObjective(linear, OptType.MIN);
 	}
 	
 	/**

@@ -82,6 +82,12 @@ public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper
 		return problem;
 	}
 	
+	@Override
+	protected void applyWuDeviceEnergyConstraints(Problem problem) {
+		
+	}
+
+	
 	/**
 	 * Each wudevice's energy consumption should be less than y.
 	 * Then we minimize y. It is a solution to resolve the

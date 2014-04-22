@@ -62,36 +62,37 @@ public abstract class AbstractSelectionMapper extends AbstractMapper {
 		//System.out.println("System total energy consumption is:" + system.getTotalEnergyConsumption());
 	}
 	
-	protected abstract Problem buildProblem();
-
-	protected abstract void applyResult(Result result);
-	
-	
-	/***
-	 * It is constraints can be used for energy harvesting, so that devices can have a
-	 * upper bound for energy usage.
-	 * 
+	/**
+	 * Apply the upper bound of energy consumption of particular device.
 	 * 
 	 * @param problem
 	 */
-	protected void applyWuDeviceEnergyConstraints(Problem problem) {
-		
-		ImmutableList<WuDevice> wuDevices= system.getDevices();
-		
-		for(WuDevice device : wuDevices) {
-			ImmutableList<Integer> classIds= device.getAllWuObjectId();
-			
-			Linear linear = new Linear();
-			for(Integer classId : classIds) {
-				Double energyCost = fbp.getWuClassEnergyConsumption(classId);
-				String varName = Util.generateVariableId(classId, device.getWuDeviceId());
-				linear.add(energyCost,  varName);
-				variables.put(varName, varName);
-			}
+	protected abstract void applyWuDeviceEnergyConstraints(Problem problem);
+	
+	
+	/**
+	 * It is the constraints come from transforming min-max problem to min problem
+	 * 
+	 * @param problem
+	 */
+	protected abstract void applyUpperBoundConstraints(Problem problem);
+	
+	/**
+	 * The entry point for setting the IP constraints for a mapping problem.
+	 * 
+	 * @return
+	 */
+	protected abstract Problem buildProblem();
+	
+	/**
+	 * 
+	 * Apply selection result into Wukong System, then caculate the final energy consumption
+	 * 
+	 * @param result
+	 */
+	protected abstract void applyResult(Result result);
+	
 
-			problem.add(linear, Operator.LE, device.getEnergyConstraint());
-		}
-	}
 	
 	
 	/**
