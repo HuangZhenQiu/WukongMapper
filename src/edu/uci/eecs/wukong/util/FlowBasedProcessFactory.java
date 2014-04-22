@@ -87,11 +87,12 @@ public class FlowBasedProcessFactory {
 			Object source = graph.getEdgeSource(edge);
 			Object target = graph.getEdgeTarget(edge);
 			random.setSeed(weightRange + System.nanoTime());
+			//The meaning of weight becomes data volumn
 			Integer weight = Math.abs(random.nextInt()) % weightRange;
 			while(weight == 0) {
 				weight = Math.abs(random.nextInt()) % weightRange;
 			}
-			Edge fbpEdge = new Edge(objectMap.get(source), objectMap.get(target), weight * ratio,   weight * (1 - ratio));
+			Edge fbpEdge = new Edge(objectMap.get(source), objectMap.get(target), weight);
 			edges.add(fbpEdge);
 		}
 		

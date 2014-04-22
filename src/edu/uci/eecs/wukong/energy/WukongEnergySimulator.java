@@ -18,8 +18,8 @@ public class WukongEnergySimulator {
 	
 	public WukongEnergySimulator() {
 		//WukongProperties.getProperty();
-		this.fbpFactory = new FlowBasedProcessFactory(10, 100, 100 /**distance range**/, 100 /**weight**/, 0.4);
-		this.wukongFactory = new WuKongSystemFactory(100, 50, 10, 100);
+		this.fbpFactory = new FlowBasedProcessFactory(10, 50, 100 /**distance range**/, 100 /**weight**/, 0.4);
+		this.wukongFactory = new WuKongSystemFactory(50, 30, 10, 100);
 	}
 	
 	public void run() {

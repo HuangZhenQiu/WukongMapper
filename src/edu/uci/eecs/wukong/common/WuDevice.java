@@ -8,10 +8,9 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.lang.Comparable;
 
+import edu.uci.eecs.wukong.common.FlowBasedProcess.WuClass;
+
 import com.google.common.collect.ImmutableList;
-import com.google.common.escape.Escapers.Builder;
-
-
 
 /**
  * 
@@ -104,6 +103,15 @@ public class WuDevice implements Comparable<WuDevice>{
 			wuObjectMap.put(id, object);
 		}
 		
+	}
+	
+	public ImmutableList<WuClass> getHostableWuClass(FlowBasedProcess fbp) {
+		ImmutableList.Builder<WuClass> builder = ImmutableList.<WuClass>builder();
+		for(WuObject object : wuObjects) {
+			builder.add(fbp.getWuClass(object.getWuClassId()));
+		}
+		
+		return builder.build();
 	}
 	
 	public void reset(){

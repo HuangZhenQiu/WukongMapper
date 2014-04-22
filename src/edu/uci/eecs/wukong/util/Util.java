@@ -12,6 +12,14 @@ public class Util {
 		return builder.toString();
 	}
 	
+	public static double getReceivingEnergyConsumption(int bytes) {
+		return 50 * bytes;
+	}
+	
+	public static double getTransmissionEnergyConsumption(int bytes, double distance) {
+		return 50 * bytes + 0.01* bytes * distance * distance;
+	}
+	
 	public static String generateTransformedVariableId(Integer sourceClassId, Integer sourceDeviceId,
 			Integer destClassId, Integer destDeviceId) {
 		

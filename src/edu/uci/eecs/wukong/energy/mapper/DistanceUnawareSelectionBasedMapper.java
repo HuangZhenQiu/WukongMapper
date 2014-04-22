@@ -116,7 +116,7 @@ public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper
 	}
 	
 	/**
-	 * 
+	 * It is for hybrid maper to set the mapping decision from GreedyBasedMapper
 	 * 
 	 * @param problem
 	 */

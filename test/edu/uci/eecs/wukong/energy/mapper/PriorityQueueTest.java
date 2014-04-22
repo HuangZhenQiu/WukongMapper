@@ -53,8 +53,8 @@ public class PriorityQueueTest extends TestCase{
 	public void testEdgePriorityQueueUpdate() {
 		PriorityQueue<FlowBasedProcess.Edge> queue = new PriorityQueue<FlowBasedProcess.Edge>();
 		
-		FlowBasedProcess.Edge edge1 = new FlowBasedProcess.Edge(null, null, 2, 5);
-		FlowBasedProcess.Edge edge2 = new FlowBasedProcess.Edge(null, null, 10, 8);
+		FlowBasedProcess.Edge edge1 = new FlowBasedProcess.Edge(null, null, 10);
+		FlowBasedProcess.Edge edge2 = new FlowBasedProcess.Edge(null, null, 15);
 		
 		queue.add(edge1);
 		queue.add(edge2);

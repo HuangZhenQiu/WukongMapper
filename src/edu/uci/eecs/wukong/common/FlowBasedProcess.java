@@ -124,16 +124,18 @@ public class FlowBasedProcess {
 
 		private WuClass inWuClass;
 		private WuClass outWuClass;
-		private double transmissionEnergy;
+		private int dataVolumn; //bits
+		private double transmissionEnergy;  //distance unaware energy consumption
 		private double receivingEnergy;
 		private double weight;
 		private boolean isMerged;
 		
-		public Edge(WuClass inWuClass, WuClass outWuClass, double transmissionEnegery, double receivingEnergy) {
+		public Edge(WuClass inWuClass, WuClass outWuClass, int dataVolumn) {
 			this.inWuClass = inWuClass;
 			this.outWuClass = outWuClass;
-			this.transmissionEnergy = transmissionEnegery;
-			this.receivingEnergy = receivingEnergy;
+			this.dataVolumn = dataVolumn;
+			this.transmissionEnergy = 50 /*nJ/bit*/ * this.dataVolumn * 1.2 /*layout parameter*/ ;
+			this.receivingEnergy = 50 /*nJ/bit*/ * this.dataVolumn;
 			this.weight = this.transmissionEnergy + this.receivingEnergy;
 			this.isMerged = false;
 		}
@@ -158,6 +160,14 @@ public class FlowBasedProcess {
 				//this.weight = 0.0;
 				this.isMerged = true;
 			}
+		}
+		
+		public int getDataVolumn() {
+			return dataVolumn;
+		}
+
+		public void setDataVolumn(int dataVolumn) {
+			this.dataVolumn = dataVolumn;
 		}
 		
 		public WuClass getInWuClass() {
@@ -314,9 +324,8 @@ public class FlowBasedProcess {
 				StringTokenizer tokenizer = new StringTokenizer(content);
 				Integer inNode = Integer.parseInt(tokenizer.nextToken());
 				Integer outNode = Integer.parseInt(tokenizer.nextToken());
-				Double transmitCost = Double.parseDouble(tokenizer.nextToken());
-				Double receivingCost = Double.parseDouble(tokenizer.nextToken());
-				Edge edge = new Edge(wuClassMap.get(inNode), wuClassMap.get(outNode), transmitCost, receivingCost);
+				Integer dataVolumn = Integer.parseInt(tokenizer.nextToken());
+				Edge edge = new Edge(wuClassMap.get(inNode), wuClassMap.get(outNode), dataVolumn);
 				edges.add(edge);
 			}
 			
@@ -396,6 +405,14 @@ public class FlowBasedProcess {
 		}
 		
 		return builder.build();
+	}
+	
+	public ImmutableList<Edge> getInEdge(Integer wuClassId) {
+		return ImmutableList.<Edge>builder().addAll(this.inEdgeMap.get(wuClassId)).build();
+	}
+	
+	public ImmutableList<Edge> getOutEdge(Integer wuClassId) {
+		return ImmutableList.<Edge>builder().addAll(this.outEdgeMap.get(wuClassId)).build();
 	}
 	
 	public void reset() {
@@ -535,6 +552,10 @@ public class FlowBasedProcess {
 			
 			return wuClass.getEnergyCost();
 		}
+	}
+	
+	public WuClass getWuClass(Integer id) {
+		return this.wuClassMap.get(id);
 	}
 	
 	public ImmutableList<Edge> getMergableEdges(WukongSystem system) 

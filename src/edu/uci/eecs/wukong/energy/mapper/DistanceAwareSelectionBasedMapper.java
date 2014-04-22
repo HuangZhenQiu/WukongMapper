@@ -6,7 +6,9 @@ import net.sf.javailp.Problem;
 import net.sf.javailp.Operator;
 import net.sf.javailp.Result;
 import net.sf.javailp.VarType;
+
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
+import edu.uci.eecs.wukong.common.FlowBasedProcess.WuClass;
 import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.common.WukongSystem;
@@ -55,9 +57,13 @@ public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 	@Override
 	protected Problem buildProblem() {
 		Problem problem = new Problem();
-		
+		Linear linear = new Linear();
+
 		//add optimization target function
-		this.applyOptimizationGoal(problem);
+		linear.add(1, 'y');
+		problem.setObjective(linear, OptType.MIN);
+		
+		this.applyUpperBoundConstraints(problem);
 		
 		this.applyWuClassConstraints(problem);
 		
@@ -93,39 +99,68 @@ public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 	protected void applyWuDeviceEnergyConstraints(Problem problem) {
 		
 	}
-
 	
-	private void applyOptimizationGoal(Problem problem) {
-		
-		Linear linear = new Linear();
+	@Override
+	protected void applyUpperBoundConstraints(Problem problem) {
+		//for each device there is a upper bound constraint
+		for(WuDevice device : this.system.getDevices()) {
 
-		//add optimization target function
-		linear.add(1, 'y');
-		problem.setObjective(linear, OptType.MIN);
-		
-		//Go through every link of the FBP
-		for(Edge edge : this.fbp.getEdges()) {
-			Integer sourceClassId = edge.getInWuClass().getWuClassId();
-			Integer destClassId = edge.getOutWuClass().getWuClassId();
-			ImmutableList<WuDevice> sourceCandidates = this.system.findWudevice(sourceClassId);
-			ImmutableList<WuDevice> destCandidates = this.system.findWudevice(destClassId);
+			Linear linear = new Linear();
 			
-			//Go through every possible combination of deployment of the link
-			for(WuDevice sd : sourceCandidates) {
-				for(WuDevice td : destCandidates) {
-					String sourceVariable = Util.generateVariableId(sourceClassId, sd.getWuDeviceId());
-					String destVariable = Util.generateVariableId(destClassId, td.getWuDeviceId());
-					String transformed = Util.generateTransformedVariableId(sourceClassId, sd.getWuDeviceId(),
-							destClassId, td.getWuDeviceId());
-					transformedVariables.put(transformed, transformed);
-					
-					applyTransformedConstraints(problem, sourceVariable, destVariable, transformed);
-					
-					if(sd.getWuDeviceId() != td.getWuDeviceId()) { //does not deploy on the same device
-						linear.add(this.system.getDistance(sd, td), transformed);
+			//add consumption of wuclasses together
+			for(WuClass wuClass : device.getHostableWuClass(this.fbp)) {
+				ImmutableList<Edge> inEdges = this.fbp.getInEdge(wuClass.getWuClassId());
+				ImmutableList<Edge> outEdges = this.fbp.getOutEdge(wuClass.getWuClassId());
+				
+				//add receiving cost of inlink
+				for(Edge edge: inEdges) {
+					ImmutableList<WuDevice> outDevices = this.system.getPossibleHostDevice(edge.getOutWuClass().getWuClassId());
+					for(WuDevice outDevice: outDevices) {
+						if(!outDevice.equals(device)) {
+							
+							String sourceVariable = Util.generateVariableId(edge.getOutWuClass().getWuClassId(), outDevice.getWuDeviceId());
+							String destVariable = Util.generateVariableId(wuClass.getWuClassId(), device.getWuDeviceId());
+							String transformed = Util.generateTransformedVariableId(edge.getOutWuClass().getWuClassId(), outDevice.getWuDeviceId(),
+									wuClass.getWuClassId(), device.getWuDeviceId());
+							
+							if(transformedVariables.containsKey(transformed)) {
+								transformedVariables.put(transformed, transformed);
+								applyTransformedConstraints(problem, sourceVariable, destVariable, transformed);
+							}
+							
+							
+							//add receiving energy on device
+							linear.add(Util.getReceivingEnergyConsumption(edge.getDataVolumn()), transformed);
+						}
+					}
+				}
+				
+				//add transmission cost of outlink
+				for(Edge edge: outEdges) {
+					ImmutableList<WuDevice> inDevices = this.system.getPossibleHostDevice(edge.getInWuClass().getWuClassId());
+					for(WuDevice inDevice: inDevices) {
+						if(!inDevice.equals(device)) {
+							
+							String sourceVariable = Util.generateVariableId(wuClass.getWuClassId(), device.getWuDeviceId());
+							String destVariable = Util.generateVariableId(edge.getInWuClass().getWuClassId(), inDevice.getWuDeviceId());
+							String transformed = Util.generateTransformedVariableId(wuClass.getWuClassId(), device.getWuDeviceId(),
+									edge.getInWuClass().getWuClassId(), inDevice.getWuDeviceId());
+							
+							if(transformedVariables.containsKey(transformed)) {
+								transformedVariables.put(transformed, transformed);
+								applyTransformedConstraints(problem, sourceVariable, destVariable, transformed);
+							}
+							
+							
+							//add transmission energy on device
+							linear.add(Util.getTransmissionEnergyConsumption(edge.getDataVolumn(), system.getDistance(device, inDevice)), transformed);
+						}
 					}
 				}
 			}
+			
+			linear.add(-1, 'y');
+			problem.add(linear, Operator.LE, 0);
 		}
 	}
 	

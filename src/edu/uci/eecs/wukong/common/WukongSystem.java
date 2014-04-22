@@ -204,6 +204,10 @@ public class WukongSystem {
 	public ImmutableMap<Integer, List<WuDevice>> getWuClassDeviceMap() {
 		return ImmutableMap.<Integer, List<WuDevice>>builder().putAll(this.wuClassDeviceMap).build();
 	}
+	
+	public ImmutableList<WuDevice> getPossibleHostDevice(Integer wuClassId) {
+		return ImmutableList.<WuDevice>builder().addAll(wuClassDeviceMap.get(wuClassId)).build();
+	}
 
 	public int getDeviceNumber() {
 		
