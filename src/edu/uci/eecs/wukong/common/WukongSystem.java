@@ -106,6 +106,9 @@ public class WukongSystem {
 			this.deviceNumber = Integer.parseInt(tokenizer.nextToken());
 			this.landmarkNumber = Integer.parseInt(tokenizer.nextToken());
 			
+			//initialize the distance matrix;
+			this.distances =  new Double[deviceNumber][deviceNumber];
+			
 			for(int i=0; i<deviceNumber; i++) {
 				initializeWuDevice(input);
 			}
@@ -135,6 +138,11 @@ public class WukongSystem {
 			}
 			devices.add(device);
 			wuClassDeviceMap.put(id, devices);
+		}
+		
+		int id = device.getWuDeviceId() -1;
+		for(int i = 0; i < this.deviceNumber; i ++) {
+			distances[id][i] = device.getDeviceDistances().get(i); 
 		}
 		
 		return device;

@@ -45,7 +45,8 @@ public class WuKongSystemFactory {
 				}
 			}
 			
-			WuDevice device = new WuDevice(i + 1, 10000.0, objectIds, getRandomDistance(landMarkNumber, distanceRange) , system);
+			WuDevice device = new WuDevice(i + 1, 10000.0, objectIds, getRandomDistance(landMarkNumber, distanceRange),
+					getRandomDistance(landMarkNumber, distanceRange), system);
 			devices.add(device);
 		}
 		

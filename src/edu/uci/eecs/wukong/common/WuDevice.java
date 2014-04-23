@@ -59,6 +59,8 @@ public class WuDevice implements Comparable<WuDevice>{
 	
 	//Distance to landmark
 	private List<Double> distances;
+	
+	private List<Double> deviceDistances;
 	private Double energyConstraint;
 	private Double initialConsumption;
 	private Double currentConsumption;
@@ -77,6 +79,7 @@ public class WuDevice implements Comparable<WuDevice>{
 		this.wuObjects = new ArrayList<WuObject>();
 		this.wuObjectMap = new HashMap<Integer, WuObject>();
 		this.distances = new ArrayList<Double>();
+		this.deviceDistances = new ArrayList<Double>();
 		this.system = system;
 	}
 	
@@ -87,7 +90,8 @@ public class WuDevice implements Comparable<WuDevice>{
 	 * @param energyConstraint
 	 * @param distances
 	 */
-	public WuDevice(int wuDeviceId, Double energyConstraint, List<Integer> wuClassIds, List<Double> distances,  WukongSystem system){
+	public WuDevice(int wuDeviceId, Double energyConstraint, List<Integer> wuClassIds, List<Double> distances,
+			List<Double> deviceDistances,  WukongSystem system){
 		this.wuDeviceId =  wuDeviceId;
 		this.energyConstraint = energyConstraint;
 		this.currentConsumption = 0.0;
@@ -95,6 +99,7 @@ public class WuDevice implements Comparable<WuDevice>{
 		this.wuObjects = new ArrayList<WuObject>();
 		this.wuObjectMap = new HashMap<Integer, WuObject>();
 		this.distances = distances;
+		this.deviceDistances = deviceDistances;
 		this.system = system;
 		
 		for (Integer id: wuClassIds) {
@@ -152,6 +157,14 @@ public class WuDevice implements Comparable<WuDevice>{
 		while (tokenizer.hasMoreTokens()) {
 			Double distance = Double.parseDouble(tokenizer.nextToken());
 			distances.add(distance);
+		}
+		
+		//read distance to devices
+		content = input.readLine();
+		tokenizer = new StringTokenizer(content);
+		while (tokenizer.hasMoreTokens()) {
+			Double distance = Double.parseDouble(tokenizer.nextToken());
+			deviceDistances.add(distance);
 		}
 	}
 	
@@ -317,6 +330,14 @@ public class WuDevice implements Comparable<WuDevice>{
 
 	public Double getEnergyConstraint() {
 		return energyConstraint;
+	}
+
+	public List<Double> getDeviceDistances() {
+		return deviceDistances;
+	}
+
+	public void setDeviceDistances(List<Double> deviceDistances) {
+		this.deviceDistances = deviceDistances;
 	}
 	
 	

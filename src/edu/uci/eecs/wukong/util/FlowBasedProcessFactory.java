@@ -21,18 +21,16 @@ public class FlowBasedProcessFactory {
 	private int landMarkNumber;
 	private int classNumber;
 	private int distanceRange;
-	private int weightRange;
-	private double ratio; // transmitcost / transmitcost + receivingcost
+	private int dataVolumnRange;
 	
 	private GraphGenerator generator;
 	
 	public FlowBasedProcessFactory(int landMarkNumber, int classNumber,
-			int distanceRange, int weightRange, double ratio) {
+			int distanceRange, int dataVolumnRange) {
 		this.landMarkNumber = landMarkNumber;
 		this.classNumber = classNumber;
 		this.distanceRange = distanceRange;
-		this.weightRange = weightRange;
-		this.ratio = ratio;
+		this.dataVolumnRange = dataVolumnRange;
 		this.generator = new GraphGenerator();
 	}
 	
@@ -86,11 +84,11 @@ public class FlowBasedProcessFactory {
 			DefaultEdge edge = edgeIterator.next();
 			Object source = graph.getEdgeSource(edge);
 			Object target = graph.getEdgeTarget(edge);
-			random.setSeed(weightRange + System.nanoTime());
+			random.setSeed(dataVolumnRange + System.nanoTime());
 			//The meaning of weight becomes data volumn
-			Integer weight = Math.abs(random.nextInt()) % weightRange;
+			Integer weight = Math.abs(random.nextInt()) % dataVolumnRange;
 			while(weight == 0) {
-				weight = Math.abs(random.nextInt()) % weightRange;
+				weight = Math.abs(random.nextInt()) % dataVolumnRange;
 			}
 			Edge fbpEdge = new Edge(objectMap.get(source), objectMap.get(target), weight);
 			edges.add(fbpEdge);
