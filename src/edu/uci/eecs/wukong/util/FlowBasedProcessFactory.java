@@ -127,7 +127,7 @@ public class FlowBasedProcessFactory {
 		Integer landMarkId = Math.abs(random.nextInt()) % landMarkNumber;
 		
 		random.setSeed(range + System.nanoTime());
-		Double distance = Math.abs(random.nextDouble()) % range;
+		Double distance = new Double(Math.abs(random.nextInt() % range)) + 30;
 		
 		return new LocationConstraint(landMarkId, distance);
 	}

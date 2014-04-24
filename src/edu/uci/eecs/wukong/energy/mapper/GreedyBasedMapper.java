@@ -22,23 +22,25 @@ public class GreedyBasedMapper extends AbstractMapper{
 		super(system, fbp, type);
 	}
 	
-	public void map() {
+	public boolean map() {
 		
 		if (system == null || fbp == null) {
 			System.out.println("Wukong System or FBP is null.");
-			return;
+			return false;
 		}
 		
 		if (system.getDeviceNumber() == 0 || system.getWuClassNunber() == 0 ) {
 			System.out.println("There is no device or wuclass within the wuclass system.");
-			return;
+			return false;
 		}
 		
 		if (fbp.getEdgeNumber() == 0) {
 			System.out.println("There is no edge within the fbp.");
 		}
 		
-		system.deploy(fbp);
+		if(!system.deploy(fbp)){
+			return false;
+		}
 		
 		if(fbp.isDeployed()) {
 			//fbp.print();
@@ -47,6 +49,8 @@ public class GreedyBasedMapper extends AbstractMapper{
 			System.out.println("FBP is not successfully deployed.");
 			//fbp.print();
 		}
+		
+		return true;
 	}
 	
 	public static void main(String argues[]) {

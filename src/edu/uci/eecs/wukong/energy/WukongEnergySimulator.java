@@ -19,8 +19,8 @@ public class WukongEnergySimulator {
 	
 	public WukongEnergySimulator() {
 		//WukongProperties.getProperty();
-		this.fbpFactory = new FlowBasedProcessFactory(10, 50, 100 /**distance range**/, 100 /**weight**/);
-		this.wukongFactory = new WuKongSystemFactory(50, 30, 10, 100);
+		this.fbpFactory = new FlowBasedProcessFactory(10, 20, 100 /**distance range**/, 100 /**weight**/);
+		this.wukongFactory = new WuKongSystemFactory(20, 20, 10, 100);
 	}
 	
 	public void run() {
@@ -45,7 +45,9 @@ public class WukongEnergySimulator {
 			double initialTotal = fbp.getTotalEnergyConsumption();
 			
 			GreedyBasedMapper greedyMapper = new GreedyBasedMapper(system, fbp, MapType.ONLY_LOCATION);
-			greedyMapper.map();
+			if(!greedyMapper.map()) {
+				continue;
+			}
 			
 			System.out.println("After Greedy Map!");
 			System.out.println("Largest Device Energy Consumption: " + system.getLargestDeviceEnergtConsumption());
@@ -60,7 +62,7 @@ public class WukongEnergySimulator {
 			//System.out.println(fbp.getTotalEnergyConsumption());
 			//System.out.println("System Total Energy Consumption: " + system.getTotalEnergyConsumption());
 			long start = System.currentTimeMillis();
-			HybridMapper hybridMapper = new HybridMapper(system, fbp, MapType.ONLY_LOCATION, 200);
+			HybridMapper hybridMapper = new HybridMapper(system, fbp, MapType.ONLY_LOCATION, 20000);
 			hybridMapper.map();
 			long end = System.currentTimeMillis();
 			hybridExecutionTime += end - start;
@@ -78,7 +80,7 @@ public class WukongEnergySimulator {
 			//System.out.println("After reset!");
 			//System.out.println(fbp.getTotalEnergyConsumption());
 			//System.out.println(system.getTotalEnergyConsumption());
-			DistanceUnawareSelectionBasedMapper mapper = new DistanceUnawareSelectionBasedMapper(system, fbp, MapType.ONLY_LOCATION, 200);
+			DistanceUnawareSelectionBasedMapper mapper = new DistanceUnawareSelectionBasedMapper(system, fbp, MapType.ONLY_LOCATION, 20000);
 			mapper.map();
 			System.out.println("After Selection Map!");
 			//System.out.println(fbp.getTotalEnergyConsumption());
@@ -93,12 +95,18 @@ public class WukongEnergySimulator {
 			fbp.reset();
 			system.reset();
 			
-			DistanceAwareSelectionBasedMapper distanceMapper = new DistanceAwareSelectionBasedMapper(system, fbp, MapType.ONLY_LOCATION, 200, false);
+			DistanceAwareSelectionBasedMapper distanceMapper = new DistanceAwareSelectionBasedMapper(system, fbp, MapType.ONLY_LOCATION, 20000, false);
 			distanceMapper.map();
 			
 			double distanceSelectionTotal = fbp.getDistanceAwareTotalEnergyConsumption(system);
 			double distanceSelectionLargest = distanceMapper.getLagestDeviceEnergyConsumption();
 			distanceSelectionTotalRatio += distanceSelectionTotal/initialTotal;
+			
+			System.out.println("After Distance Selection Map!");
+			//System.out.println(fbp.getTotalEnergyConsumption());
+			System.out.println("Largest Device Energy Consumption: " + system.getLargestDeviceEnergtConsumption());
+			System.out.println("System Total Energy Consumption: " + system.getTotalEnergyConsumption());
+			
 		
 			double largest = Math.max(Math.max(greedyLargest, Math.max(hybridLargest, selectionLargest)), distanceSelectionLargest);
 			greedyLargestRatio +=  greedyLargest/largest;

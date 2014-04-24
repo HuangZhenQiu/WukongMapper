@@ -9,5 +9,5 @@ public interface Mapper {
 		ONLY_ENERGY;
 	}
 	
-	public void map();
+	public boolean map();
 }

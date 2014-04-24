@@ -34,8 +34,8 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void map() {
-		
+	public boolean map() {
+		return false;
 	}
 	
 	private ImmutableList<Edge> merge() {

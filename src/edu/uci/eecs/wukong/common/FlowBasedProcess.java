@@ -135,7 +135,7 @@ public class FlowBasedProcess {
 			this.inWuClass = inWuClass;
 			this.outWuClass = outWuClass;
 			this.dataVolumn = dataVolumn;
-			this.transmissionEnergy = 50 /*nJ/bit*/ * this.dataVolumn * 1.2 /*layout parameter*/ ;
+			this.transmissionEnergy = 50 /*nJ/bit*/ * this.dataVolumn * 1.4 /*layout parameter*/ ;
 			this.receivingEnergy = 50 /*nJ/bit*/ * this.dataVolumn;
 			this.weight = this.transmissionEnergy + this.receivingEnergy;
 			this.isMerged = false;

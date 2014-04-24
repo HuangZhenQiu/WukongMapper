@@ -57,11 +57,12 @@ public class WukongSystem {
 		initializeMap(this.devices);
 	}
 	
-	public void initialize(List<WuDevice> devices, int wuClassNumber, int landmarkNumber) {
+	public void initialize(List<WuDevice> devices, Double[][] distances, int wuClassNumber, int landmarkNumber) {
 		this.wuClassNumber = wuClassNumber;
 		this.landmarkNumber = landmarkNumber;
 		this.devices.addAll(devices);
-		this.distances = new Double[this.devices.size()][this.devices.size()];
+		this.deviceNumber = this.devices.size();
+		this.distances = distances;
 		initializeMap(this.devices);
 	}
 	
@@ -375,7 +376,6 @@ public class WukongSystem {
 			
 			
 			if (!edge.isFullDeployed()) {
-				System.out.println("dede");
 				System.out.println("Edge <" + edge.getInWuClass().getWuClassId() + ", " + edge.getOutWuClass().getWuClassId() + "> is undepoyable.");
 				return false;
 			}

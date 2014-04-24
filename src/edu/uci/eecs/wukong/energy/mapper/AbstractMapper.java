@@ -17,6 +17,6 @@ public abstract class AbstractMapper implements Mapper {
 		this.type = type;
 	}
 
-	public abstract void map();
+	public abstract boolean map();
 
 }

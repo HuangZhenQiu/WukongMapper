@@ -29,11 +29,10 @@ public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper
 	
 	@Override
 	protected void applyResult(Result result) {
-
+		
 		Set<String> variableIds= variables.keySet();
 		ImmutableList<Integer> classes= fbp.getPreDeployedWuClasses();
 		for(String variableId : variableIds) {
-			
 			if(result.getBoolean(variableId)) {
 				Integer wuClassId = Util.getWuClassIdFromVariableId(variableId);
 				Integer wuDeviceId = Util.getWuDeviceIdFromVariableId(variableId);

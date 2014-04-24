@@ -36,16 +36,16 @@ public abstract class AbstractSelectionMapper extends AbstractMapper {
 	}
 
 	@Override
-	public void map() {
+	public boolean map() {
 		
 		if (system == null || fbp == null) {
 			System.out.println("Wukong System or FBP is null.");
-			return;
+			return false;
 		}
 		
 		if (system.getDeviceNumber() == 0 || system.getWuClassNunber() == 0 ) {
 			System.out.println("There is no device or wuclass within the wuclass system.");
-			return;
+			return false;
 		}
 		
 		if (fbp.getEdgeNumber() == 0) {
@@ -60,14 +60,36 @@ public abstract class AbstractSelectionMapper extends AbstractMapper {
 		//System.out.println(result);
 		applyResult(result);
 		//System.out.println("System total energy consumption is:" + system.getTotalEnergyConsumption());
+		
+		return true;
 	}
 	
-	/**
-	 * Apply the upper bound of energy consumption of particular device.
+	
+	/***
+	 * It is constraints can be used for energy harvesting, so that devices can have a
+	 * upper bound for energy usage.
+	 * 
 	 * 
 	 * @param problem
 	 */
-	protected abstract void applyWuDeviceEnergyConstraints(Problem problem);
+	protected void applyWuDeviceEnergyConstraints(Problem problem) {
+		
+		ImmutableList<WuDevice> wuDevices= system.getDevices();
+		
+		for(WuDevice device : wuDevices) {
+			ImmutableList<Integer> classIds= device.getAllWuObjectId();
+			
+			Linear linear = new Linear();
+			for(Integer classId : classIds) {
+				Double energyCost = fbp.getWuClassEnergyConsumption(classId);
+				String varName = Util.generateVariableId(classId, device.getWuDeviceId());
+				linear.add(energyCost,  varName);
+				variables.put(varName, varName);
+			}
+
+			problem.add(linear, Operator.LE, device.getEnergyConstraint());
+		}
+	}
 	
 	
 	/**
