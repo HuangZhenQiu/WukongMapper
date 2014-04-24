@@ -6,7 +6,6 @@ import net.sf.javailp.Problem;
 import net.sf.javailp.Operator;
 import net.sf.javailp.Result;
 import net.sf.javailp.VarType;
-
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.WuClass;
 import edu.uci.eecs.wukong.common.WuDevice;
@@ -45,12 +44,14 @@ import com.google.common.collect.ImmutableList;
 
 public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 	private boolean relaxation;
+	private double lagestDeviceEnergyConsumption;
 	private HashMap<String, String> transformedVariables;
 	
 	public DistanceAwareSelectionBasedMapper(WukongSystem system,
 			FlowBasedProcess fbp, MapType type, int timeout, boolean relaxation) {
 		super(system, fbp, type, timeout);
 		this.relaxation = relaxation;
+		this.lagestDeviceEnergyConsumption = 0.0;
 		this.transformedVariables = new HashMap<String, String> ();
 	}
 
@@ -60,7 +61,7 @@ public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 		Linear linear = new Linear();
 
 		//add optimization target function
-		linear.add(1, 'y');
+		linear.add(1.0, 'y');
 		problem.setObjective(linear, OptType.MIN);
 		
 		this.applyUpperBoundConstraints(problem);
@@ -84,6 +85,15 @@ public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 			}
 		}
 		
+		Set<String> transformedNames= transformedVariables.keySet();
+		for(String name : transformedNames) {
+			if(relaxation) {
+				problem.setVarType(name, VarType.REAL);
+			} else {
+				problem.setVarType(name, VarType.BOOL);
+			}
+		}
+		
 		//System.out.println(problem.toString());
 		
 		return problem;
@@ -93,7 +103,31 @@ public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 	protected void applyResult(Result result) {
 		// TODO Distinguish the ILP and relaxed Linear Programming cases
 		
+		//System.out.println(result.toString());
+		Set<String> variableIds= variables.keySet();
+		for(String variableId : variableIds) {
+			if(result.getBoolean(variableId) && !Util.isTransformedVariable(variableId)) {
+				
+				Integer wuClassId = Util.getWuClassIdFromVariableId(variableId);
+				Integer wuDeviceId = Util.getWuDeviceIdFromVariableId(variableId);
+				this.fbp.deploy(wuClassId, wuDeviceId);
+				this.system.deploy(wuDeviceId, wuClassId);
+			}
+		}
+		
+		//in case select two sensor in the same device
+		fbp.merge();
+		
+		lagestDeviceEnergyConsumption = result.get('y').doubleValue();
+		
 	}
+	
+	protected HashMap<String, Boolean> roundUp(Result result) {
+		// TODO heuristic algorithm and round up should be defined here
+		
+		return new HashMap<String, Boolean>();
+	}
+	
 	
 	@Override
 	protected void applyWuDeviceEnergyConstraints(Problem problem) {
@@ -114,16 +148,16 @@ public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 				
 				//add receiving cost of inlink
 				for(Edge edge: inEdges) {
-					ImmutableList<WuDevice> outDevices = this.system.getPossibleHostDevice(edge.getOutWuClass().getWuClassId());
+					ImmutableList<WuDevice> outDevices = this.system.getPossibleHostDevice(edge.getInWuClass().getWuClassId());
 					for(WuDevice outDevice: outDevices) {
 						if(!outDevice.equals(device)) {
 							
-							String sourceVariable = Util.generateVariableId(edge.getOutWuClass().getWuClassId(), outDevice.getWuDeviceId());
+							String sourceVariable = Util.generateVariableId(edge.getInWuClass().getWuClassId(), outDevice.getWuDeviceId());
 							String destVariable = Util.generateVariableId(wuClass.getWuClassId(), device.getWuDeviceId());
-							String transformed = Util.generateTransformedVariableId(edge.getOutWuClass().getWuClassId(), outDevice.getWuDeviceId(),
+							String transformed = Util.generateTransformedVariableId(edge.getInWuClass().getWuClassId(), outDevice.getWuDeviceId(),
 									wuClass.getWuClassId(), device.getWuDeviceId());
 							
-							if(transformedVariables.containsKey(transformed)) {
+							if(!transformedVariables.containsKey(transformed)) {
 								transformedVariables.put(transformed, transformed);
 								applyTransformedConstraints(problem, sourceVariable, destVariable, transformed);
 							}
@@ -137,16 +171,16 @@ public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 				
 				//add transmission cost of outlink
 				for(Edge edge: outEdges) {
-					ImmutableList<WuDevice> inDevices = this.system.getPossibleHostDevice(edge.getInWuClass().getWuClassId());
+					ImmutableList<WuDevice> inDevices = this.system.getPossibleHostDevice(edge.getOutWuClass().getWuClassId());
 					for(WuDevice inDevice: inDevices) {
 						if(!inDevice.equals(device)) {
 							
 							String sourceVariable = Util.generateVariableId(wuClass.getWuClassId(), device.getWuDeviceId());
-							String destVariable = Util.generateVariableId(edge.getInWuClass().getWuClassId(), inDevice.getWuDeviceId());
+							String destVariable = Util.generateVariableId(edge.getOutWuClass().getWuClassId(), inDevice.getWuDeviceId());
 							String transformed = Util.generateTransformedVariableId(wuClass.getWuClassId(), device.getWuDeviceId(),
-									edge.getInWuClass().getWuClassId(), inDevice.getWuDeviceId());
+									edge.getOutWuClass().getWuClassId(), inDevice.getWuDeviceId());
 							
-							if(transformedVariables.containsKey(transformed)) {
+							if(!transformedVariables.containsKey(transformed)) {
 								transformedVariables.put(transformed, transformed);
 								applyTransformedConstraints(problem, sourceVariable, destVariable, transformed);
 							}
@@ -192,12 +226,22 @@ public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 		
 		// 4) 1 - x_i_n - x_j_m + y_i_n_j_m  >=0
 		linear = new Linear();
-		linear.add(1, 1);
 		linear.add(-1, source);
 		linear.add(-1, desct);
 		linear.add(1, transformed);
-		problem.add(linear, Operator.GE, 0);
+		problem.add(linear, Operator.GE, -1);
 		
 		
 	}
+
+	public double getLagestDeviceEnergyConsumption() {
+		return lagestDeviceEnergyConsumption;
+	}
+
+	public void setLagestDeviceEnergyConsumption(
+			double lagestDeviceEnergyConsumption) {
+		this.lagestDeviceEnergyConsumption = lagestDeviceEnergyConsumption;
+	}
+	
+	
 }

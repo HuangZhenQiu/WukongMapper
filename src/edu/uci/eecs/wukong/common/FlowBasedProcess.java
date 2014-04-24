@@ -7,12 +7,13 @@ import java.util.StringTokenizer;
 import java.util.Collection;
 import java.util.Set;
 import java.util.Iterator;
-
 import java.lang.Comparable;
 import java.io.BufferedReader;
 import java.io.IOException;
 
 import com.google.common.collect.ImmutableList;
+
+import edu.uci.eecs.wukong.util.Util;
 
 
 /**
@@ -333,7 +334,7 @@ public class FlowBasedProcess {
 			
 			System.out.println("Error in initialize FBP from file");
 			System.exit(-1);
-		}
+		} 
 		
 
 		this.setupMaps();
@@ -408,11 +409,23 @@ public class FlowBasedProcess {
 	}
 	
 	public ImmutableList<Edge> getInEdge(Integer wuClassId) {
-		return ImmutableList.<Edge>builder().addAll(this.inEdgeMap.get(wuClassId)).build();
+		List<Edge> edges = this.inEdgeMap.get(wuClassId);
+		
+		if(edges != null) {
+			return ImmutableList.<Edge>builder().addAll(edges).build();
+		} 
+		
+		return ImmutableList.<Edge>builder().build();
 	}
 	
 	public ImmutableList<Edge> getOutEdge(Integer wuClassId) {
-		return ImmutableList.<Edge>builder().addAll(this.outEdgeMap.get(wuClassId)).build();
+		List<Edge> edges = this.outEdgeMap.get(wuClassId);
+		
+		if(edges != null) {
+			return ImmutableList.<Edge>builder().addAll(edges).build();
+		} 
+		
+		return ImmutableList.<Edge>builder().build();
 	}
 	
 	public void reset() {
@@ -517,6 +530,22 @@ public class FlowBasedProcess {
 		}
 		return total;
 	}
+	
+	public Double getDistanceAwareTotalEnergyConsumption(WukongSystem system) {
+		Double total = 0.0;
+		for (Edge edge: this.edges) {
+			
+			if(edge.getInWuClass().isDeployed() && edge.getOutWuClass().isDeployed()) {
+				if(!edge.isMerged()) {
+					total += Util.getTransmissionEnergyConsumption(edge.getDataVolumn(),
+							system.getDistance(edge.getInWuClass().getDeviceId(), edge.getOutWuClass().getDeviceId()));
+					total += Util.getReceivingEnergyConsumption(edge.getDataVolumn());
+				}
+			}
+		}
+		return total;
+	}
+	
 	
 	public Double getWuClassEnergyConsumption(Integer classId) {
 		

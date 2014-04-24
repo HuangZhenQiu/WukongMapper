@@ -30,6 +30,14 @@ public class Util {
 		return builder.toString();
 	}
 	
+	public static boolean isTransformedVariable(String name) {
+		if(name.startsWith("y")){
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public static Integer getWuClassIdFromVariableId(String variableId) {
 
 		String[] items = variableId.split("_");

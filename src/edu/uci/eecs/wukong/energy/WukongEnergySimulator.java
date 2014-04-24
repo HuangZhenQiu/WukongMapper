@@ -4,6 +4,7 @@ import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.energy.mapper.DistanceUnawareSelectionBasedMapper;
+import edu.uci.eecs.wukong.energy.mapper.DistanceAwareSelectionBasedMapper;
 import edu.uci.eecs.wukong.energy.mapper.HybridMapper;
 import edu.uci.eecs.wukong.energy.mapper.GreedyBasedMapper;
 import edu.uci.eecs.wukong.energy.mapper.Mapper.MapType;
@@ -27,10 +28,12 @@ public class WukongEnergySimulator {
 		double greedyTotalRatio = 0.0;
 		double hybridTotalRatio = 0.0;
 		double selectionTotalRatio = 0.0;
+		double distanceSelectionTotalRatio = 0.0;
 		
 		double greedyLargestRatio = 0.0 ;
 		double hybridLargestRatio = 0.0;
 		double selectionLargestRatio = 0.0;
+		double distanceSelectionLargestRatio = 0.0;
 		
 		long hybridExecutionTime = 0;
 		
@@ -86,16 +89,26 @@ public class WukongEnergySimulator {
 			double selectionTotal = system.getTotalEnergyConsumption();
 			double selectionLargest = system.getLargestDeviceEnergtConsumption();
 			selectionTotalRatio += selectionTotal/initialTotal;
+			
+			fbp.reset();
+			system.reset();
+			
+			DistanceAwareSelectionBasedMapper distanceMapper = new DistanceAwareSelectionBasedMapper(system, fbp, MapType.ONLY_LOCATION, 200, false);
+			distanceMapper.map();
+			
+			double distanceSelectionTotal = fbp.getDistanceAwareTotalEnergyConsumption(system);
+			double distanceSelectionLargest = distanceMapper.getLagestDeviceEnergyConsumption();
+			distanceSelectionTotalRatio += distanceSelectionTotal/initialTotal;
 		
-			double largest = Math.max(greedyLargest, Math.max(hybridLargest, selectionLargest));
+			double largest = Math.max(Math.max(greedyLargest, Math.max(hybridLargest, selectionLargest)), distanceSelectionLargest);
 			greedyLargestRatio +=  greedyLargest/largest;
 			hybridLargestRatio += hybridLargest/largest;
 			selectionLargestRatio += selectionLargest/largest;
-			
+			distanceSelectionLargestRatio += distanceSelectionLargest/largest;
 		}
 		
-		System.out.println(greedyTotalRatio/ 100 + "     "+ hybridTotalRatio/ 100 + "     "+ selectionTotalRatio / 100);
-		System.out.println(greedyLargestRatio/ 100 + "     "+ hybridLargestRatio/ 100 + "     "+ selectionLargestRatio / 100);
+		System.out.println(greedyTotalRatio/ 100 + "     "+ hybridTotalRatio/ 100 + "     "+ selectionTotalRatio / 100 + "       " + distanceSelectionTotalRatio / 100);
+		System.out.println(greedyLargestRatio/ 100 + "     "+ hybridLargestRatio/ 100 + "     "+ selectionLargestRatio / 100 + "     " + distanceSelectionLargestRatio/100);
 		
 		//System.out.println(hybridTotalRatio/ 100);
 		//System.out.println(hybridLargestRatio/ 100);

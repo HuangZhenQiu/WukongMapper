@@ -113,6 +113,7 @@ public class WuDevice implements Comparable<WuDevice>{
 	public ImmutableList<WuClass> getHostableWuClass(FlowBasedProcess fbp) {
 		ImmutableList.Builder<WuClass> builder = ImmutableList.<WuClass>builder();
 		for(WuObject object : wuObjects) {
+			if(fbp.getWuClass(object.getWuClassId())!=null)
 			builder.add(fbp.getWuClass(object.getWuClassId()));
 		}
 		

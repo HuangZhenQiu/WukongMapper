@@ -158,6 +158,15 @@ public class WukongSystem {
 		return distances[source.getWuDeviceId() - 1][dest.getWuDeviceId() - 1]; // Ids start from 1
 	}
 	
+	public Double getDistance(int source, int dest) {
+		if((1<= source && source <=this.deviceNumber.intValue())
+				&& (1<= dest && dest <= this.deviceNumber)) {
+			return distances[source - 1][dest - 1]; // Ids start from 1
+		}
+		
+		return 0.0;
+	}
+	
 	public ImmutableList<WuDevice> findWudevice(int wuClassId) {
 		ImmutableList.Builder<WuDevice> builder = ImmutableList.<WuDevice>builder();
 		for(WuDevice device : this.devices) {
@@ -267,7 +276,7 @@ public class WukongSystem {
 		while (edgeQueue.size() > 0){
 			currentEdge = edgeQueue.poll();
 			
-			//if both two end is unployed
+			//if both two end is undeployed
 			if (currentEdge.isUndeployed()) {
 				
 				Iterator<WuDevice> itr = deviceQueue.iterator();
