@@ -125,6 +125,7 @@ public class FlowBasedProcess {
 
 		private WuClass inWuClass;
 		private WuClass outWuClass;
+		private List<WuDevice> targetDevices;
 		private int dataVolumn; //bits
 		private double transmissionEnergy;  //distance unaware energy consumption
 		private double receivingEnergy;
@@ -163,6 +164,14 @@ public class FlowBasedProcess {
 			}
 		}
 		
+		public List<WuDevice> getTargetDevices() {
+			return targetDevices;
+		}
+
+		public void setTargetDevices(List<WuDevice> targetDevices) {
+			this.targetDevices = targetDevices;
+		}
+
 		public int getDataVolumn() {
 			return dataVolumn;
 		}
