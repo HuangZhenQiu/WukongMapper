@@ -12,9 +12,9 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.WuClass;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.LocationConstraint;
+import edu.uci.eecs.wukong.common.WuClass;
 
 public class FlowBasedProcessFactory {
 	

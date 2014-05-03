@@ -1,15 +1,15 @@
 package edu.uci.eecs.wukong.common;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.StringTokenizer;
-
-import edu.uci.eecs.wukong.common.FlowBasedProcess.WuClass;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -250,6 +250,20 @@ public class WukongSystem {
 			}
 		}
 		
+		return false;
+	}
+	
+	public boolean isHostable(Set<Integer> done){
+		for(WuDevice device: devices){
+			Set<Integer> wuobjects = new HashSet<Integer>();
+			for(Integer integer: device.getAllWuObjectId()){
+				wuobjects.add(integer);
+			}
+			
+			if (wuobjects.containsAll(done)) {
+				return true;
+			}
+		}
 		return false;
 	}
 	

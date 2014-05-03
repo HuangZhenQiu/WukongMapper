@@ -7,7 +7,7 @@ import net.sf.javailp.Operator;
 import net.sf.javailp.Result;
 import net.sf.javailp.VarType;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.WuClass;
+import edu.uci.eecs.wukong.common.WuClass;
 import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.common.WukongSystem;

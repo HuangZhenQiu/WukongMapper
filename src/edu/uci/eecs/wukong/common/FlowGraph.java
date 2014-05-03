@@ -1,7 +1,6 @@
 package edu.uci.eecs.wukong.common;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.WuClass;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,55 +9,21 @@ import java.util.HashSet;
 
 public class FlowGraph {
 	
-	public static class EdgeNode {
-		protected static int currentId = 0;
-		private int id;
-		private Edge edge;
-		private double weight;
-		
-		public EdgeNode(Edge edge) {
-			this.id = currentId++;
-			this.edge = edge;
-			this.weight = edge.getWeight();
-		}
-
-		public int getId() {
-			return id;
-		}
-
-		public void setId(int id) {
-			this.id = id;
-		}
-
-		public Edge getEdge() {
-			return edge;
-		}
-
-		public void setEdge(Edge edge) {
-			this.edge = edge;
-		}
-
-		public double getWeight() {
-			return weight;
-		}
-
-		public void setWeight(double weight) {
-			this.weight = weight;
-		}
-		
-		
-	}
+	
 	
 	private Set<Integer> wuClassSet;
 	private List<Edge> edges;
-	
+	public List<Edge> getEdges(){
+		return edges;
+	}
 	public FlowGraph() {
 		wuClassSet = new HashSet<Integer>();
 		edges =  new ArrayList<Edge>();
 	}
 	
 	public void addEdge(Edge edge) {
-		if(!edges.contains(edge) && isConnect(edge)) {
+		if(!edges.contains(edge)) {
+//		if(!edges.contains(edge) && isConnect(edge)) {
 			edges.add(edge);
 			wuClassSet.add(edge.getInWuClass().getWuClassId());
 			wuClassSet.add(edge.getOutWuClass().getWuClassId());
@@ -84,5 +49,16 @@ public class FlowGraph {
 	public void merge(FlowGraph newGraph) {
 		wuClassSet.addAll(newGraph.wuClassSet);
 		edges.addAll(newGraph.edges);
+	}
+	
+	public void print(){
+		System.out.print("Flowgraph:");
+		for(Integer wuclass : wuClassSet){
+			System.out.print(wuclass + " ");
+		}
+		System.out.println("");
+		for(int i = 0; i < edges.size(); i++){
+			System.out.println("Edge<" + edges.get(i).getInWuClass().getWuClassId() + ", " + edges.get(i).getOutWuClass().getWuClassId() + ">");
+		}
 	}
 }

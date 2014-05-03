@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.lang.Comparable;
 
-import edu.uci.eecs.wukong.common.FlowBasedProcess.WuClass;
-
 import com.google.common.collect.ImmutableList;
 
 /**
