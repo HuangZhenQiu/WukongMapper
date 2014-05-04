@@ -39,4 +39,8 @@ public class CollocationGraphNode {
 	public void setWeight(double weight) {
 		this.mWeight = weight;
 	}
+	
+	public boolean equal(CollocationGraphNode node){
+		return (this.getNodeId() == node.getNodeId());
+	}
 }
