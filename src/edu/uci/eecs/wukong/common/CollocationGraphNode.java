@@ -4,14 +4,14 @@ import java.util.HashSet;
 
 import edu.uci.eecs.wukong.util.ObjectCloner;
 
+/*
+ * Each collocation node represents a way to do merge on original FBP.
+ * 
+ */
 public class CollocationGraphNode {
+	private static int id = 0; 
+	private int nodeId;
 
-	private int mNodeId = 0;
-
-	/*
-	 * 
-	 * Each collocation node represents a way to do merge on original FBP.
-	 */
 	private HashSet<Integer> mWuClasses = new HashSet<Integer>();
 	private double mWeight = 0.0;
 	private int degree = 0;
@@ -20,6 +20,7 @@ public class CollocationGraphNode {
 			double amountOfSavingEnergy) {
 		this.mWeight = amountOfSavingEnergy;
 		this.mWuClasses = (HashSet<Integer>) ObjectCloner.deepCopy(wuclasses);
+		this.nodeId = id++;
 	}
 
 	public HashSet<Integer> getInvolveWuClasses() {
@@ -27,7 +28,7 @@ public class CollocationGraphNode {
 	}
 
 	public int getNodeId() {
-		return mNodeId;
+		return nodeId;
 	}
 
 	public void increaseDegree() {
@@ -43,7 +44,7 @@ public class CollocationGraphNode {
 	}
 
 	public void setNodeId(int id) {
-		this.mNodeId = id;
+		this.nodeId = id;
 	}
 
 	public double getWeight() {

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
-import edu.uci.eecs.wukong.util.ObjectCloner;
 
 public class CollocationGraph {
 	private ArrayList<CollocationGraphNode> mNodes;
@@ -40,7 +39,7 @@ public class CollocationGraph {
 				CollocationGraphNode node1 = mNodes.get(i);
 				CollocationGraphNode node2 = mNodes.get(j);
 	    		
-				if (getIntersection(node1, node2).size() != 0) { //有交集
+				if (getIntersection(node1, node2).size() != 0) { //嚙踝蕭嚙賣集
 					HashSet<Integer> union = getUnion(node1, node2);
 	    			if(!system.isHostable(union)){
 	    				CollocationGraphEdge edge = new CollocationGraphEdge(node1, node2);
@@ -80,12 +79,12 @@ public class CollocationGraph {
 	
 	
 	private HashSet<Integer> getIntersection(CollocationGraphNode node1, CollocationGraphNode node2){
-		HashSet<Integer> intersection = (HashSet<Integer>)ObjectCloner.deepCopy(node1.getInvolveWuClasses());
+		HashSet<Integer> intersection = new HashSet<Integer>(node1.getInvolveWuClasses());
 		intersection.retainAll(node2.getInvolveWuClasses());
 		return intersection;
 	}
 	private HashSet<Integer> getUnion(CollocationGraphNode node1, CollocationGraphNode node2){
-		HashSet<Integer> union = (HashSet<Integer>)ObjectCloner.deepCopy(node1.getInvolveWuClasses());
+		HashSet<Integer> union = new HashSet<Integer>(node1.getInvolveWuClasses());
 		union.addAll(node2.getInvolveWuClasses());
 		return union;
 
@@ -150,8 +149,8 @@ public class CollocationGraph {
 		return null;
 	}
 	
-	public ArrayList<CollocationGraphNode> getNeighbors(CollocationGraphNode node){
-		ArrayList<CollocationGraphNode> neighbors = new ArrayList<CollocationGraphNode>();
+	public List<CollocationGraphNode> getNeighbors(CollocationGraphNode node){
+		List<CollocationGraphNode> neighbors = new ArrayList<CollocationGraphNode>();
 
 		for (CollocationGraphEdge edge : getEdges()) {
 			if (edge.isOutLink(node)) {
@@ -165,7 +164,7 @@ public class CollocationGraph {
 
 	public double getNeighborWeight(CollocationGraphNode node) {
 		double sum = 0;
-		ArrayList<CollocationGraphNode> neighbors = getNeighbors(node);
+		List<CollocationGraphNode> neighbors = getNeighbors(node);
 		for (CollocationGraphNode neighbor : neighbors) {
 			sum += neighbor.getWeight();
 		}
@@ -211,7 +210,7 @@ public class CollocationGraph {
 
 	public void deleteAndItsNeighbors(CollocationGraphNode node) {
 
-		ArrayList<CollocationGraphNode> nodes_to_be_deleted = getNeighbors(node);
+		List<CollocationGraphNode> nodes_to_be_deleted = getNeighbors(node);
 		nodes_to_be_deleted.add(node);
 		
 		for (CollocationGraphNode n : nodes_to_be_deleted) {

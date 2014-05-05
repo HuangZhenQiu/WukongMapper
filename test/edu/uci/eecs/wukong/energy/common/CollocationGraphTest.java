@@ -6,6 +6,7 @@ import java.io.FileReader;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import junit.framework.TestCase;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;

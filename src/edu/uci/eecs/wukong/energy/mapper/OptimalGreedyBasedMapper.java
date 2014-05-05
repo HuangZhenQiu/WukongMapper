@@ -1,11 +1,11 @@
 package edu.uci.eecs.wukong.energy.mapper;
 
+import edu.uci.eecs.wukong.common.CollocationGraphNode;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
-import edu.uci.eecs.wukong.energy.mapper.Mapper.MapType;
 import edu.uci.eecs.wukong.util.WeightedIndependentSetSelector;
 
 import java.io.BufferedReader;
@@ -14,10 +14,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.LinkedList;
-import java.util.ArrayList;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
 
 /**
  * It is the algorithm for TETS Journal which is using the optimal greedy algorithm
@@ -33,12 +31,18 @@ import com.google.common.collect.ImmutableList.Builder;
  */
 
 public class OptimalGreedyBasedMapper extends AbstractMapper {
+	public static enum GreedyType{
+		GWMIN,
+		GWMAX,
+		GWMIN2,
+	}
 	
+	private GreedyType greedyType;
 	
 	public OptimalGreedyBasedMapper(WukongSystem system, FlowBasedProcess fbp,
-			MapType type) {
+			MapType type, GreedyType greedyType) {
 		super(system, fbp, type);
-		// TODO Auto-generated constructor stub
+		this.greedyType = greedyType;
 	}
 
 	public boolean map() {
@@ -46,22 +50,17 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 		return false;
 	}
 	
-	private ImmutableList<Edge> merge() {
+	private List<CollocationGraphNode> merge() {
+		List<CollocationGraphNode> answers = new LinkedList<CollocationGraphNode>();
 		ImmutableList<Edge> mergableEdges = this.fbp.getMergableEdges(this.system);
 		
-//		ImmutableList<FlowGraph> graphs = split(mergableEdges);
-		
-//		for(FlowGraph graph: graphs){
-//			graph.print();
-//		}
-		FlowGraph graph = new FlowGraph();
-		for(Edge edge: mergableEdges){
-			graph.addEdge(edge);
+		ImmutableList<FlowGraph> graphs = split(mergableEdges);
+		for(FlowGraph graph: graphs){
+			WeightedIndependentSetSelector selector = new WeightedIndependentSetSelector(system, greedyType);
+			answers.addAll(selector.select(graph));
 		}
-		WeightedIndependentSetSelector selector = new WeightedIndependentSetSelector(system);
-		List<Edge> answers = selector.select(graph);
-//		graph.print();
-		return mergableEdges;
+
+		return answers;
 	}
 	
 	private ImmutableList<FlowGraph> split(ImmutableList<Edge> mergableEdges) {
@@ -121,7 +120,7 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 				fbp.initialize(fbpConfigReader);
 				system.initialize(systemConfigReader);
 				
-				OptimalGreedyBasedMapper mapper = new OptimalGreedyBasedMapper(system, fbp, MapType.ONLY_LOCATION);
+				OptimalGreedyBasedMapper mapper = new OptimalGreedyBasedMapper(system, fbp, MapType.ONLY_LOCATION, GreedyType.GWMIN);
 				mapper.map();
 				
 			} finally {
