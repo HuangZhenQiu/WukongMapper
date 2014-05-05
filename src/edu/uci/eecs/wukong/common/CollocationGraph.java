@@ -23,8 +23,7 @@ public class CollocationGraph {
 			sets.add(fbp_edge.getInWuClass().getWuClassId());
 			sets.add(fbp_edge.getOutWuClass().getWuClassId());
 
-			CollocationGraphNode node = new CollocationGraphNode(sets,
-					fbp_edge.getDataVolumn());
+			CollocationGraphNode node = new CollocationGraphNode(sets, fbp_edge.getDataVolumn());
 			addNode(node);
 		}
 	}
@@ -45,33 +44,31 @@ public class CollocationGraph {
 					HashSet<Integer> union = getUnion(node1, node2);
 	    			if(!system.isHostable(union)){
 	    				CollocationGraphEdge edge = new CollocationGraphEdge(node1, node2);
-	    				if(!isEdgeExist(edge)){
-	    					mEdges.add(edge);
-	    				}
+	    				addEdge(edge);
+	    				
 	    			}
 	    			else{
 	    				// hostable @@
 	    				
 	    				CollocationGraphNode node = new CollocationGraphNode(union, node1.getWeight() + node2.getWeight());
-	    				if(addNode(node)){
-	    					System.out.println("node1:" + node.getInvolveWuClasses() + " node2: " + node1.getInvolveWuClasses() + " New node " + node.getInvolveWuClasses());
-	    				}
-	    				else{
-	    					System.out.println("node1:" + node.getInvolveWuClasses() + " node2: " + node1.getInvolveWuClasses() + " Node exists" + node.getInvolveWuClasses());
+	    				if(!addNode(node)){
+//	    					System.out.println("node1:" + node.getInvolveWuClasses() + " node2: " + node1.getInvolveWuClasses() + " New node " + node.getInvolveWuClasses());
+	    					node = getNode(node.getNodeId());
 	    				}
 	    				
 	    				CollocationGraphEdge edge1 = new CollocationGraphEdge(node1, node);
-	    				if(!(node1.getInvolveWuClasses().size() == node.getInvolveWuClasses().size() && node1.getInvolveWuClasses().containsAll(node.getInvolveWuClasses())) && addEdge(edge1)){
-	    					System.out.println("New edge from" + node1.getInvolveWuClasses() + " to " + node.getInvolveWuClasses() + " <" + node1.getNodeId() + ", " + node.getNodeId() +" >");
+	    				if(!node1.equal(node)){
+	    					addEdge(edge1);
 	    				}
+	    				
 	    				CollocationGraphEdge edge2 = new CollocationGraphEdge(node2, node);
-	    				if(!(node2.getInvolveWuClasses().size() == node.getInvolveWuClasses().size() && node2.getInvolveWuClasses().containsAll(node.getInvolveWuClasses())) && addEdge(edge2)){
-	    					System.out.println("New edge from" + node2.getInvolveWuClasses() + " to " + node.getInvolveWuClasses() + " <" + node2.getNodeId() + ", " + node.getNodeId() +" >");
+	    				if(!node2.equal(node)){
+	    					addEdge(edge2);
 	    				}
 	    				
 	    				CollocationGraphEdge edge3 = new CollocationGraphEdge(node2, node1);
-	    				if(!(node2.getInvolveWuClasses().size() == node1.getInvolveWuClasses().size() && node2.getInvolveWuClasses().containsAll(node1.getInvolveWuClasses())) && addEdge(edge3)){
-	    					System.out.println("New edge from" + node2.getInvolveWuClasses() + " to " + node1.getInvolveWuClasses() + " <" + node2.getNodeId() + ", " + node1.getNodeId() +" >");
+	    				if(!node2.equal(node1)){
+	    					addEdge(edge3);
 	    				}
 	    				
 	    			}
@@ -97,8 +94,7 @@ public class CollocationGraph {
 	private boolean isNodeExist(CollocationGraphNode node) {
 		for (int i = 0; i < mNodes.size(); i++) {
 			CollocationGraphNode n = mNodes.get(i);
-			if(n.getInvolveWuClasses().size() == node.getInvolveWuClasses().size() && n.getInvolveWuClasses().containsAll(node.getInvolveWuClasses())){ 
-				node.setNodeId(n.getNodeId());
+			if(n.equal(node)){ 
 				return true;
 			}
 			
@@ -106,16 +102,22 @@ public class CollocationGraph {
 		return false;
 	}
 	
-	private boolean addNode(CollocationGraphNode node){
-		if(!isNodeExist(node)){
+	private boolean addNode(CollocationGraphNode node) {
+		if (!isNodeExist(node)) {
 			mNodes.add(node);
 			node.setNodeId(mNodes.indexOf(node));
 			return true;
 		}
 		return false;
 	}
-	private boolean addEdge(CollocationGraphEdge edge){
-		if(!isEdgeExist(edge)){
+	
+	private boolean addEdge(CollocationGraphEdge edge) {
+		if (!isEdgeExist(edge)) {
+			edge.getInNode().increaseDegree();
+			edge.getOutNode().increaseDegree();
+//			System.out.println("node:" + edge.getInNode().getNodeId() + " degree: " + edge.getInNode().getDegree());
+//			System.out.println("node:" + edge.getOutNode().getNodeId() + " degree: " + edge.getOutNode().getDegree());
+//			System.out.println("New edge from" + edge.getInNode().getInvolveWuClasses() + " to " + edge.getOutNode().getInvolveWuClasses() + " <" + edge.getInNode().getNodeId() + ", " + edge.getOutNode().getNodeId() +" >");
 			mEdges.add(edge);
 			return true;
 		}
@@ -130,24 +132,13 @@ public class CollocationGraph {
 		}
 		return false;
 	}
-	
-	public List<CollocationGraphNode> getNodes(){
+
+	public List<CollocationGraphNode> getNodes() {
 		return mNodes;
 	}
-	public List<CollocationGraphEdge> getEdges(){
+
+	public List<CollocationGraphEdge> getEdges() {
 		return mEdges;
-	}
-	
-	public int getDegree(CollocationGraphNode node) {
-		int degree = 0;
-		for (CollocationGraphEdge edge : getEdges()) {
-			if (edge.isOutLink(node)) {
-				degree++; // out degree
-			} else if (edge.isInLink(node)) {
-				degree++; // in degree
-			}
-		}
-		return degree;
 	}
 
 	public CollocationGraphNode getNode(int nodeId) {
@@ -158,17 +149,25 @@ public class CollocationGraph {
 		}
 		return null;
 	}
+	
+	public ArrayList<CollocationGraphNode> getNeighbors(CollocationGraphNode node){
+		ArrayList<CollocationGraphNode> neighbors = new ArrayList<CollocationGraphNode>();
+
+		for (CollocationGraphEdge edge : getEdges()) {
+			if (edge.isOutLink(node)) {
+				neighbors.add(edge.getOutNode());
+			} else if (edge.isInLink(node)) {
+				neighbors.add(edge.getInNode());
+			}
+		}
+		return neighbors;
+	}
 
 	public double getNeighborWeight(CollocationGraphNode node) {
 		double sum = 0;
-
-		for(CollocationGraphEdge edge: getEdges()){
-			if (edge.isOutLink(node)) {
-				sum += edge.getInNode().getWeight();
-			} else if (edge.isInLink(node)) {
-				sum += edge.getOutNode().getWeight();
-			}
-
+		ArrayList<CollocationGraphNode> neighbors = getNeighbors(node);
+		for (CollocationGraphNode neighbor : neighbors) {
+			sum += neighbor.getWeight();
 		}
 		return sum;
 	}
@@ -180,54 +179,44 @@ public class CollocationGraph {
 	 * 
 	 */
 	
-	public void deleteNode(CollocationGraphNode node){
-		for (CollocationGraphNode n : getNodes()) {
-			if (n.equal(node)) {
-				getNodes().remove(n);
-				return;
-			}
-		}
-	}
-	
-	public void deleteNodeAndEdges(CollocationGraphNode node){
-		
-		for (int i=0;i<getEdges().size(); i++){
-			CollocationGraphEdge edge = getEdges().get(i);
-			if(edge.getInNode().equal(node)){
-				
-//				System.out.println("Deleting edge: " + edge.getInNode().getNodeId() + ", " + edge.getOutNode().getNodeId());
-				getEdges().remove(i);
-				i--;
-			}
-			else if(edge.getOutNode().equal(node)){
-//				System.out.println("Deleting edge: " + edge.getInNode().getNodeId() + ", " + edge.getOutNode().getNodeId());
-				getEdges().remove(i);
-				i--;
-			}
-		}
-//		System.out.println("Deleting node: " + node.getNodeId()+", " + node.getInvolveWuClasses());
-		deleteNode(node);
-	}
-	
-	public void deleteAndItsNeighbors(CollocationGraphNode node){
-		
-		ArrayList<CollocationGraphNode> nodes = new ArrayList<CollocationGraphNode>();
-		
-		for(CollocationGraphEdge edge: getEdges()){
-			if(edge.isOutLink(node)){
-//				deleteNodeAndEdges(edge.getOutNode());
-				nodes.add(edge.getOutNode());
-			}
-			else if(edge.isInLink(node)){
-//				deleteNodeAndEdges(edge.getInNode());
-				nodes.add(edge.getInNode());
-			}
-		}
-		
-		for(CollocationGraphNode n :nodes){
-			deleteNodeAndEdges(n);
-		}
+	public void deleteNode(CollocationGraphNode node) {
 		deleteNodeAndEdges(node);
+	}
+	
+	public void deleteNodeAndEdges(CollocationGraphNode node) {
+
+		for (int i = 0; i < getEdges().size(); i++) {
+			CollocationGraphEdge edge = getEdges().get(i);
+			if (edge.getInNode().equal(node)) {
+				deleteEdge(edge);
+				i--;
+			} else if (edge.getOutNode().equal(node)) {
+				deleteEdge(edge);
+				i--;
+			}
+		}
+		deleteNodeOnly(node);
+	}
+	
+	public void deleteNodeOnly(CollocationGraphNode node) {
+		getNodes().remove(node);
+	}
+
+	public void deleteEdge(CollocationGraphEdge edge) {
+		edge.getInNode().decreaseDegree();
+		edge.getOutNode().decreaseDegree();
+		getEdges().remove(edge);
+//		System.out.println("Deleting edge: " + edge.getInNode().getNodeId() + ", " + edge.getOutNode().getNodeId());
+	}
+
+	public void deleteAndItsNeighbors(CollocationGraphNode node) {
+
+		ArrayList<CollocationGraphNode> nodes_to_be_deleted = getNeighbors(node);
+		nodes_to_be_deleted.add(node);
+		
+		for (CollocationGraphNode n : nodes_to_be_deleted) {
+			deleteNode(n);
+		}
 	}
 	
 	public void print(){
@@ -236,12 +225,12 @@ public class CollocationGraph {
 		
 		System.out.println("Nodes:" + mNodes.size());
 		for (int i = 0; i < mNodes.size(); i++) {
-			System.out.println("ID: " + mNodes.get(i).getNodeId() + ", weight: " + mNodes.get(i).getWeight() + ", wuclasses: "+ mNodes.get(i).getInvolveWuClasses());
+			System.out.println(mNodes.get(i).toString());
 		}
 		
 		System.out.println("Links:" + mEdges.size());
 		for(int i = 0; i < mEdges.size(); i++) {
-			System.out.println("<" + mEdges.get(i).getInNode().getNodeId() + ", " + mEdges.get(i).getOutNode().getNodeId()+">" + mEdges.get(i).getInNode().getInvolveWuClasses() + " v.s " + mEdges.get(i).getOutNode().getInvolveWuClasses());
+			System.out.println(mEdges.get(i).toString());
 		}
 
 	}
