@@ -181,7 +181,9 @@ public class FlowBasedProcess {
 			this.weight = weight;
 		}
 		
-		
+		public String toString(){
+			return "Edge: " + this.inWuClass.getWuClassId() + ", " + this.outWuClass.getWuClassId();
+		}
 	}
 	
 	public static enum TYPE {LINEAR, STAR, RANDOM, SCALE_FREE};
