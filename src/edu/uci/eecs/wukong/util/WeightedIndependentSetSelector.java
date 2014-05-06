@@ -28,15 +28,19 @@ public class WeightedIndependentSetSelector {
 			switch(greedyType){
 				case GWMIN:
 					node = gminChoose(collocationGraph);
+					collocationGraph.deleteNodeAndEdges(node);
 					break;
 				case GWMAX:
 					node = gmaxChoose(collocationGraph);
+					collocationGraph.deleteAndItsNeighbors(node);
 					break;
 				default:
 					node = gwmin2Choose(collocationGraph);
+					collocationGraph.deleteNodeAndEdges(node);
+					break;
 			}
 			
-			collocationGraph.deleteAndItsNeighbors(node);
+			
 		}
 
 		return maxIndependentSet;

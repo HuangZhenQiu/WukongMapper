@@ -11,13 +11,13 @@ import edu.uci.eecs.wukong.energy.mapper.Mapper.MapType;
 import edu.uci.eecs.wukong.util.FlowBasedProcessFactory;
 import edu.uci.eecs.wukong.util.WuKongSystemFactory;
 
-public class Ithing2104Simulator {
+public class Ithing2014Simulator {
 
 	private FlowBasedProcessFactory fbpFactory;
 	
 	private WuKongSystemFactory wukongFactory;
 	
-	public Ithing2104Simulator() {
+	public Ithing2014Simulator() {
 		//WukongProperties.getProperty();
 		this.fbpFactory = new FlowBasedProcessFactory(10, 20, 100 /**distance range**/, 100 /**weight**/);
 		this.wukongFactory = new WuKongSystemFactory(20, 20, 10, 100);
@@ -128,7 +128,7 @@ public class Ithing2104Simulator {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Ithing2104Simulator simulator = new Ithing2104Simulator();
+		Ithing2014Simulator simulator = new Ithing2014Simulator();
 		simulator.run();
 	}
 
