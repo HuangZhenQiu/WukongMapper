@@ -46,8 +46,11 @@ public class CollocationGraphEdge {
 	public boolean isOutLink(CollocationGraphNode node) {
 		return (this.getInNode().getNodeId() == node.getNodeId());
 	}
-	
-	public String toString(){
-		return "<" + this.getInNode().getNodeId() + ", " + this.getOutNode().getNodeId()+">" + this.getInNode().getInvolveWuClasses() + " v.s " + this.getOutNode().getInvolveWuClasses();
+
+	public String toString() {
+		return "<" + this.getInNode().getNodeId() + ", "
+				+ this.getOutNode().getNodeId() + ">"
+				+ this.getInNode().getInvolveWuClasses() + " v.s "
+				+ this.getOutNode().getInvolveWuClasses();
 	}
 }

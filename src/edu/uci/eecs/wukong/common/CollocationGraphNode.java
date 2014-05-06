@@ -1,7 +1,6 @@
 package edu.uci.eecs.wukong.common;
 
 import java.util.HashSet;
-
 import edu.uci.eecs.wukong.util.ObjectCloner;
 
 /*
@@ -9,12 +8,13 @@ import edu.uci.eecs.wukong.util.ObjectCloner;
  * 
  */
 public class CollocationGraphNode {
-	private static int id = 0; 
+	private static int id = 0;
 	private int nodeId;
 
 	private HashSet<Integer> mWuClasses = new HashSet<Integer>();
 	private double mWeight = 0.0;
-	private int degree = 0;
+	private int mDegree = 0;
+	private int deployDevice = -1;
 
 	public CollocationGraphNode(HashSet<Integer> wuclasses,
 			double amountOfSavingEnergy) {
@@ -32,15 +32,15 @@ public class CollocationGraphNode {
 	}
 
 	public void increaseDegree() {
-		degree++;
+		mDegree++;
 	}
 
 	public void decreaseDegree() {
-		degree--;
+		mDegree--;
 	}
 
 	public int getDegree() {
-		return degree;
+		return mDegree;
 	}
 
 	public void setNodeId(int id) {
@@ -55,16 +55,19 @@ public class CollocationGraphNode {
 		this.mWeight = weight;
 	}
 
-	public boolean equal(CollocationGraphNode node){
-		if((this.getInvolveWuClasses().size() == node.getInvolveWuClasses().size() && 
-				this.getInvolveWuClasses().containsAll(node.getInvolveWuClasses()))){
+	public boolean equal(CollocationGraphNode node) {
+		if ((this.getInvolveWuClasses().size() == node.getInvolveWuClasses()
+				.size() && this.getInvolveWuClasses().containsAll(
+				node.getInvolveWuClasses()))) {
 			return true;
-		} else{
+		} else {
 			return false;
 		}
 	}
-	
-	public String toString(){
-		return "ID: " + this.getNodeId() + ", weight: " + this.getWeight() + ", degree:" + this.getDegree() + ", wuclasses: "+ this.getInvolveWuClasses();
+
+	public String toString() {
+		return "ID: " + this.getNodeId() + ", weight: " + this.getWeight()
+				+ ", degree:" + this.getDegree() + ", wuclasses: "
+				+ this.getInvolveWuClasses();
 	}
 }
