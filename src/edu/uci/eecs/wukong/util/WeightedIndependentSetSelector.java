@@ -21,31 +21,46 @@ public class WeightedIndependentSetSelector {
 	public List<CollocationGraphNode> select(FlowGraph graph) {
 
 		CollocationGraph collocationGraph = new CollocationGraph(graph, system);
+//		collocationGraph.print();
 		List<CollocationGraphNode> maxIndependentSet = new ArrayList<CollocationGraphNode>();
-		
-		while(!collocationGraph.getNodes().isEmpty()) {
-			CollocationGraphNode node;
-			switch(greedyType){
-				case GWMIN:
-					node = gminChoose(collocationGraph);
-					collocationGraph.deleteNodeAndEdges(node);
-					break;
-				case GWMAX:
-					node = gmaxChoose(collocationGraph);
-					collocationGraph.deleteAndItsNeighbors(node);
-					break;
-				default:
-					node = gwmin2Choose(collocationGraph);
-					collocationGraph.deleteNodeAndEdges(node);
-					break;
-			}
-			
-			
+		switch (greedyType) {
+		case GWMAX:
+			maxIndependentSet = gmaxFramework(collocationGraph);
+			break;
+		default:
+			maxIndependentSet = gminFramework(collocationGraph);
+			break;
 		}
-
+		
 		return maxIndependentSet;
 	}
 
+	public List<CollocationGraphNode> gminFramework(CollocationGraph graph){
+		List<CollocationGraphNode> maxIndependentSet = new ArrayList<CollocationGraphNode>();
+		while(!graph.getNodes().isEmpty()){
+			CollocationGraphNode node; 
+			switch (greedyType) {
+			case GWMIN:
+				node = gminChoose(graph);
+				break;
+			default:
+				node = gwmin2Choose(graph);
+				break;
+			}
+//			System.out.println(node.toString());
+			maxIndependentSet.add(node);
+			graph.deleteAndItsNeighbors(node);
+		}
+		return maxIndependentSet;
+	}
+	public List<CollocationGraphNode> gmaxFramework(CollocationGraph graph){
+		while (graph.getEdges().size() != 0) {
+			CollocationGraphNode node = gmaxChoose(graph);
+			graph.deleteNodeAndEdges(node);
+		}
+		return graph.getNodes();
+	}
+	
 	public CollocationGraphNode gminChoose(CollocationGraph graph) {
 
 		ArrayList<CollocationGraphNode> lists = (ArrayList<CollocationGraphNode>) graph

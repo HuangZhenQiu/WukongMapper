@@ -2,6 +2,7 @@ package edu.uci.eecs.wukong.energy.mapper;
 
 import edu.uci.eecs.wukong.common.CollocationGraphNode;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
+import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
@@ -12,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedList;
 
@@ -46,7 +48,37 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 	}
 
 	public boolean map() {
-		merge();
+		LinkedList<CollocationGraphNode> answers = (LinkedList<CollocationGraphNode>) merge();
+		
+		for(int i = 0; i < answers.size();i++){
+			CollocationGraphNode node = answers.get(i);
+			WuDevice device = system.getHostableDevice(node.getInvolveWuClasses());
+			
+			for(Edge edge: node.getMergingEdges()){
+				edge.getInWuClass().deploy(device.getWuDeviceId());
+				edge.getOutWuClass().deploy(device.getWuDeviceId());
+			}
+			System.out.println("device " + device.getWuDeviceId() + " will merge" + node.getMergingEdges());
+		}
+		
+		ArrayList<Edge> temp = new ArrayList<FlowBasedProcess.Edge>();
+		for(Edge edge : fbp.getEdges()){
+			if(!edge.isFullDeployed()){
+				temp.add(edge);
+			}
+		}
+		if(!system.deployWithNoMerge(fbp, temp)){
+			return false;
+		}
+		
+		if(fbp.isDeployed()) {
+			//fbp.print();
+			System.out.println("System total energy consumpiton is: " + system.getTotalEnergyConsumption());
+		} else {
+			System.out.println("FBP is not successfully deployed.");
+			//fbp.print();
+		}
+		
 		return false;
 	}
 	
@@ -56,10 +88,11 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 		
 		ImmutableList<FlowGraph> graphs = split(mergableEdges);
 		for(FlowGraph graph: graphs){
+//			graph.print();
 			WeightedIndependentSetSelector selector = new WeightedIndependentSetSelector(system, greedyType);
+//			System.out.println(selector.select(graph));
 			answers.addAll(selector.select(graph));
 		}
-
 		return answers;
 	}
 	
