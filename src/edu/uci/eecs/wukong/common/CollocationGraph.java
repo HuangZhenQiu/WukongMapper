@@ -5,12 +5,13 @@ import java.util.HashSet;
 import java.util.List;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
+import edu.uci.eecs.wukong.util.ObjectCloner;
 
 public class CollocationGraph {
 	private ArrayList<CollocationGraphNode> mNodes;
 	private List<CollocationGraphEdge> mEdges;
-	
-	public CollocationGraph(FlowGraph graph, WukongSystem system){
+
+	public CollocationGraph(FlowGraph graph, WukongSystem system) {
 		mNodes = new ArrayList<CollocationGraphNode>();
 		mEdges = new ArrayList<CollocationGraphEdge>();
 		this.initCollocation(graph, system);
@@ -21,102 +22,122 @@ public class CollocationGraph {
 			HashSet<Integer> sets = new HashSet<Integer>();
 			sets.add(fbp_edge.getInWuClass().getWuClassId());
 			sets.add(fbp_edge.getOutWuClass().getWuClassId());
-
-			CollocationGraphNode node = new CollocationGraphNode(sets, fbp_edge.getDataVolumn());
+			ArrayList<Edge> edge_list = new ArrayList<FlowBasedProcess.Edge>();
+			edge_list.add(fbp_edge);
+			CollocationGraphNode node = new CollocationGraphNode(sets, fbp_edge.getDataVolumn(), edge_list);
 			addNode(node);
 		}
 	}
-	
-	public void initCollocation(FlowGraph graph, WukongSystem system){
-		
+
+	public void initCollocation(FlowGraph graph, WukongSystem system) {
+
 		this.convertFBPEdges(graph);
-			
-		for(int i=0;i<mNodes.size();i++){
-			for(int j=0;j<mNodes.size();j++){
-				if(i==j){
+		for (int i = 0; i < mNodes.size(); i++) {
+			for (int j = 0; j < mNodes.size(); j++) {
+				if (i == j) {
 					continue;
 				}
 				CollocationGraphNode node1 = mNodes.get(i);
 				CollocationGraphNode node2 = mNodes.get(j);
-	    		
-				if (getIntersection(node1, node2).size() != 0) { //���涰
+
+				if (getIntersection(node1, node2).size() != 0) {
 					HashSet<Integer> union = getUnion(node1, node2);
-	    			if(!system.isHostable(union)){
-	    				CollocationGraphEdge edge = new CollocationGraphEdge(node1, node2);
-	    				addEdge(edge);
-	    				
-	    			}
-	    			else{
-	    				// hostable @@
-	    				
-	    				CollocationGraphNode node = new CollocationGraphNode(union, node1.getWeight() + node2.getWeight());
-	    				if(!addNode(node)){
-//	    					System.out.println("node1:" + node.getInvolveWuClasses() + " node2: " + node1.getInvolveWuClasses() + " New node " + node.getInvolveWuClasses());
-	    					node = getNode(node.getNodeId());
-	    				}
-	    				
-	    				CollocationGraphEdge edge1 = new CollocationGraphEdge(node1, node);
-	    				if(!node1.equal(node)){
-	    					addEdge(edge1);
-	    				}
-	    				
-	    				CollocationGraphEdge edge2 = new CollocationGraphEdge(node2, node);
-	    				if(!node2.equal(node)){
-	    					addEdge(edge2);
-	    				}
-	    				
-	    				CollocationGraphEdge edge3 = new CollocationGraphEdge(node2, node1);
-	    				if(!node2.equal(node1)){
-	    					addEdge(edge3);
-	    				}
-	    				
-	    			}
-	    		}
-	    		
+					if (!system.isHostable(union)) {
+						CollocationGraphEdge edge = new CollocationGraphEdge(
+								node1, node2);
+						addEdge(edge);
+
+					} else {
+						// hostable @@
+						ArrayList<Edge> edges = new ArrayList<FlowBasedProcess.Edge>(node1.getMergingEdges());
+						edges.addAll(node2.getMergingEdges());
+						CollocationGraphNode node = new CollocationGraphNode(union, node1.getWeight() + node2.getWeight(), edges);
+						
+						if (!addNode(node)) {
+							// System.out.println("node1:" +
+							// node.getInvolveWuClasses() + " node2: " +
+							// node1.getInvolveWuClasses() + " New node " +
+							// node.getInvolveWuClasses());
+							node = getNode(node);
+						}
+
+						CollocationGraphEdge edge1 = new CollocationGraphEdge(node1, node);
+						
+						if (!node1.equal(node)) {
+							addEdge(edge1);
+						}
+
+						CollocationGraphEdge edge2 = new CollocationGraphEdge(
+								node2, node);
+						if (!node2.equal(node)) {
+							addEdge(edge2);
+						}
+
+						CollocationGraphEdge edge3 = new CollocationGraphEdge(
+								node2, node1);
+						if (!node2.equal(node1)) {
+							addEdge(edge3);
+						}
+
+					}
+				}
+
 			}
 		}
 	}
-	
-	
-	private HashSet<Integer> getIntersection(CollocationGraphNode node1, CollocationGraphNode node2){
-		HashSet<Integer> intersection = new HashSet<Integer>(node1.getInvolveWuClasses());
+
+	private HashSet<Integer> getIntersection(CollocationGraphNode node1,
+			CollocationGraphNode node2) {
+		HashSet<Integer> intersection = new HashSet<Integer>(
+				node1.getInvolveWuClasses());
 		intersection.retainAll(node2.getInvolveWuClasses());
 		return intersection;
 	}
-	private HashSet<Integer> getUnion(CollocationGraphNode node1, CollocationGraphNode node2){
-		HashSet<Integer> union = new HashSet<Integer>(node1.getInvolveWuClasses());
+
+	private HashSet<Integer> getUnion(CollocationGraphNode node1,
+			CollocationGraphNode node2) {
+		HashSet<Integer> union = new HashSet<Integer>(
+				node1.getInvolveWuClasses());
 		union.addAll(node2.getInvolveWuClasses());
 		return union;
 
 	}
-	
+
 	private boolean isNodeExist(CollocationGraphNode node) {
 		for (int i = 0; i < mNodes.size(); i++) {
 			CollocationGraphNode n = mNodes.get(i);
-			if(n.equal(node)){ 
+			if (n.equal(node)) {
 				return true;
 			}
-			
+
 		}
 		return false;
 	}
-	
+
 	private boolean addNode(CollocationGraphNode node) {
 		if (!isNodeExist(node)) {
 			mNodes.add(node);
 			node.setNodeId(mNodes.indexOf(node));
+//			 System.out.println("New node:" + node.getNodeId() +
+//						 " degree: " + node.getDegree() + "involved wuclasses " + node.getInvolveWuClasses());
 			return true;
 		}
 		return false;
 	}
-	
+
 	private boolean addEdge(CollocationGraphEdge edge) {
 		if (!isEdgeExist(edge)) {
 			edge.getInNode().increaseDegree();
 			edge.getOutNode().increaseDegree();
-//			System.out.println("node:" + edge.getInNode().getNodeId() + " degree: " + edge.getInNode().getDegree());
-//			System.out.println("node:" + edge.getOutNode().getNodeId() + " degree: " + edge.getOutNode().getDegree());
-//			System.out.println("New edge from" + edge.getInNode().getInvolveWuClasses() + " to " + edge.getOutNode().getInvolveWuClasses() + " <" + edge.getInNode().getNodeId() + ", " + edge.getOutNode().getNodeId() +" >");
+			// System.out.println("node:" + edge.getInNode().getNodeId() +
+			// " degree: " + edge.getInNode().getDegree());
+			// System.out.println("node:" + edge.getOutNode().getNodeId() +
+			// " degree: " + edge.getOutNode().getDegree());
+//			 System.out.println("New edge from" +
+//			 edge.getInNode().getInvolveWuClasses() + " to " +
+//			 edge.getOutNode().getInvolveWuClasses() + " <" +
+//			 edge.getInNode().getNodeId() + ", " +
+//			 edge.getOutNode().getNodeId() +" >");
 			mEdges.add(edge);
 			return true;
 		}
@@ -149,7 +170,16 @@ public class CollocationGraph {
 		return null;
 	}
 	
-	public List<CollocationGraphNode> getNeighbors(CollocationGraphNode node){
+	public CollocationGraphNode getNode(CollocationGraphNode node) {
+		for (int i = 0; i < getNodes().size(); i++) {
+			if (getNodes().get(i).equal(node)) {
+				return getNodes().get(i);
+			}
+		}
+		return null;
+	}
+
+	public List<CollocationGraphNode> getNeighbors(CollocationGraphNode node) {
 		List<CollocationGraphNode> neighbors = new ArrayList<CollocationGraphNode>();
 
 		for (CollocationGraphEdge edge : getEdges()) {
@@ -170,18 +200,16 @@ public class CollocationGraph {
 		}
 		return sum;
 	}
-	
-	
+
 	/*
 	 * 
 	 * Operation to delete node in collocation graph
-	 * 
 	 */
-	
+
 	public void deleteNode(CollocationGraphNode node) {
 		deleteNodeAndEdges(node);
 	}
-	
+
 	public void deleteNodeAndEdges(CollocationGraphNode node) {
 
 		for (int i = 0; i < getEdges().size(); i++) {
@@ -196,7 +224,7 @@ public class CollocationGraph {
 		}
 		deleteNodeOnly(node);
 	}
-	
+
 	public void deleteNodeOnly(CollocationGraphNode node) {
 		getNodes().remove(node);
 	}
@@ -205,30 +233,31 @@ public class CollocationGraph {
 		edge.getInNode().decreaseDegree();
 		edge.getOutNode().decreaseDegree();
 		getEdges().remove(edge);
-//		System.out.println("Deleting edge: " + edge.getInNode().getNodeId() + ", " + edge.getOutNode().getNodeId());
+		// System.out.println("Deleting edge: " + edge.getInNode().getNodeId() +
+		// ", " + edge.getOutNode().getNodeId());
 	}
 
 	public void deleteAndItsNeighbors(CollocationGraphNode node) {
 
 		List<CollocationGraphNode> nodes_to_be_deleted = getNeighbors(node);
 		nodes_to_be_deleted.add(node);
-		
+
 		for (CollocationGraphNode n : nodes_to_be_deleted) {
 			deleteNode(n);
 		}
 	}
-	
-	public void print(){
+
+	public void print() {
 
 		System.out.println("Collocation graph information:");
-		
+
 		System.out.println("Nodes:" + mNodes.size());
 		for (int i = 0; i < mNodes.size(); i++) {
 			System.out.println(mNodes.get(i).toString());
 		}
-		
+
 		System.out.println("Links:" + mEdges.size());
-		for(int i = 0; i < mEdges.size(); i++) {
+		for (int i = 0; i < mEdges.size(); i++) {
 			System.out.println(mEdges.get(i).toString());
 		}
 
