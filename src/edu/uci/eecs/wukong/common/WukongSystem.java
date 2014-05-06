@@ -267,6 +267,20 @@ public class WukongSystem {
 		return false;
 	}
 	
+	public WuDevice getHostableDevice(Set<Integer> done){
+		for(WuDevice device: devices){
+			Set<Integer> wuobjects = new HashSet<Integer>();
+			for(Integer integer: device.getAllWuObjectId()){
+				wuobjects.add(integer);
+			}
+			
+			if (wuobjects.containsAll(done)) {
+				return device;
+			}
+		}
+		return null;
+	}
+	
 	public boolean merge(FlowBasedProcess fbp) {
 		List<FlowBasedProcess.Edge> temporaryList = new ArrayList<FlowBasedProcess.Edge>();
 		PriorityQueue<WuDevice> deviceQueue = new PriorityQueue<WuDevice>();
@@ -362,7 +376,30 @@ public class WukongSystem {
 		return device.deploy(wuClassId);
 	}
 
-
+	public boolean deployWithNoMerge(FlowBasedProcess fbp, ArrayList<FlowBasedProcess.Edge> temporaryList){
+		PriorityQueue<WuDevice> deviceQueue = new PriorityQueue<WuDevice>();
+		deviceQueue.addAll(devices);
+		
+		for (FlowBasedProcess.Edge edge : temporaryList) {
+			System.out.println("Checking edge: "+edge.getInWuClass().wuClassId + ", " + edge.getOutWuClass().wuClassId);
+			if(edge.isPartialDeployed()) {
+				Integer undeployedClassId  = edge.getUndeployedClassId();
+				deployOneEnd(edge, undeployedClassId, deviceQueue);
+			}
+			
+			if(edge.isUndeployed()) {
+				deployOneEnd(edge, edge.getInWuClass().getWuClassId(), deviceQueue);
+				deployOneEnd(edge, edge.getOutWuClass().getWuClassId(), deviceQueue);
+			}
+			
+			
+			if (!edge.isFullDeployed()) {
+				System.out.println("Edge <" + edge.getInWuClass().getWuClassId() + ", " + edge.getOutWuClass().getWuClassId() + "> is undepoyable.");
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	public boolean deploy(FlowBasedProcess fbp) {
 		
