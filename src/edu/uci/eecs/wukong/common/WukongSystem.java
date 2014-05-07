@@ -282,7 +282,12 @@ public class WukongSystem {
 	}
 	
 	public boolean isHostable(CollocationGraphNode node) {
-		for(WuDevice device: devices){
+		
+		PriorityQueue<WuDevice> deviceQueue = new PriorityQueue<WuDevice>();
+		deviceQueue.addAll(devices);
+		
+		while (deviceQueue.size() > 0){
+			WuDevice device = deviceQueue.poll();
 			Set<Integer> wuobjects = new HashSet<Integer>();
 			for(Integer integer: device.getAllWuObjectId()){
 				wuobjects.add(integer);
