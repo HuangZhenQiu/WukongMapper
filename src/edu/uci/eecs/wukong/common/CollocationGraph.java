@@ -49,7 +49,7 @@ public class CollocationGraph {
 
 					} else {
 						// hostable @@
-						ArrayList<Edge> edges = new ArrayList<FlowBasedProcess.Edge>(node1.getMergingEdges());
+						List<Edge> edges = new ArrayList<FlowBasedProcess.Edge>(node1.getMergingEdges());
 						edges.addAll(node2.getMergingEdges());
 						CollocationGraphNode node = new CollocationGraphNode(union, node1.getWeight() + node2.getWeight(), edges);
 						

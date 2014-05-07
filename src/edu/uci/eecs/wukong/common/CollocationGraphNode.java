@@ -1,11 +1,10 @@
 package edu.uci.eecs.wukong.common;
 
-import java.lang.reflect.Array;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
-import edu.uci.eecs.wukong.util.ObjectCloner;
 
 /*
  * Each collocation node represents a way to do merge on original FBP.
@@ -17,21 +16,21 @@ public class CollocationGraphNode {
 
 	private HashSet<Integer> mWuClasses = new HashSet<Integer>();
 	
-	private ArrayList<Edge> mMergeEdges = new ArrayList<FlowBasedProcess.Edge>();
+	private List<Edge> mMergeEdges = new ArrayList<FlowBasedProcess.Edge>();
 	private double mWeight = 0.0;
 	private int mDegree = 0;
 	
 	private int deployDevice = -1;
 
 	public CollocationGraphNode(HashSet<Integer> wuclasses,
-			double amountOfSavingEnergy, ArrayList<Edge> mergingEdges) {
+			double amountOfSavingEnergy, List<Edge> mergingEdges) {
 		this.mWeight = amountOfSavingEnergy;
-		this.mWuClasses = (HashSet<Integer>) ObjectCloner.deepCopy(wuclasses);
+		this.mWuClasses = new HashSet<Integer>(wuclasses);
 		this.nodeId = id++;
 		this.mMergeEdges = mergingEdges;
 	}
 
-	public ArrayList<Edge> getMergingEdges() {
+	public List<Edge> getMergingEdges() {
 		return mMergeEdges;
 	}
 	public HashSet<Integer> getInvolveWuClasses() {
