@@ -71,7 +71,7 @@ public class WeightedIndependentSetSelector {
 		for (CollocationGraphNode node : lists) {
 			double comparing = node.getWeight() / (node.getDegree() + 1);
 
-			if (comparing > value) {
+			if (comparing > value && system.isHostable(node)) {
 				value = comparing;
 				selected = node;
 			}
@@ -92,7 +92,7 @@ public class WeightedIndependentSetSelector {
 			if (node.getDegree() != 0) {
 				double comparing = node.getWeight()
 						/ (node.getDegree()  * (node.getDegree()  + 1));
-				if (comparing < value || value == -1) {
+				if ((comparing < value || value == -1) && system.isHostable(node)) {
 					value = comparing;
 					selected = node;
 				}
@@ -110,7 +110,7 @@ public class WeightedIndependentSetSelector {
 		for (CollocationGraphNode node : lists) {
 
 			double comparing = node.getWeight() / graph.getNeighborWeight(node);
-			if (comparing > value) {
+			if (comparing > value  && system.isHostable(node)) {
 				value = comparing;
 				selected = node;
 			}

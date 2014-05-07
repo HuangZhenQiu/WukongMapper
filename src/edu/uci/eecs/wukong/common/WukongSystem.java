@@ -281,6 +281,20 @@ public class WukongSystem {
 		return null;
 	}
 	
+	public boolean isHostable(CollocationGraphNode node) {
+		for(WuDevice device: devices){
+			Set<Integer> wuobjects = new HashSet<Integer>();
+			for(Integer integer: device.getAllWuObjectId()){
+				wuobjects.add(integer);
+			}
+			
+			if (wuobjects.containsAll(node.getInvolveWuClasses())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean merge(FlowBasedProcess fbp) {
 		List<FlowBasedProcess.Edge> temporaryList = new ArrayList<FlowBasedProcess.Edge>();
 		PriorityQueue<WuDevice> deviceQueue = new PriorityQueue<WuDevice>();
