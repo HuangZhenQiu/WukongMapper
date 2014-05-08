@@ -1,8 +1,7 @@
 package edu.uci.eecs.wukong.common;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 
@@ -13,27 +12,25 @@ import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 public class CollocationGraphNode {
 	private static int id = 0;
 	private int nodeId;
-
-	private HashSet<Integer> mWuClasses = new HashSet<Integer>();
+	private Set<Integer> mWuClasses;
+	private Set<Edge> mMergeEdges;
 	
-	private List<Edge> mMergeEdges = new ArrayList<FlowBasedProcess.Edge>();
 	private double mWeight = 0.0;
 	private int mDegree = 0;
-	
 	private int deployDevice = -1;
 
-	public CollocationGraphNode(HashSet<Integer> wuclasses,
-			double amountOfSavingEnergy, List<Edge> mergingEdges) {
+	public CollocationGraphNode(Set<Integer> wuclasses,
+			double amountOfSavingEnergy, Set<Edge> mergingEdges) {
 		this.mWeight = amountOfSavingEnergy;
 		this.mWuClasses = new HashSet<Integer>(wuclasses);
 		this.nodeId = id++;
 		this.mMergeEdges = mergingEdges;
 	}
 
-	public List<Edge> getMergingEdges() {
+	public Set<Edge> getMergingEdges() {
 		return mMergeEdges;
 	}
-	public HashSet<Integer> getInvolveWuClasses() {
+	public Set<Integer> getInvolveWuClasses() {
 		return mWuClasses;
 	}
 
