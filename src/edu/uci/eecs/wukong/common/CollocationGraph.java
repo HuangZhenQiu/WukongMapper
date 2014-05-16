@@ -3,9 +3,12 @@ package edu.uci.eecs.wukong.common;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.util.ObjectCloner;
+import edu.uci.eecs.wukong.util.Pair;
 
 public class CollocationGraph {
 	private ArrayList<CollocationGraphNode> mNodes;
@@ -16,8 +19,14 @@ public class CollocationGraph {
 		mEdges = new ArrayList<CollocationGraphEdge>();
 		this.initCollocation(graph, system);
 	}
+	
+	public CollocationGraph(FlowGraph graph, WukongSystem system, int flag) {
+		mNodes = new ArrayList<CollocationGraphNode>();
+		mEdges = new ArrayList<CollocationGraphEdge>();
+		this.initCollocation2(graph, system);
+	}
 
-	public void convertFBPEdges(FlowGraph graph) {
+	public void rawInitCollocationGraph(FlowGraph graph) {
 		for (Edge fbp_edge : graph.getEdges()) {
 			HashSet<Integer> sets = new HashSet<Integer>();
 			sets.add(fbp_edge.getInWuClass().getWuClassId());
@@ -29,9 +38,72 @@ public class CollocationGraph {
 		}
 	}
 
-	public void initCollocation(FlowGraph graph, WukongSystem system) {
+	
+	public void initCollocation2(FlowGraph graph, WukongSystem system) {
+		rawInitCollocationGraph(graph);
+		
+		ArrayList<Pair<CollocationGraphNode, CollocationGraphNode>> pair_list = new ArrayList<Pair<CollocationGraphNode, CollocationGraphNode>>();
+		for (int i = 0; i < mNodes.size() - 1; i++) {
+			for (int j = i + 1; j < mNodes.size(); j++) {
+				Pair<CollocationGraphNode, CollocationGraphNode> pair = new Pair<CollocationGraphNode, CollocationGraphNode>(mNodes.get(i), mNodes.get(j));
+				pair_list.add(pair);
+			}
+		}
+		
+		while(pair_list.size() != 0){
+			Pair<CollocationGraphNode, CollocationGraphNode> pair = pair_list.remove(0);
+			CollocationGraphNode node1 = pair.getFirst();
+			CollocationGraphNode node2 = pair.getSecond();
 
-		this.convertFBPEdges(graph);
+			if (getIntersection(node1, node2).size() != 0) {
+				HashSet<Integer> union = getUnion(node1, node2);
+				if (!system.isHostable(union)) {
+					CollocationGraphEdge edge = new CollocationGraphEdge(node1, node2);
+					addEdge(edge);
+				} else {
+					// hostable @@
+					ArrayList<Edge> edges = new ArrayList<FlowBasedProcess.Edge>(node1.getMergingEdges());
+					edges.addAll(node2.getMergingEdges());
+					CollocationGraphNode node = new CollocationGraphNode(union, node1.getWeight() + node2.getWeight(), edges);
+					
+					if (!addNode(node)) { 
+						/* Node exists */
+						node = getNode(node);
+					}
+					else{ 
+						/* Node does not exist */
+						for(CollocationGraphNode remain_node: mNodes){
+							if (!remain_node.equal(node1) && !remain_node.equal(node2)) {
+								Pair<CollocationGraphNode, CollocationGraphNode> new_pair = new Pair<CollocationGraphNode, CollocationGraphNode>(node, remain_node);
+								pair_list.add(new_pair);
+							}
+						}
+					}
+
+					CollocationGraphEdge edge1 = new CollocationGraphEdge(node1, node);
+					
+					if (!node1.equal(node)) {
+						addEdge(edge1);
+					}
+
+					CollocationGraphEdge edge2 = new CollocationGraphEdge(
+							node2, node);
+					if (!node2.equal(node)) {
+						addEdge(edge2);
+					}
+
+					CollocationGraphEdge edge3 = new CollocationGraphEdge(
+							node2, node1);
+					if (!node2.equal(node1)) {
+						addEdge(edge3);
+					}
+
+				}
+			}
+		}
+	}
+	public void initCollocation(FlowGraph graph, WukongSystem system) {
+		rawInitCollocationGraph(graph);
 		for (int i = 0; i < mNodes.size(); i++) {
 			for (int j = 0; j < mNodes.size(); j++) {
 				if (i == j) {
@@ -129,6 +201,9 @@ public class CollocationGraph {
 		if (!isEdgeExist(edge)) {
 			edge.getInNode().increaseDegree();
 			edge.getOutNode().increaseDegree();
+			
+			edge.getInNode().addNeighbors(edge.getOutNode());
+			edge.getOutNode().addNeighbors(edge.getInNode());
 			// System.out.println("node:" + edge.getInNode().getNodeId() +
 			// " degree: " + edge.getInNode().getDegree());
 			// System.out.println("node:" + edge.getOutNode().getNodeId() +
