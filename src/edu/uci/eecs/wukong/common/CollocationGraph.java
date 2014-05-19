@@ -33,11 +33,11 @@ public class CollocationGraph {
 
 		this.convertFBPEdges(graph);
 		for (int i = 0; i < mNodes.size(); i++) {
+			CollocationGraphNode node1 = mNodes.get(i);
 			for (int j = 0; j < mNodes.size(); j++) {
 				if (i == j) {
 					continue;
 				}
-				CollocationGraphNode node1 = mNodes.get(i);
 				CollocationGraphNode node2 = mNodes.get(j);
 
 				if (getIntersection(node1, node2).size() != 0) {
