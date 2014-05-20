@@ -62,7 +62,7 @@ public class WuKongSystemFactory {
 			}
 		}
 		
-		system.initialize(devices, distances, landMarkNumber, classNumber);
+		system.initialize(devices, distances, classNumber, landMarkNumber);
 		 
 		return system;
 	}
