@@ -3,12 +3,16 @@ package edu.uci.eecs.wukong.common;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Collection;
 import java.util.Set;
 import java.util.Iterator;
 import java.lang.Comparable;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import com.google.common.collect.ImmutableList;
@@ -539,5 +543,40 @@ public class FlowBasedProcess {
 		return builder.build();
 		
 	}
-
+	
+	public String toFileFormat(){
+		String fileString = "";
+		
+		fileString += "#FBP \n";
+		fileString += wuClassMap.size() + "\n";
+		Iterator it = wuClassMap.entrySet().iterator();
+		while (it.hasNext()){
+			Map.Entry pairs= (Map.Entry)it.next();
+			int classId = (Integer) pairs.getKey();
+			WuClass wuclass = (WuClass) pairs.getValue();
+			
+			String line = ""+ classId + " " + wuclass.getLocationConstraint().getLandMarkId() + " " + wuclass.getLocationConstraint().getDistance();
+			fileString += line + "\n";
+		}
+		fileString += edges.size() + "\n";
+		for(Edge edge : edges){
+			String line = "" + edge.getInWuClass().getWuClassId() + " " + edge.getOutWuClass().getWuClassId() + " " + edge.getDataVolumn();
+			fileString += line + "\n";
+		}
+		
+		return fileString;
+		
+	}
+	public void toFile(String fileName) throws Exception{
+		File file = new File(fileName);
+		if ( !file.exists() ){
+			file.createNewFile();
+		}
+		
+		FileWriter writer = new FileWriter(file.getAbsoluteFile());
+		BufferedWriter bw =  new BufferedWriter(writer);
+		
+		bw.write(this.toFileFormat());
+		bw.close();
+	}
 }

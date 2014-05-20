@@ -5,14 +5,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
+import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
+import edu.uci.eecs.wukong.common.WuDevice.WuObject;
 
 /**
  * 
@@ -475,6 +482,45 @@ public class WukongSystem {
 		}
 		
 		return false;
+	}
+	public String toFileFormat(){ 
+		
+		String fileString = "";
+		
+		fileString += "#Wukong System  #(Number of WuClass) #(Number of WuDevice)  #(Number of Landmark) \n";
+		fileString += wuClassNumber + " " + deviceNumber + " " + landmarkNumber + "\n";
+		
+		for(WuDevice device: devices) {
+			String line = device.getWuDeviceId() + " " + device.getEnergyConstraint() + "\n";
+			for(Integer object : device.getAllWuObjectId()){
+				line += object + " "; 
+			}
+			line += "\n";
+			for(Double distance : device.getLandmarkDistances()){
+				line += distance + " ";
+			}
+			line += "\n";
+			for(Double device_distance : device.getDeviceDistances()){
+				line += device_distance + " ";
+			}
+			line += "\n";
+			fileString += line;
+		}
+		
+		return fileString;
+	}
+	
+	public void toFile(String fileName) throws Exception {
+		File file = new File(fileName);
+		if (!file.exists()) {
+			file.createNewFile();
+		}
+
+		FileWriter writer = new FileWriter(file.getAbsoluteFile());
+		BufferedWriter bw = new BufferedWriter(writer);
+
+		bw.write(this.toFileFormat());
+		bw.close();
 	}
 	
 	public String toString() {
