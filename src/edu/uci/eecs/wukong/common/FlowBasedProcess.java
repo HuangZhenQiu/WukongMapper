@@ -430,7 +430,7 @@ public class FlowBasedProcess {
 		for (WuClass wuclass : classes) {
 			
 			if (!wuclass.isDeployed()) {
-				
+				System.out.println("wuclass " + wuclass.wuClassId + " undeployed");
 				return false;
 			}
 		}
@@ -439,7 +439,6 @@ public class FlowBasedProcess {
 	}
 	
 	public void print() {
-		
 		for(Edge edge : edges) {
 			System.out.println("Edge<" + edge.getInWuClass().getWuClassId() + ", "
 					+ edge.getOutWuClass().getWuClassId() + ">  -->   Device<"

@@ -44,7 +44,7 @@ public class GreedyBasedMapper extends AbstractMapper{
 		
 		if(fbp.isDeployed()) {
 			//fbp.print();
-			System.out.println("System total energy consumpiton is: " + system.getTotalEnergyConsumption());
+//			System.out.println("System total energy consumpiton is: " + system.getTotalEnergyConsumption());
 		} else {
 			System.out.println("FBP is not successfully deployed.");
 			//fbp.print();

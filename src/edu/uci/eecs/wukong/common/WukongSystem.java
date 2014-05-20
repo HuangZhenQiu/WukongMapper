@@ -400,7 +400,7 @@ public class WukongSystem {
 		deviceQueue.addAll(devices);
 		
 		for (FlowBasedProcess.Edge edge : temporaryList) {
-			System.out.println("Checking edge: "+edge.getInWuClass().wuClassId + ", " + edge.getOutWuClass().wuClassId);
+//			System.out.println("Checking edge: "+edge.getInWuClass().wuClassId + ", " + edge.getOutWuClass().wuClassId);
 			if(edge.isPartialDeployed()) {
 				Integer undeployedClassId  = edge.getUndeployedClassId();
 				deployOneEnd(edge, undeployedClassId, deviceQueue);
@@ -414,7 +414,7 @@ public class WukongSystem {
 			
 			if (!edge.isFullDeployed()) {
 				System.out.println("Edge <" + edge.getInWuClass().getWuClassId() + ", " + edge.getOutWuClass().getWuClassId() + "> is undepoyable.");
-				return false;
+//				return false;
 			}
 		}
 		return true;
@@ -456,9 +456,11 @@ public class WukongSystem {
 	
 	private boolean deployOneEnd(FlowBasedProcess.Edge edge, int wuclassId, PriorityQueue<WuDevice> deviceQueue) {
 		Iterator<WuDevice> itr = deviceQueue.iterator();
+		System.out.println("finding wuclass for " + wuclassId);
 		while (itr.hasNext()) {
 			
 			WuDevice currentDevice = itr.next();
+			System.out.println(currentDevice);
 			if (currentDevice.deploy(wuclassId)) {
 				
 				if (edge.getInWuClass().getWuClassId() == wuclassId) {

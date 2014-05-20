@@ -209,6 +209,8 @@ public class WuDevice implements Comparable<WuDevice>{
 					return true;
 				}
 			}
+		}else{
+			System.out.println("Can't find out the wuclass" + nodeId);
 		}
 		
 		return false;
@@ -302,6 +304,7 @@ public class WuDevice implements Comparable<WuDevice>{
 			}
 		}
 		builder.append("]," + this.currentConsumption + ">");
+		builder.append(", " + this.energyConstraint);
 		return builder.toString();
 	}
 	

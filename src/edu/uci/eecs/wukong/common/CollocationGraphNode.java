@@ -15,16 +15,18 @@ public class CollocationGraphNode {
 	private int nodeId;
 
 	private ArrayList<CollocationGraphNode> mNeighbors = new ArrayList<CollocationGraphNode>();
-	
-	public void addNeighbors(CollocationGraphNode node){
+
+	public void addNeighbors(CollocationGraphNode node) {
 		mNeighbors.add(node);
 	}
-	public ArrayList<CollocationGraphNode> getNeighbors(){
+
+	public ArrayList<CollocationGraphNode> getNeighbors() {
 		return mNeighbors;
 	}
+
 	public void removeNeighbors(CollocationGraphNode node) {
-		for(CollocationGraphNode iter: mNeighbors){
-			if (iter.equal(node)){
+		for (CollocationGraphNode iter : mNeighbors) {
+			if (iter.equal(node)) {
 				mNeighbors.remove(node);
 			}
 		}

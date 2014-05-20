@@ -37,7 +37,7 @@ public class WuKongSystemFactory {
 		for(int i = 0; i < deviceNumber; i++) {
 			Util.reset(classMap);
 			List<Integer> objectIds = new ArrayList<Integer>();
-			for(int j = 0; j < 6; j++) {
+			for(int j = 0; j < 3; j++) {
 				ran.setSeed(System.nanoTime() + j * j);
 				int  classId = Math.abs(ran.nextInt()) % (classNumber - 1) + 1;
 				classId = findClassId(glabalClassMap, classId);

@@ -67,19 +67,20 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 				temp.add(edge);
 			}
 		}
+		
 		if(!system.deployWithNoMerge(fbp, temp)){
 			return false;
 		}
 		
 		if(fbp.isDeployed()) {
 			//fbp.print();
-			System.out.println("System total energy consumpiton is: " + system.getTotalEnergyConsumption());
+//			System.out.println("System total energy consumpiton is: " + system.getTotalEnergyConsumption());
 		} else {
 			System.out.println("FBP is not successfully deployed.");
 			//fbp.print();
 		}
 		
-		return false;
+		return true;
 	}
 	
 	private List<CollocationGraphNode> merge() {

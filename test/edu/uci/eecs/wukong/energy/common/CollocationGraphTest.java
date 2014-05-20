@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableList;
 
 import junit.framework.TestCase;
 import edu.uci.eecs.wukong.common.CollocationGraph;
+import edu.uci.eecs.wukong.common.CollocationGraphNode;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.FlowGraph;
 import edu.uci.eecs.wukong.common.WukongSystem;
@@ -37,12 +38,15 @@ public class CollocationGraphTest extends TestCase{
 			for(Edge edge: mergableEdges){
 				graph.addEdge(edge);
 			}
-//			WeightedIndependentSetSelector selector = new WeightedIndependentSetSelector(system);
 			
-			CollocationGraph collocationGraph = new CollocationGraph(graph, system);
+			CollocationGraph collocationGraph = new CollocationGraph(graph, system, 1);
 			collocationGraph.print();
-			
-//			List<Edge> answers = selector.select(graph);
+			for (CollocationGraphNode node : collocationGraph.getNodes()) {
+				System.out.println("I am node" + node.getNodeId());
+				System.out.println(node.getNeighbors().size());
+			}
+//			CollocationGraph collocationGraph2 = new CollocationGraph(graph, system);
+//			collocationGraph2.print();
 			
 		} catch (Exception e) {
 			
