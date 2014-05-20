@@ -6,18 +6,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import com.google.common.collect.ImmutableList;
-
-import net.sf.javailp.Linear;
-import net.sf.javailp.Operator;
 import net.sf.javailp.Problem;
 import net.sf.javailp.Result;
 import net.sf.javailp.Solver;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
-import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
-import edu.uci.eecs.wukong.util.Util;
 
 public class HybridMapper extends DistanceUnawareSelectionBasedMapper {
 

@@ -53,6 +53,7 @@ public class WeightedIndependentSetSelector {
 		}
 		return maxIndependentSet;
 	}
+	
 	public List<CollocationGraphNode> gmaxFramework(CollocationGraph graph){
 		while (graph.getEdges().size() != 0) {
 			CollocationGraphNode node = gmaxChoose(graph);
