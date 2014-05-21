@@ -1,12 +1,10 @@
 package edu.uci.eecs.wukong.energy;
 
-import java.net.Proxy.Type;
-import java.util.logging.Logger;
-
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.energy.mapper.Mapper.MapType;
+import edu.uci.eecs.wukong.energy.mapper.GreedyBasedMapper;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper.GreedyType;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper;
 import edu.uci.eecs.wukong.util.FlowBasedProcessFactory;

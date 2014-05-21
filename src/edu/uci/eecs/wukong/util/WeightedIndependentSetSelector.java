@@ -1,8 +1,8 @@
 package edu.uci.eecs.wukong.util;
 
-import edu.uci.eecs.wukong.common.CollocationGraph;
-import edu.uci.eecs.wukong.common.CollocationGraphNode;
-import edu.uci.eecs.wukong.common.FlowGraph;
+import edu.uci.eecs.wukong.colocation.ColocationGraph;
+import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
+import edu.uci.eecs.wukong.colocation.FlowGraph;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper.GreedyType;
 
@@ -19,10 +19,10 @@ public class WeightedIndependentSetSelector {
 		this.greedyType = greedyType;
 	}
 
-	public List<CollocationGraphNode> select(FlowGraph graph) {
+	public List<ColocationGraphNode> select(FlowGraph graph) {
 
-		CollocationGraph collocationGraph = new CollocationGraph(graph, system);
-		List<CollocationGraphNode> maxIndependentSet = new ArrayList<CollocationGraphNode>();
+		ColocationGraph collocationGraph = new ColocationGraph(graph, system);
+		List<ColocationGraphNode> maxIndependentSet = new ArrayList<ColocationGraphNode>();
 		switch (greedyType) {
 		case GWMAX:
 			maxIndependentSet = gmaxFramework(collocationGraph);
@@ -35,10 +35,10 @@ public class WeightedIndependentSetSelector {
 		return maxIndependentSet;
 	}
 
-	public List<CollocationGraphNode> gminFramework(CollocationGraph graph) {
-		List<CollocationGraphNode> maxIndependentSet = new ArrayList<CollocationGraphNode>();
+	public List<ColocationGraphNode> gminFramework(ColocationGraph graph) {
+		List<ColocationGraphNode> maxIndependentSet = new ArrayList<ColocationGraphNode>();
 		while (!graph.getNodes().isEmpty()) {
-			CollocationGraphNode node;
+			ColocationGraphNode node;
 			switch (greedyType) {
 			case GWMIN:
 				node = gminChoose(graph);
@@ -53,22 +53,22 @@ public class WeightedIndependentSetSelector {
 		return maxIndependentSet;
 	}
 	
-	public List<CollocationGraphNode> gmaxFramework(CollocationGraph graph){
+	public List<ColocationGraphNode> gmaxFramework(ColocationGraph graph){
 		while (graph.getEdges().size() != 0) {
-			CollocationGraphNode node = gmaxChoose(graph);
+			ColocationGraphNode node = gmaxChoose(graph);
 			graph.deleteNodeAndEdges(node);
 		}
 		return graph.getNodes();
 	}
 
-	public CollocationGraphNode gminChoose(CollocationGraph graph) {
+	public ColocationGraphNode gminChoose(ColocationGraph graph) {
 
-		ArrayList<CollocationGraphNode> lists = (ArrayList<CollocationGraphNode>) graph
+		ArrayList<ColocationGraphNode> lists = (ArrayList<ColocationGraphNode>) graph
 				.getNodes();
 
 		double value = 0;
-		CollocationGraphNode selected = lists.get(0);
-		for (CollocationGraphNode node : lists) {
+		ColocationGraphNode selected = lists.get(0);
+		for (ColocationGraphNode node : lists) {
 			double comparing = node.getWeight() / (node.getDegree() + 1);
 
 			if (comparing > value && system.isHostable(node)) {
@@ -80,15 +80,15 @@ public class WeightedIndependentSetSelector {
 		return selected;
 	}
 
-	public CollocationGraphNode gmaxChoose(CollocationGraph graph) {
+	public ColocationGraphNode gmaxChoose(ColocationGraph graph) {
 
-		ArrayList<CollocationGraphNode> lists = (ArrayList<CollocationGraphNode>) graph
+		ArrayList<ColocationGraphNode> lists = (ArrayList<ColocationGraphNode>) graph
 				.getNodes();
 
-		CollocationGraphNode selected = lists.get(0);
+		ColocationGraphNode selected = lists.get(0);
 		double value = -1;
 
-		for (CollocationGraphNode node : lists) {
+		for (ColocationGraphNode node : lists) {
 			if (node.getDegree() != 0) {
 				double comparing = node.getWeight()
 						/ (node.getDegree() * (node.getDegree() + 1));
@@ -102,14 +102,14 @@ public class WeightedIndependentSetSelector {
 		return selected;
 	}
 
-	public CollocationGraphNode gwmin2Choose(CollocationGraph graph) {
-		ArrayList<CollocationGraphNode> lists = (ArrayList<CollocationGraphNode>) graph
+	public ColocationGraphNode gwmin2Choose(ColocationGraph graph) {
+		ArrayList<ColocationGraphNode> lists = (ArrayList<ColocationGraphNode>) graph
 				.getNodes();
 
-		CollocationGraphNode selected = lists.get(0);
+		ColocationGraphNode selected = lists.get(0);
 		double value = 0;
 
-		for (CollocationGraphNode node : lists) {
+		for (ColocationGraphNode node : lists) {
 
 			double comparing = node.getWeight() / graph.getNeighborWeight(node);
 			if (comparing > value && system.isHostable(node)) {

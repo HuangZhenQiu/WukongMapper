@@ -10,10 +10,10 @@ import java.util.HashSet;
 import com.google.common.collect.ImmutableList;
 
 import junit.framework.TestCase;
-import edu.uci.eecs.wukong.common.CollocationGraph;
-import edu.uci.eecs.wukong.common.CollocationGraphNode;
+import edu.uci.eecs.wukong.colocation.ColocationGraph;
+import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
+import edu.uci.eecs.wukong.colocation.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
-import edu.uci.eecs.wukong.common.FlowGraph;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.util.WeightedIndependentSetSelector;
@@ -39,9 +39,9 @@ public class CollocationGraphTest extends TestCase{
 				graph.addEdge(edge);
 			}
 			
-			CollocationGraph collocationGraph = new CollocationGraph(graph, system, 1);
+			ColocationGraph collocationGraph = new ColocationGraph(graph, system, 1);
 			collocationGraph.print();
-			for (CollocationGraphNode node : collocationGraph.getNodes()) {
+			for (ColocationGraphNode node : collocationGraph.getNodes()) {
 				System.out.println("I am node" + node.getNodeId());
 				System.out.println(node.getNeighbors().size());
 			}

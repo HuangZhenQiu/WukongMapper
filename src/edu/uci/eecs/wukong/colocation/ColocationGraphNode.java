@@ -1,31 +1,32 @@
-package edu.uci.eecs.wukong.common;
+package edu.uci.eecs.wukong.colocation;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 
 /*
  * Each collocation node represents a way to do merge on original FBP.
  * 
  */
-public class CollocationGraphNode {
+public class ColocationGraphNode {
 	private static int id = 0;
 	private int nodeId;
 
-	private ArrayList<CollocationGraphNode> mNeighbors = new ArrayList<CollocationGraphNode>();
+	private ArrayList<ColocationGraphNode> mNeighbors = new ArrayList<ColocationGraphNode>();
 
-	public void addNeighbors(CollocationGraphNode node) {
+	public void addNeighbors(ColocationGraphNode node) {
 		mNeighbors.add(node);
 	}
 
-	public ArrayList<CollocationGraphNode> getNeighbors() {
+	public ArrayList<ColocationGraphNode> getNeighbors() {
 		return mNeighbors;
 	}
 
-	public void removeNeighbors(CollocationGraphNode node) {
-		for (CollocationGraphNode iter : mNeighbors) {
+	public void removeNeighbors(ColocationGraphNode node) {
+		for (ColocationGraphNode iter : mNeighbors) {
 			if (iter.equal(node)) {
 				mNeighbors.remove(node);
 			}
@@ -38,7 +39,7 @@ public class CollocationGraphNode {
 	private int mDegree = 0;
 	private int deployDevice = -1;
 
-	public CollocationGraphNode(Set<Integer> wuclasses,
+	public ColocationGraphNode(Set<Integer> wuclasses,
 			double amountOfSavingEnergy, Set<Edge> mergingEdges) {
 		this.mWeight = amountOfSavingEnergy;
 		this.mWuClasses = new HashSet<Integer>(wuclasses);
@@ -81,7 +82,7 @@ public class CollocationGraphNode {
 		this.mWeight = weight;
 	}
 
-	public boolean equal(CollocationGraphNode node) {
+	public boolean equal(ColocationGraphNode node) {
 		if ((this.getInvolveWuClasses().size() == node.getInvolveWuClasses()
 				.size() && this.getInvolveWuClasses().containsAll(
 				node.getInvolveWuClasses()))) {

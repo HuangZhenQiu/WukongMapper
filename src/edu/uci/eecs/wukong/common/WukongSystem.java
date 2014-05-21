@@ -18,6 +18,7 @@ import java.util.StringTokenizer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.common.WuDevice.WuObject;
 
@@ -288,7 +289,7 @@ public class WukongSystem {
 		return null;
 	}
 	
-	public boolean isHostable(CollocationGraphNode node) {
+	public boolean isHostable(ColocationGraphNode node) {
 		
 		PriorityQueue<WuDevice> deviceQueue = new PriorityQueue<WuDevice>();
 		deviceQueue.addAll(devices);

@@ -10,10 +10,10 @@ import java.util.HashSet;
 import com.google.common.collect.ImmutableList;
 
 import junit.framework.TestCase;
-import edu.uci.eecs.wukong.common.CollocationGraph;
-import edu.uci.eecs.wukong.common.CollocationGraphNode;
+import edu.uci.eecs.wukong.colocation.ColocationGraph;
+import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
+import edu.uci.eecs.wukong.colocation.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
-import edu.uci.eecs.wukong.common.FlowGraph;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;

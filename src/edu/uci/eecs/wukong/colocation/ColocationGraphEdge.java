@@ -1,9 +1,10 @@
-package edu.uci.eecs.wukong.common;
+package edu.uci.eecs.wukong.colocation;
 
-public class CollocationGraphEdge {
 
-	public CollocationGraphNode inNode;
-	public CollocationGraphNode outNode;
+public class ColocationGraphEdge {
+
+	public ColocationGraphNode inNode;
+	public ColocationGraphNode outNode;
 
 	/*
 	 * Each collocation edge represents the dependency of merging. If two nodes
@@ -11,21 +12,21 @@ public class CollocationGraphEdge {
 	 * time
 	 */
 
-	public CollocationGraphEdge(CollocationGraphNode in,
-			CollocationGraphNode out) {
+	public ColocationGraphEdge(ColocationGraphNode in,
+			ColocationGraphNode out) {
 		inNode = in;
 		outNode = out;
 	}
 
-	public CollocationGraphNode getInNode() {
+	public ColocationGraphNode getInNode() {
 		return inNode;
 	}
 
-	public CollocationGraphNode getOutNode() {
+	public ColocationGraphNode getOutNode() {
 		return outNode;
 	}
 
-	public boolean equals(CollocationGraphEdge edge) {
+	public boolean equals(ColocationGraphEdge edge) {
 		if (edge.getInNode().getNodeId() == this.getInNode().getNodeId()
 				&& edge.getOutNode().getNodeId() == this.getOutNode()
 						.getNodeId()) {
@@ -39,11 +40,11 @@ public class CollocationGraphEdge {
 		return false;
 	}
 
-	public boolean isInLink(CollocationGraphNode node) {
+	public boolean isInLink(ColocationGraphNode node) {
 		return (this.getOutNode().getNodeId() == node.getNodeId());
 	}
 
-	public boolean isOutLink(CollocationGraphNode node) {
+	public boolean isOutLink(ColocationGraphNode node) {
 		return (this.getInNode().getNodeId() == node.getNodeId());
 	}
 

@@ -1,10 +1,10 @@
 package edu.uci.eecs.wukong.energy.mapper;
 
-import edu.uci.eecs.wukong.common.CollocationGraphNode;
+import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
+import edu.uci.eecs.wukong.colocation.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.util.WeightedIndependentSetSelector;
@@ -48,10 +48,10 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 	}
 
 	public boolean map() {
-		LinkedList<CollocationGraphNode> answers = (LinkedList<CollocationGraphNode>) merge();
+		LinkedList<ColocationGraphNode> answers = (LinkedList<ColocationGraphNode>) merge();
 		
 		for(int i = 0; i < answers.size();i++){
-			CollocationGraphNode node = answers.get(i);
+			ColocationGraphNode node = answers.get(i);
 			WuDevice device = system.getHostableDevice(node.getInvolveWuClasses());
 			
 			for(Edge edge: node.getMergingEdges()){
@@ -83,8 +83,8 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 		return true;
 	}
 	
-	private List<CollocationGraphNode> merge() {
-		List<CollocationGraphNode> answers = new LinkedList<CollocationGraphNode>();
+	private List<ColocationGraphNode> merge() {
+		List<ColocationGraphNode> answers = new LinkedList<ColocationGraphNode>();
 		ImmutableList<Edge> mergableEdges = this.fbp.getMergableEdges(this.system);
 		
 		ImmutableList<FlowGraph> graphs = split(mergableEdges);

@@ -1,5 +1,7 @@
-package edu.uci.eecs.wukong.common;
+package edu.uci.eecs.wukong.colocation;
 
+import edu.uci.eecs.wukong.common.FlowBasedProcess;
+import edu.uci.eecs.wukong.common.WuClass;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 
 import java.util.ArrayList;
