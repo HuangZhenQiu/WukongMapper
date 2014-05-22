@@ -11,18 +11,15 @@ import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.util.Pair;
 
 public class ColocationGraph extends AbstractColocationGraph{
-	private List<ColocationGraphNode> mNodes;
 
 	public ColocationGraph(FlowGraph graph, WukongSystem system) {
 		super(graph, system);
-		this.mNodes = new ArrayList<ColocationGraphNode>();
 		this.init();
 	}
 	
 	public ColocationGraph(FlowGraph graph, WukongSystem system, int flag) {
 		super(graph, system);
-		this.mNodes = new ArrayList<ColocationGraphNode>();
-		this.initCollocation2(graph, system);
+		this.init();
 	}
 
 	public void rawInitCollocationGraph(FlowGraph graph) {
@@ -38,13 +35,13 @@ public class ColocationGraph extends AbstractColocationGraph{
 	}
 
 	
-	public void initCollocation2(FlowGraph graph, WukongSystem system) {
+	public void init() {
 		rawInitCollocationGraph(graph);
 		
 		ArrayList<Pair<ColocationGraphNode, ColocationGraphNode>> pair_list = new ArrayList<Pair<ColocationGraphNode, ColocationGraphNode>>();
-		for (int i = 0; i < mNodes.size() - 1; i++) {
-			for (int j = i + 1; j < mNodes.size(); j++) {
-				Pair<ColocationGraphNode, ColocationGraphNode> pair = new Pair<ColocationGraphNode, ColocationGraphNode>(mNodes.get(i), mNodes.get(j));
+		for (int i = 0; i < getNodes().size() - 1; i++) {
+			for (int j = i + 1; j < getNodes().size(); j++) {
+				Pair<ColocationGraphNode, ColocationGraphNode> pair = new Pair<ColocationGraphNode, ColocationGraphNode>(getNodes().get(i), getNodes().get(j));
 				pair_list.add(pair);
 			}
 		}
@@ -71,7 +68,7 @@ public class ColocationGraph extends AbstractColocationGraph{
 					}
 					else{ 
 						/* Node does not exist */
-						for(ColocationGraphNode remain_node: mNodes){
+						for(ColocationGraphNode remain_node: getNodes()){
 							if (!remain_node.equal(node1) && !remain_node.equal(node2)) {
 								Pair<ColocationGraphNode, ColocationGraphNode> new_pair = new Pair<ColocationGraphNode, ColocationGraphNode>(node, remain_node);
 								pair_list.add(new_pair);
@@ -95,51 +92,6 @@ public class ColocationGraph extends AbstractColocationGraph{
 					}
 
 				}
-			}
-		}
-	}
-	
-	public void init() {
-		rawInitCollocationGraph(graph);
-		for (int i = 0; i < mNodes.size(); i++) {
-			ColocationGraphNode node1 = mNodes.get(i);
-			for (int j = 0; j < mNodes.size(); j++) {
-				if (i == j) {
-					continue;
-				}
-				ColocationGraphNode node2 = mNodes.get(j);
-
-				if (getIntersection(node1, node2).size() != 0) {
-					Set<Integer> union = getUnion(node1, node2);
-					if (!system.isHostable(union)) {
-						addEdge(new ColocationGraphEdge(node1, node2));
-
-					} else {
-						// hostable @@
-						if(node1.getInvolveWuClasses().containsAll(node2.getInvolveWuClasses()) ||
-								node2.getInvolveWuClasses().containsAll(node1.getInvolveWuClasses())) {
-							//won't create new node, but create an edge for node1 != node2 anyway
-							addEdge(new ColocationGraphEdge(node1, node2)); 
-						} else {
-							
-							//in case node != node1 != node2, so we make three edges
-							ColocationGraphNode node = new ColocationGraphNode(union,
-									node1.getWeight() + node2.getWeight(), getEdgeUnion(node1, node2));
-							
-							if (!addNode(node)) {
-								node = getNode(node);
-							}
-
-							addEdge(new ColocationGraphEdge(node1, node));
-							addEdge(new ColocationGraphEdge(node2, node));
-							//i =!j ensures node1 != node2
-							addEdge(new ColocationGraphEdge(node1, node2)); 
-
-						}
-						
-					}
-				}
-
 			}
 		}
 	}
