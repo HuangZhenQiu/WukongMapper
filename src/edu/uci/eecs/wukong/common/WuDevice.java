@@ -333,7 +333,11 @@ public class WuDevice implements Comparable<WuDevice>{
 	public Double getEnergyConstraint() {
 		return energyConstraint;
 	}
-
+	
+	public List<Double> getLandmarkDistances() {
+		return distances;
+	}
+	
 	public List<Double> getDeviceDistances() {
 		return deviceDistances;
 	}

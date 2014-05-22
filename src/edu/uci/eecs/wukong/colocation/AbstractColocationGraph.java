@@ -90,5 +90,10 @@ public abstract class AbstractColocationGraph {
 	}
 
 
-
+	protected void printEdges(){
+		System.out.println("Links:" + edges.size());
+		for (int i = 0; i < edges.size(); i++) {
+			System.out.println(edges.get(i).toString());
+		}
+	}
 }
