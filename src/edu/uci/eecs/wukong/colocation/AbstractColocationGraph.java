@@ -13,30 +13,47 @@ public abstract class AbstractColocationGraph {
 	protected FlowGraph graph;
 	protected WukongSystem system;
 	protected List<ColocationGraphEdge> edges;
+	protected List<ColocationGraphNode> nodes;
 
+	
 	public AbstractColocationGraph(FlowGraph graph, WukongSystem system) {
 		this.edges = new ArrayList<ColocationGraphEdge>();
+		this.nodes = new ArrayList<ColocationGraphNode>();
+
 		this.graph = graph;
 		this.system = system;
 	}
 	
 	protected abstract void init();
 	
-	protected Set<Integer> getIntersection(ColocationGraphNode node1,
-			ColocationGraphNode node2) {
-		Set<Integer> intersection = new HashSet<Integer>(
-				node1.getInvolveWuClasses());
+	
+	protected void rawInitCollocationGraph(FlowGraph graph) {
+		for (Edge fbpEdge : graph.getEdges()) {
+			Set<Integer> sets = new HashSet<Integer>();
+			sets.add(fbpEdge.getInWuClass().getWuClassId());
+			sets.add(fbpEdge.getOutWuClass().getWuClassId());
+			Set<Edge> edgeSet = new HashSet<Edge>();
+			edgeSet.add(fbpEdge);
+			ColocationGraphNode node = new ColocationGraphNode(sets, fbpEdge.getWeight(), edgeSet);
+			addNode(node);
+		}
+	}
+	
+	/*
+	 * 
+	 * Set operation
+	 * 
+	 */
+	protected Set<Integer> getIntersection(ColocationGraphNode node1, ColocationGraphNode node2) {
+		Set<Integer> intersection = new HashSet<Integer>(node1.getInvolveWuClasses());
 		intersection.retainAll(node2.getInvolveWuClasses());
 		return intersection;
 	}
 
-	protected Set<Integer> getUnion(ColocationGraphNode node1,
-			ColocationGraphNode node2) {
-		Set<Integer> union = new HashSet<Integer>(
-				node1.getInvolveWuClasses());
+	protected Set<Integer> getUnion(ColocationGraphNode node1, ColocationGraphNode node2) {
+		Set<Integer> union = new HashSet<Integer>(node1.getInvolveWuClasses());
 		union.addAll(node2.getInvolveWuClasses());
 		return union;
-
 	}
 	
 	protected Set<Edge> getEdgeUnion(ColocationGraphNode node1, ColocationGraphNode node2) {
@@ -45,24 +62,44 @@ public abstract class AbstractColocationGraph {
 		return union;
 	}
 
+	public List<ColocationGraphEdge> getAllEdges() {
+		return edges;
+	}
+	
 	public boolean isEdgeExist(ColocationGraphEdge e) {
-		for (ColocationGraphEdge edge : getEdges()) {
+		for (ColocationGraphEdge edge : getAllEdges()) {
 			if (edge.equals(e)) {
 				return true;
 			}
 		}
 		return false;
 	}
-
-	public List<ColocationGraphEdge> getEdges() {
-		return edges;
+	protected boolean addEdge(ColocationGraphEdge edge) {
+		if (!isEdgeExist(edge)) {
+			edge.getInNode().addNeighbors(edge.getOutNode());
+			edge.getOutNode().addNeighbors(edge.getInNode());
+			edges.add(edge);
+			return true;
+		}
+		return false;
 	}
 
+	
+	public void deleteEdge(ColocationGraphEdge edge) {
+		edge.getInNode().getNeighbors().remove(edge.getOutNode());
+		edge.getOutNode().getNeighbors().remove(edge.getInNode());
+		getAllEdges().remove(edge);
+		// System.out.println("Deleting edge: " + edge.getInNode().getNodeId() +
+		// ", " + edge.getOutNode().getNodeId());
+	}
+	
+	
+	
 
 	public List<ColocationGraphNode> getNeighbors(ColocationGraphNode node) {
 		List<ColocationGraphNode> neighbors = new ArrayList<ColocationGraphNode>();
 
-		for (ColocationGraphEdge edge : getEdges()) {
+		for (ColocationGraphEdge edge : getAllEdges()) {
 			if (edge.isOutLink(node)) {
 				neighbors.add(edge.getOutNode());
 			} else if (edge.isInLink(node)) {
@@ -81,19 +118,100 @@ public abstract class AbstractColocationGraph {
 		return sum;
 	}
 
-	public void deleteEdge(ColocationGraphEdge edge) {
-		edge.getInNode().decreaseDegree();
-		edge.getOutNode().decreaseDegree();
-		getEdges().remove(edge);
-		// System.out.println("Deleting edge: " + edge.getInNode().getNodeId() +
-		// ", " + edge.getOutNode().getNodeId());
+	
+	private boolean isNodeExist(ColocationGraphNode node) {
+		for (int i = 0; i < getNodes().size(); i++) {
+			ColocationGraphNode n = getNodes().get(i);
+			if (n.equal(node)) {
+				return true;
+			}
+
+		}
+		return false;
 	}
 
+	protected boolean addNode(ColocationGraphNode node) {
+		if (!isNodeExist(node)) {
+			getNodes().add(node);
+			node.setNodeId(getNodes().indexOf(node));
+			return true;
+		}
+		return false;
+	}
+	
+	public List<ColocationGraphNode> getNodes() {
+		return nodes;
+	}
+	
+	public ColocationGraphNode getNode(ColocationGraphNode node) {
+		for (int i = 0; i < getNodes().size(); i++) {
+			if (getNodes().get(i).equal(node)) {
+				return getNodes().get(i);
+			}
+		}
+		return null;
+	}
 
-	protected void printEdges(){
+	public void deleteNodeOnly(ColocationGraphNode node) {
+		getNodes().remove(node);
+	}
+	
+	/*
+	 * 
+	 * Operation to delete node in collocation graph
+	 */
+
+	public void deleteNode(ColocationGraphNode node) {
+		deleteNodeAndEdges(node);
+	}
+
+	public void deleteNodeAndEdges(ColocationGraphNode node) {
+
+		for (int i = 0; i < getAllEdges().size(); i++) {
+			ColocationGraphEdge edge = getAllEdges().get(i);
+			if (edge.getInNode().equal(node)) {
+				deleteEdge(edge);
+				i--;
+			} else if (edge.getOutNode().equal(node)) {
+				deleteEdge(edge);
+				i--;
+			}
+		}
+		deleteNodeOnly(node);
+	}
+	
+	public void deleteAndItsNeighbors(ColocationGraphNode node) {
+
+		List<ColocationGraphNode> nodes_to_be_deleted = getNeighbors(node);
+		nodes_to_be_deleted.add(node);
+
+		for (ColocationGraphNode n : nodes_to_be_deleted) {
+			deleteNode(n);
+		}
+	}
+
+	/*
+	 * Print debug message.
+	 */
+	
+	protected void printEdges() {
 		System.out.println("Links:" + edges.size());
 		for (int i = 0; i < edges.size(); i++) {
 			System.out.println(edges.get(i).toString());
 		}
 	}
+	
+	protected void printNodes() {
+		System.out.println("Nodes:" + getNodes().size());
+		for (int i = 0; i < getNodes().size(); i++) {
+			System.out.println(getNodes().get(i).toString());
+		}
+	}
+	
+	public void print() {
+		System.out.println("Collocation graph information:");
+		printNodes();
+		printEdges();
+	}
+	
 }
