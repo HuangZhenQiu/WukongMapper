@@ -11,11 +11,10 @@ import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.util.Pair;
 
 public class UpdatedColocationGraph extends AbstractColocationGraph{
-	private List<ColocationGraphNode> mNodes;
+	
 	
 	public UpdatedColocationGraph(FlowGraph graph, WukongSystem system) {
 		super(graph, system);
-		this.mNodes = new ArrayList<ColocationGraphNode>();
 		this.init();
 	}
 
@@ -30,13 +29,15 @@ public class UpdatedColocationGraph extends AbstractColocationGraph{
 			addNode(node);
 		}
 	}
+	
 	public void init() {
+		
 		rawInitCollocationGraph(graph);
 		
 		ArrayList<Pair<ColocationGraphNode, ColocationGraphNode>> pair_list = new ArrayList<Pair<ColocationGraphNode, ColocationGraphNode>>();
-		for (int i = 0; i < mNodes.size() - 1; i++) {
-			for (int j = i + 1; j < mNodes.size(); j++) {
-				Pair<ColocationGraphNode, ColocationGraphNode> pair = new Pair<ColocationGraphNode, ColocationGraphNode>(mNodes.get(i), mNodes.get(j));
+		for (int i = 0; i < getNodes().size() - 1; i++) {
+			for (int j = i + 1; j < getNodes().size(); j++) {
+				Pair<ColocationGraphNode, ColocationGraphNode> pair = new Pair<ColocationGraphNode, ColocationGraphNode>(getNodes().get(i), getNodes().get(j));
 				pair_list.add(pair);
 			}
 		}
@@ -67,7 +68,7 @@ public class UpdatedColocationGraph extends AbstractColocationGraph{
 					}
 					else{ 
 						/* Node does not exist */
-						for(ColocationGraphNode remain_node: mNodes){
+						for(ColocationGraphNode remain_node: getNodes()){
 							if (!remain_node.equal(node1) && !remain_node.equal(node2)) {
 								Pair<ColocationGraphNode, ColocationGraphNode> new_pair = new Pair<ColocationGraphNode, ColocationGraphNode>(node, remain_node);
 								pair_list.add(new_pair);
@@ -104,106 +105,9 @@ public class UpdatedColocationGraph extends AbstractColocationGraph{
 		}
 	}
 	
-	private boolean isNodeExist(ColocationGraphNode node) {
-		for (int i = 0; i < mNodes.size(); i++) {
-			ColocationGraphNode n = mNodes.get(i);
-			if (n.equal(node)) {
-				return true;
-			}
-
-		}
-		return false;
-	}
-
-	private boolean addNode(ColocationGraphNode node) {
-		if (!isNodeExist(node)) {
-			mNodes.add(node);
-			node.setNodeId(mNodes.indexOf(node));
-			return true;
-		}
-		return false;
-	}
-	
-	public List<ColocationGraphNode> getNodes() {
-		return mNodes;
-	}
-
-	private boolean addEdge(ColocationGraphEdge edge) {
-		if (!isEdgeExist(edge)) {
-			edge.getInNode().increaseDegree();
-			edge.getOutNode().increaseDegree();
-			edge.getInNode().addNeighbors(edge.getOutNode());
-			edge.getOutNode().addNeighbors(edge.getInNode());
-			edges.add(edge);
-			return true;
-		}
-		return false;
-	}
-	
-	public ColocationGraphNode getNode(int nodeId) {
-		for (int i = 0; i < getNodes().size(); i++) {
-			if (getNodes().get(i).getNodeId() == nodeId) {
-				return getNodes().get(i);
-			}
-		}
-		return null;
-	}
-	
-	public ColocationGraphNode getNode(ColocationGraphNode node) {
-		for (int i = 0; i < getNodes().size(); i++) {
-			if (getNodes().get(i).equal(node)) {
-				return getNodes().get(i);
-			}
-		}
-		return null;
-	}
-
-	public void deleteNodeOnly(ColocationGraphNode node) {
-		getNodes().remove(node);
-	}
-	
-	/*
-	 * 
-	 * Operation to delete node in collocation graph
-	 */
-
-	public void deleteNode(ColocationGraphNode node) {
-		deleteNodeAndEdges(node);
-	}
-
-	public void deleteNodeAndEdges(ColocationGraphNode node) {
-
-		for (int i = 0; i < getEdges().size(); i++) {
-			ColocationGraphEdge edge = getEdges().get(i);
-			if (edge.getInNode().equal(node)) {
-				deleteEdge(edge);
-				i--;
-			} else if (edge.getOutNode().equal(node)) {
-				deleteEdge(edge);
-				i--;
-			}
-		}
-		deleteNodeOnly(node);
-	}
-	
-	public void deleteAndItsNeighbors(ColocationGraphNode node) {
-
-		List<ColocationGraphNode> nodes_to_be_deleted = getNeighbors(node);
-		nodes_to_be_deleted.add(node);
-
-		for (ColocationGraphNode n : nodes_to_be_deleted) {
-			deleteNode(n);
-		}
-	}
-	
 	public void print() {
-
 		System.out.println("Collocation graph information:");
-
-		System.out.println("Nodes:" + mNodes.size());
-		for (int i = 0; i < mNodes.size(); i++) {
-			System.out.println(mNodes.get(i).toString());
-		}
+		printNodes();
 		printEdges();
 	}
 }

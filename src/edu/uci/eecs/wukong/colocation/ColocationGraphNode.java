@@ -2,6 +2,7 @@ package edu.uci.eecs.wukong.colocation;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
@@ -12,16 +13,35 @@ import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
  * 
  */
 public class ColocationGraphNode {
+	
 	private static int id = 0;
 	private int nodeId;
+	private Set<Integer> mWuClasses;
 
-	private ArrayList<ColocationGraphNode> mNeighbors = new ArrayList<ColocationGraphNode>();
+	private Set<Edge> mMergeEdges;
+	private double mWeight = 0.0;
+	private int deployDevice = -1;
+
+	/*
+	 * 
+	 * Neighbors of this colocation graph node
+	 * 
+	 */
+	private List<ColocationGraphNode> mNeighbors = new ArrayList<ColocationGraphNode>();
 
 	public void addNeighbors(ColocationGraphNode node) {
 		mNeighbors.add(node);
 	}
 
-	public ArrayList<ColocationGraphNode> getNeighbors() {
+	public boolean isNeighborExist(ColocationGraphNode node){
+		for (ColocationGraphNode neigobor : getNeighbors()) {
+			if (neigobor.equal(node)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public List<ColocationGraphNode> getNeighbors() {
 		return mNeighbors;
 	}
 
@@ -33,11 +53,42 @@ public class ColocationGraphNode {
 		}
 	}
 	
-	private Set<Integer> mWuClasses;
-	private Set<Edge> mMergeEdges;
-	private double mWeight = 0.0;
-	private int mDegree = 0;
-	private int deployDevice = -1;
+	/*
+	 * 
+	 * Parents
+	 * 
+	 */
+	private List<ColocationGraphNode> mParents = new ArrayList<ColocationGraphNode>();
+	
+	public List<ColocationGraphNode> getParents() {
+		return mParents;
+	}
+	
+	public boolean isParentExist(ColocationGraphNode node) {
+		for (ColocationGraphNode parent : getParents()) {
+			if (parent.equal(node)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addParents(ColocationGraphNode node) {
+		if (!isParentExist(node)) {
+			getParents().add(node);
+		}
+	}
+	
+	public void removeParents(ColocationGraphNode node) {
+		if (isParentExist(node)) {
+			getParents().remove(node);
+		}
+	}
+	
+	
+	/*
+	 * Constructor
+	 */
 
 	public ColocationGraphNode(Set<Integer> wuclasses,
 			double amountOfSavingEnergy, Set<Edge> mergingEdges) {
@@ -47,6 +98,8 @@ public class ColocationGraphNode {
 		this.mMergeEdges = mergingEdges;
 	}
 
+	
+	/* Getter and Setter */
 	public Set<Edge> getMergingEdges() {
 		return mMergeEdges;
 	}
@@ -58,16 +111,8 @@ public class ColocationGraphNode {
 		return nodeId;
 	}
 
-	public void increaseDegree() {
-		mDegree++;
-	}
-
-	public void decreaseDegree() {
-		mDegree--;
-	}
-
 	public int getDegree() {
-		return mDegree;
+		return mNeighbors.size();
 	}
 
 	public void setNodeId(int id) {
