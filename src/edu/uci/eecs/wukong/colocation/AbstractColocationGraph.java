@@ -27,6 +27,18 @@ public abstract class AbstractColocationGraph {
 	protected abstract void init();
 	
 	
+	protected void rawInitCollocationGraph(FlowGraph graph) {
+		for (Edge fbpEdge : graph.getEdges()) {
+			Set<Integer> sets = new HashSet<Integer>();
+			sets.add(fbpEdge.getInWuClass().getWuClassId());
+			sets.add(fbpEdge.getOutWuClass().getWuClassId());
+			Set<Edge> edgeSet = new HashSet<Edge>();
+			edgeSet.add(fbpEdge);
+			ColocationGraphNode node = new ColocationGraphNode(sets, fbpEdge.getWeight(), edgeSet);
+			addNode(node);
+		}
+	}
+	
 	/*
 	 * 
 	 * Set operation
@@ -81,19 +93,7 @@ public abstract class AbstractColocationGraph {
 		// ", " + edge.getOutNode().getNodeId());
 	}
 	
-	protected void printEdges() {
-		System.out.println("Links:" + edges.size());
-		for (int i = 0; i < edges.size(); i++) {
-			System.out.println(edges.get(i).toString());
-		}
-	}
 	
-	protected void printNodes() {
-		System.out.println("Nodes:" + getNodes().size());
-		for (int i = 0; i < getNodes().size(); i++) {
-			System.out.println(getNodes().get(i).toString());
-		}
-	}
 	
 
 	public List<ColocationGraphNode> getNeighbors(ColocationGraphNode node) {
@@ -190,5 +190,28 @@ public abstract class AbstractColocationGraph {
 		}
 	}
 
+	/*
+	 * Print debug message.
+	 */
+	
+	protected void printEdges() {
+		System.out.println("Links:" + edges.size());
+		for (int i = 0; i < edges.size(); i++) {
+			System.out.println(edges.get(i).toString());
+		}
+	}
+	
+	protected void printNodes() {
+		System.out.println("Nodes:" + getNodes().size());
+		for (int i = 0; i < getNodes().size(); i++) {
+			System.out.println(getNodes().get(i).toString());
+		}
+	}
+	
+	public void print() {
+		System.out.println("Collocation graph information:");
+		printNodes();
+		printEdges();
+	}
 	
 }

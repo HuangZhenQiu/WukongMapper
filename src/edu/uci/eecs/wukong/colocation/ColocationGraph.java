@@ -17,24 +17,6 @@ public class ColocationGraph extends AbstractColocationGraph{
 		this.init();
 	}
 	
-	public ColocationGraph(FlowGraph graph, WukongSystem system, int flag) {
-		super(graph, system);
-		this.init();
-	}
-
-	public void rawInitCollocationGraph(FlowGraph graph) {
-		for (Edge fbpEdge : graph.getEdges()) {
-			Set<Integer> sets = new HashSet<Integer>();
-			sets.add(fbpEdge.getInWuClass().getWuClassId());
-			sets.add(fbpEdge.getOutWuClass().getWuClassId());
-			Set<Edge> edgeSet = new HashSet<Edge>();
-			edgeSet.add(fbpEdge);
-			ColocationGraphNode node = new ColocationGraphNode(sets, fbpEdge.getWeight(), edgeSet);
-			addNode(node);
-		}
-	}
-
-	
 	public void init() {
 		rawInitCollocationGraph(graph);
 		
@@ -94,11 +76,5 @@ public class ColocationGraph extends AbstractColocationGraph{
 				}
 			}
 		}
-	}
-	
-	public void print() {
-		System.out.println("Collocation graph information:");
-		printNodes();
-		printEdges();
 	}
 }
