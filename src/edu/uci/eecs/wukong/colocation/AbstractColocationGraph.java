@@ -22,7 +22,6 @@ public abstract class AbstractColocationGraph {
 	
 	protected abstract void init();
 	
-	
 	protected Set<Integer> getIntersection(ColocationGraphNode node1,
 			ColocationGraphNode node2) {
 		Set<Integer> intersection = new HashSet<Integer>(
