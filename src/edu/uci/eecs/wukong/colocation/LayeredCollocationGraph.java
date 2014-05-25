@@ -20,25 +20,17 @@ public class LayeredCollocationGraph extends AbstractColocationGraph{
 		this.init();
 	}
 	
-	
-	
-	
 	public void init() {
-		
+		rawInitCollocationGraph(graph);
+
 		ArrayList<ColocationGraphNode> first = new ArrayList<ColocationGraphNode>();
-		for (Edge fbpEdge : graph.getEdges()) {
-			Set<Integer> sets = new HashSet<Integer>();
-			sets.add(fbpEdge.getInWuClass().getWuClassId());
-			sets.add(fbpEdge.getOutWuClass().getWuClassId());
-			Set<Edge> edgeSet = new HashSet<Edge>();
-			edgeSet.add(fbpEdge);
-			ColocationGraphNode node = new ColocationGraphNode(sets, fbpEdge.getWeight(), edgeSet);
+		for(ColocationGraphNode node: getNodes()){
 			first.add(node);
 		}
+		
 		layers.add(first);
 		
 		for (int i = 0; i < layers.size(); i++) {
-			
 			
 			ArrayList<ColocationGraphEdge> edgesToBeAdd = new ArrayList<ColocationGraphEdge>();
 			for (int k = 0; k < layers.get(i).size(); k++) {
@@ -76,42 +68,34 @@ public class LayeredCollocationGraph extends AbstractColocationGraph{
 				
 				if (getIntersection(node1, node2).size() != 0) {
 					Set<Integer> union = getUnion(node1, node2);
-					if (!system.isHostable(union)) {
-						ColocationGraphEdge edge = new ColocationGraphEdge(node1, node2);
-						addEdge(edge);
-					} else {
+					
+					ColocationGraphEdge edge = new ColocationGraphEdge(node1, node2);
+					addEdge(edge);
+					
+					if (system.isHostable(union)) {
 						// hostable @@
 						
 						Set<Edge> edges = new HashSet<FlowBasedProcess.Edge>(node1.getMergingEdges());
 						edges.addAll(node2.getMergingEdges());
+						
 						ColocationGraphNode node = new ColocationGraphNode(union, node1.getWeight() + node2.getWeight(), edges);
-						ColocationGraphEdge edge = new ColocationGraphEdge(node1, node2);
-						if(!isEdgeExist(edge)){
-							addEdge(edge);
-						}
 						node.addParents(node1);
 						node.addParents(node2);
 						
-						int size = node.getInvolveWuClasses().size();
-						if(layers.size()-1 < size-2) {
+						int layer_index = node.getInvolveWuClasses().size()-2;
+						if(layers.size()-1 < layer_index) {
 							ArrayList<ColocationGraphNode> layer = new ArrayList<ColocationGraphNode>();
 							layers.add(layer);
 						}
 						
-						ArrayList<ColocationGraphNode> layer = layers.get(size-2);
-						
-						boolean found = false;
-						for (ColocationGraphNode check : layer) {
-							if(check.equal(node)){
-								found = true;
-								check.addParents(node1);
-								check.addParents(node2);
-							}
+						ColocationGraphNode check = null;
+						if ((check = isNodeExist(node, layers.get(layer_index)))!=null){
+							check.addParents(node1);
+							check.addParents(node2);
+						}else {
+							layers.get(layer_index).add(node);
+							addNode(node);
 						}
-						if(!found){
-							layer.add(node);
-						}
-						
 					}
 				}
 			}
@@ -119,18 +103,23 @@ public class LayeredCollocationGraph extends AbstractColocationGraph{
 		}
 	}
 	
-	public void printLayeredColocationGraph(){
-		for(ArrayList<ColocationGraphNode> layer:layers){
-			
-			System.out.println("Size: " + layers.indexOf(layer) + ", sized " + layer.size());
-			for(ColocationGraphNode node:layer) {
-				System.out.print("node: " + node.getInvolveWuClasses() + ", parents: ");
-				for(ColocationGraphNode parent: node.getParents()){
-					System.out.print(parent.getInvolveWuClasses() + ", ");
-				}
-				System.out.println();
+	private ColocationGraphNode isNodeExist(ColocationGraphNode node, ArrayList<ColocationGraphNode> layer) {
+		for(ColocationGraphNode check : layer){
+			if(check.equal(node)){
+				return check;
 			}
 		}
+		return null;
+	}
+	
+	public void printLayeredColocationGraph(){
+
+		printNodes();
+		
+		for(ColocationGraphNode node: getNodes()){
+			System.out.println(node.getParents());
+		}
+		
 		printEdges();
 	}
 }
