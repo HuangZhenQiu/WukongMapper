@@ -1,8 +1,10 @@
 package edu.uci.eecs.wukong.util;
 
+import edu.uci.eecs.wukong.colocation.AbstractColocationGraph;
 import edu.uci.eecs.wukong.colocation.ColocationGraph;
 import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
 import edu.uci.eecs.wukong.colocation.FlowGraph;
+import edu.uci.eecs.wukong.colocation.LayeredCollocationGraph;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper.GreedyType;
 
@@ -34,8 +36,23 @@ public class WeightedIndependentSetSelector {
 
 		return maxIndependentSet;
 	}
+	
+	public List<ColocationGraphNode> select_layer(FlowGraph graph) {
+		AbstractColocationGraph collocationGraph = new LayeredCollocationGraph(graph, system);
+		List<ColocationGraphNode> maxIndependentSet = new ArrayList<ColocationGraphNode>();
+		switch (greedyType) {
+		case GWMAX:
+			maxIndependentSet = gmaxFramework(collocationGraph);
+			break;
+		default:
+			maxIndependentSet = gminFramework(collocationGraph);
+			break;
+		}
 
-	public List<ColocationGraphNode> gminFramework(ColocationGraph graph) {
+		return maxIndependentSet;
+	}
+
+	public List<ColocationGraphNode> gminFramework(AbstractColocationGraph graph) {
 		List<ColocationGraphNode> maxIndependentSet = new ArrayList<ColocationGraphNode>();
 		while (!graph.getNodes().isEmpty()) {
 			ColocationGraphNode node;
@@ -53,15 +70,15 @@ public class WeightedIndependentSetSelector {
 		return maxIndependentSet;
 	}
 	
-	public List<ColocationGraphNode> gmaxFramework(ColocationGraph graph){
-		while (graph.getEdges().size() != 0) {
+	public List<ColocationGraphNode> gmaxFramework(AbstractColocationGraph graph){
+		while (graph.getAllEdges().size() != 0) {
 			ColocationGraphNode node = gmaxChoose(graph);
 			graph.deleteNodeAndEdges(node);
 		}
 		return graph.getNodes();
 	}
 
-	public ColocationGraphNode gminChoose(ColocationGraph graph) {
+	public ColocationGraphNode gminChoose(AbstractColocationGraph graph) {
 
 		ArrayList<ColocationGraphNode> lists = (ArrayList<ColocationGraphNode>) graph
 				.getNodes();
@@ -80,7 +97,7 @@ public class WeightedIndependentSetSelector {
 		return selected;
 	}
 
-	public ColocationGraphNode gmaxChoose(ColocationGraph graph) {
+	public ColocationGraphNode gmaxChoose(AbstractColocationGraph graph) {
 
 		ArrayList<ColocationGraphNode> lists = (ArrayList<ColocationGraphNode>) graph
 				.getNodes();
@@ -102,7 +119,7 @@ public class WeightedIndependentSetSelector {
 		return selected;
 	}
 
-	public ColocationGraphNode gwmin2Choose(ColocationGraph graph) {
+	public ColocationGraphNode gwmin2Choose(AbstractColocationGraph graph) {
 		ArrayList<ColocationGraphNode> lists = (ArrayList<ColocationGraphNode>) graph
 				.getNodes();
 
