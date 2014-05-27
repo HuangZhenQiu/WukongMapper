@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 
 
 public class WuKongSystemFactory {
@@ -17,6 +16,8 @@ public class WuKongSystemFactory {
 	private int deviceNumber;
 	private int distanceRange;
 	
+	private int K;
+	
 	public WuKongSystemFactory(int classNumber, int deviceNumber, int landMarkNumber, int distanceRange) {
 		
 		this.landMarkNumber = landMarkNumber;
@@ -25,46 +26,81 @@ public class WuKongSystemFactory {
 		this.distanceRange = distanceRange;
 	}
 	
-	public WukongSystem createRandomWuKongSystem() {
+	public WuKongSystemFactory(int classNumber, int deviceNumber, int landMarkNumber, int distanceRange, int K){
+		this.landMarkNumber = landMarkNumber;
+		this.classNumber = classNumber;
+		this.deviceNumber = deviceNumber;
+		this.distanceRange = distanceRange;
+		this.K = K;
+	}
+	
+	public WukongSystem createRandomWukongSystem(int K, int replica){
+		
+		
+		if(replica * classNumber >= K * deviceNumber) {
+			System.out.println("Not creatable");
+			return null;
+		}
+		
 		WukongSystem system = new WukongSystem();
 		List<WuDevice> devices = new ArrayList<WuDevice>();
+		
 		Random ran = new Random();
-		int[] glabalClassMap = new int[classNumber];
-		Util.reset(glabalClassMap);
-		int[] classMap = new int[classNumber];
+		
+		int[] globalClassMap = new int[classNumber]; // used for global recording wuclasses.
+		Util.reset(globalClassMap);
+		int[] classMap = new int[classNumber]; // used for recording wuclasses on a device. 
 		Double[][] distances = getRandomDeviceDistanceMatrix(deviceNumber, distanceRange);
-
+		
+		/* initial all devices */ 
 		for(int i = 0; i < deviceNumber; i++) {
-			Util.reset(classMap);
 			List<Integer> objectIds = new ArrayList<Integer>();
-			for(int j = 0; j < 6; j++) {
-				ran.setSeed(System.nanoTime() + j * j);
-				int  classId = Math.abs(ran.nextInt()) % (classNumber - 1) + 1;
-				classId = findClassId(glabalClassMap, classId);
-				if(classMap[classId] == 0) {
-					objectIds.add(classId);
-					classMap[classId] = 1;
-				}
-			}
-			
-			WuDevice device = new WuDevice(i + 1, Double.MAX_VALUE, objectIds, getRandomDistance(landMarkNumber, distanceRange),
-					new ArrayList<Double>(Arrays.asList(distances[i])), system);
+			WuDevice device = new WuDevice(i + 1, Double.MAX_VALUE, objectIds, getRandomDistance(landMarkNumber, distanceRange), new ArrayList<Double>(Arrays.asList(distances[i])), system);
 			devices.add(device);
 		}
 		
-		//add wuclass haven't been added
+		// distribute replica of non-duplicate wuclasses to devices, all globalclassmap should reach replica after this operation 
 		for (int i = 0; i < classNumber; i ++) {
 			
-			if(glabalClassMap[i] == 0) {
+			while(globalClassMap[i] < replica ) {
 				ran.setSeed(System.nanoTime() + i * i);
 				int deviceId = Math.abs(ran.nextInt()) % deviceNumber;
-				devices.get(deviceId).addWuObject(i);
+				
+				if (!devices.get(deviceId).isWuObjectExist(i)){
+					if(devices.get(deviceId).getAllWuObjectId().size() < K){
+						devices.get(deviceId).addWuObject(i);
+						globalClassMap[i] ++;
+					}
+				}
 			}
 		}
 		
+		for (int i = 0; i < deviceNumber; i++) {
+			Util.reset(classMap);
+			
+			List<Integer> objectIds = devices.get(i).getWuObjects();
+			for( Integer objectId: objectIds){
+				classMap[objectId] ++;
+			}
+			
+			while(devices.get(i).getWuObjects().size() < K){
+				ran.setSeed(System.nanoTime() + i * i);
+				int classId = Math.abs(ran.nextInt()) % (classNumber - 1) + 1;
+				
+				if(classMap[classId] < replica){
+					devices.get(i).addWuObject(classId);
+					classMap[classId] ++;
+				}
+			}
+			
+		}
+		
 		system.initialize(devices, distances, classNumber, landMarkNumber);
-		 
 		return system;
+	}
+	
+	public WukongSystem createRandomWuKongSystem() {
+		return createRandomWukongSystem(6, 1);
 	}
 	
 	private int findClassId(int[] glabalClassMap, int number) {
