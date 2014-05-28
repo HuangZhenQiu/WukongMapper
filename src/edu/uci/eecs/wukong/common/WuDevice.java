@@ -168,6 +168,24 @@ public class WuDevice implements Comparable<WuDevice>{
 	}
 	
 	
+	public boolean isWuObjectExist(Integer wuclassId) {
+		for (Integer wuobject : getWuObjects()) {
+			if (wuclassId == wuobject) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public List<Integer> getWuObjects() {
+		List<Integer> ids = new ArrayList<Integer>();
+		
+		for (WuObject wuObject : wuObjects) {
+			ids.add(wuObject.wuClassId);
+		}
+		return ids;
+	}
+	
 	public ImmutableList<Integer> getAllWuObjectId() {
 		List<Integer> ids = new ArrayList<Integer>();
 		
