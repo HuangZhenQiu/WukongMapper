@@ -51,6 +51,11 @@ public class WeightedIndependentSetSelector {
 
 		return maxIndependentSet;
 	}
+	
+	public AbstractColocationGraph get_layer(FlowGraph graph) { 
+		AbstractColocationGraph collocationGraph = new LayeredCollocationGraph(graph, system);
+		return collocationGraph;
+	}
 
 	public List<ColocationGraphNode> gminFramework(AbstractColocationGraph graph) {
 		List<ColocationGraphNode> maxIndependentSet = new ArrayList<ColocationGraphNode>();
@@ -61,7 +66,7 @@ public class WeightedIndependentSetSelector {
 				node = gminChoose(graph);
 				break;
 			default:
-				node = gwmin2Choose(graph);
+				node = louisChoose(graph);
 				break;
 			}
 			maxIndependentSet.add(node);
@@ -129,6 +134,24 @@ public class WeightedIndependentSetSelector {
 		for (ColocationGraphNode node : lists) {
 
 			double comparing = node.getWeight() / graph.getNeighborWeight(node);
+			if (comparing > value && system.isHostable(node)) {
+				value = comparing;
+				selected = node;
+			}
+		}
+		return selected;
+	}
+	
+	public ColocationGraphNode louisChoose(AbstractColocationGraph graph) {
+		ArrayList<ColocationGraphNode> lists = (ArrayList<ColocationGraphNode>) graph
+				.getNodes();
+
+		ColocationGraphNode selected = lists.get(0);
+		double value = 0;
+
+		for (ColocationGraphNode node : lists) {
+
+			double comparing = node.getWeight() - graph.getNeighborWeight(node);
 			if (comparing > value && system.isHostable(node)) {
 				value = comparing;
 				selected = node;

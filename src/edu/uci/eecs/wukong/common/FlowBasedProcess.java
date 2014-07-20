@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.Collection;
 import java.util.Set;
@@ -193,6 +194,7 @@ public class FlowBasedProcess {
 	public static enum TYPE {LINEAR, STAR, RANDOM, SCALE_FREE};
 	
 	private List<Edge> edges;
+	private List<WuClass> wuClasses;
 	
 	private HashMap<Integer, WuClass> wuClassMap;
 	
@@ -257,6 +259,8 @@ public class FlowBasedProcess {
 				Double distanceConstraint= Double.parseDouble(tokenizer.nextToken());
 				LocationConstraint constraint= new LocationConstraint(landmarkId, distanceConstraint);
 				WuClass wuClass = new WuClass(classId, constraint);
+				wuClasses.add(wuClass);
+				
 				wuClassMap.put(classId, wuClass);
 				locationConstraints.put(classId, constraint);
 				
@@ -283,8 +287,7 @@ public class FlowBasedProcess {
 		
 
 		this.setupMaps();
-	}
-	
+	}	
 	
 	private void setupMaps() {
 		
@@ -531,6 +534,12 @@ public class FlowBasedProcess {
 		return this.wuClassMap.get(id);
 	}
 	
+	public List<WuClass> getWuClassList(){
+		return wuClasses;
+	}
+	public void setWuClassList(List<WuClass> wuClasses) { 
+		this.wuClasses = wuClasses; 
+	}
 	public ImmutableList<Edge> getMergableEdges(WukongSystem system) 
 	{
 		ImmutableList.Builder<Edge> builder = ImmutableList.<Edge>builder();
@@ -549,9 +558,9 @@ public class FlowBasedProcess {
 		
 		fileString += "#FBP \n";
 		fileString += wuClassMap.size() + "\n";
-		Iterator it = wuClassMap.entrySet().iterator();
+		Iterator<Entry<Integer, WuClass>> it = wuClassMap.entrySet().iterator();
 		while (it.hasNext()){
-			Map.Entry pairs= (Map.Entry)it.next();
+			Map.Entry<Integer, WuClass> pairs= (Map.Entry<Integer, WuClass>)it.next();
 			int classId = (Integer) pairs.getKey();
 			WuClass wuclass = (WuClass) pairs.getValue();
 			
@@ -578,5 +587,30 @@ public class FlowBasedProcess {
 		
 		bw.write(this.toFileFormat());
 		bw.close();
+	}
+	
+	public HashMap<Integer, WuClass> getWuClasses(){
+		return wuClassMap;
+	}
+	
+	public ArrayList<WuClass> getWuClassesList(){
+		HashMap<Integer, WuClass> maps = this.getWuClasses();
+		
+		ArrayList<WuClass> return_list = new ArrayList<WuClass>();
+		Iterator it = wuClassMap.entrySet().iterator();
+		while(it.hasNext()){
+			Map.Entry pairs =  (Map.Entry) it.next();
+			return_list.add((WuClass)pairs.getValue());
+			it.remove();
+		}
+		return return_list;
+	}
+	public void printWuClasses(){
+		Iterator it = wuClassMap.entrySet().iterator();
+		while(it.hasNext()){
+			Map.Entry pairs =  (Map.Entry) it.next();
+			System.out.println("Wuclass:" + pairs.getKey()+", " + pairs.getValue());
+			it.remove();
+		}
 	}
 }

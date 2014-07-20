@@ -1,5 +1,6 @@
 package edu.uci.eecs.wukong.util;
 
+import edu.uci.eecs.wukong.common.WuObject;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.WuDevice;
 
@@ -34,7 +35,7 @@ public class WuKongSystemFactory {
 		this.K = K;
 	}
 	
-	public WukongSystem createRandomWukongSystem(int K, int replica){
+	public WukongSystem createRandomWukongSystem(int K, int replica, int dimension){
 		
 		
 		if(replica * classNumber >= K * deviceNumber) {
@@ -68,7 +69,9 @@ public class WuKongSystemFactory {
 				
 				if (!devices.get(deviceId).isWuObjectExist(i)){
 					if(devices.get(deviceId).getAllWuObjectId().size() < K){
-						devices.get(deviceId).addWuObject(i);
+						WuObject wuObject = new WuObject(i);
+						wuObject.initProperties(dimension);
+						devices.get(deviceId).addWuObject(wuObject);
 						globalClassMap[i] ++;
 					}
 				}
@@ -88,7 +91,12 @@ public class WuKongSystemFactory {
 				int classId = Math.abs(ran.nextInt()) % (classNumber - 1) + 1;
 				
 				if(classMap[classId] < replica){
-					devices.get(i).addWuObject(classId);
+//					devices.get(i).addWuObject(classId);
+					
+					WuObject wuObject = new WuObject(classId);
+					wuObject.initProperties(dimension);
+					devices.get(i).addWuObject(wuObject);
+					
 					classMap[classId] ++;
 				}
 			}
@@ -100,7 +108,7 @@ public class WuKongSystemFactory {
 	}
 	
 	public WukongSystem createRandomWuKongSystem() {
-		return createRandomWukongSystem(6, 1);
+		return createRandomWukongSystem(6, 1, 10);
 	}
 	
 	private int findClassId(int[] glabalClassMap, int number) {

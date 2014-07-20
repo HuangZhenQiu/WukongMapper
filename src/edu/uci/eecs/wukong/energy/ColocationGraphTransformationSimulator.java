@@ -1,5 +1,8 @@
 package edu.uci.eecs.wukong.energy;
 
+
+import edu.uci.eecs.wukong.common.FlowBasedProcess;
+import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.energy.common.CollocationGraphTransformationTest;
 
 public class ColocationGraphTransformationSimulator {
@@ -9,6 +12,10 @@ public class ColocationGraphTransformationSimulator {
 	private static final int class_number = 30;
 	
 	public CollocationGraphTransformationTest getTest(int K, int replica){
+		return getTest(K, replica, TYPE.RANDOM);
+	}
+	
+	public CollocationGraphTransformationTest getTest(int K, int replica, FlowBasedProcess.TYPE type) {
 		CollocationGraphTransformationTest test = new CollocationGraphTransformationTest(K, replica) {
 			protected void runTest(){
 				testCollocationGraphTrasformation();
@@ -16,6 +23,7 @@ public class ColocationGraphTransformationSimulator {
 		};
 		test.setClassNumber(class_number);
 		test.setDeviceNumber(device_number);
+		test.setType(type);
 		
 		return test;
 	}
@@ -26,9 +34,18 @@ public class ColocationGraphTransformationSimulator {
 		CollocationGraphTransformationTest test = getTest(4, 2);
 		test.run();
 		
-		/* K = 4 and replica = 2 */
-		test = getTest(4, 2);
+		/* K = 4 and replica = 2 Type Random */
+		test = getTest(4, 2, TYPE.RANDOM);
 		test.run();
+		
+		/* K = 4 and replica = 2 Type Linear */
+		test = getTest(4, 2, TYPE.LINEAR);
+		test.run();
+		
+		/* K = 4 and replica = 2 Type Star */
+		test = getTest(4, 2, TYPE.STAR);
+		test.run();
+		
 		
 		/* K = 4 and replica = 3 */
 		test = getTest(4, 3);

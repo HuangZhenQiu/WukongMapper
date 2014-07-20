@@ -76,4 +76,12 @@ public class WuClass {
 		this.energyCost = energy;
 	}
 	
+	private double[] userPreferences = {0};
+	
+	public void setPreference(double[] preferences){
+		this.userPreferences = preferences;
+	}
+	public double[] getUserPreferences(){
+		return userPreferences;
+	}
 }

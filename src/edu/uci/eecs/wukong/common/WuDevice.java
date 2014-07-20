@@ -18,38 +18,6 @@ import com.google.common.collect.ImmutableList;
  */
 public class WuDevice implements Comparable<WuDevice>{
 
-	public class WuObject {
-		
-		private Integer wuClassId;
-		private WuDevice device;
-		private boolean active;
-		
-		public WuObject(Integer wuClassId, WuDevice device) {
-			this.wuClassId = wuClassId;
-			this.device = device;
-			this.active = false;
-		}
-		
-		public Integer getWuClassId() {
-			return this.wuClassId;
-		}
-		
-		public boolean isActive() {
-			return active;
-		}
-		
-		
-		//They are only accessible by WuDevice
-		protected void activate() {
-			this.active = true;
-		}
-		
-		protected void deactivate() {
-			this.active = false;
-		}
-		
-	}
-
 	private int wuDeviceId;
 	private List<WuObject> wuObjects;
 	private HashMap<Integer, WuObject> wuObjectMap;
@@ -101,7 +69,7 @@ public class WuDevice implements Comparable<WuDevice>{
 		this.system = system;
 		
 		for (Integer id: wuClassIds) {
-			WuObject object = new WuObject(id, this);
+			WuObject object = new WuObject(id);
 			wuObjects.add(object);
 			wuObjectMap.put(id, object);
 		}
@@ -145,7 +113,7 @@ public class WuDevice implements Comparable<WuDevice>{
 		
 		while (tokenizer.hasMoreTokens()) {
 			Integer classId = Integer.parseInt(tokenizer.nextToken());
-			WuObject object = new WuObject(classId, this);
+			WuObject object = new WuObject(classId);
 			wuObjects.add(object);
 			wuObjectMap.put(classId, object);
 		}
@@ -177,11 +145,15 @@ public class WuDevice implements Comparable<WuDevice>{
 		return false;
 	}
 	
+	public List<WuObject> getServices() {
+		return wuObjects;
+	}
+	
 	public List<Integer> getWuObjects() {
 		List<Integer> ids = new ArrayList<Integer>();
 		
 		for (WuObject wuObject : wuObjects) {
-			ids.add(wuObject.wuClassId);
+			ids.add(wuObject.getWuClassId());
 		}
 		return ids;
 	}
@@ -190,7 +162,7 @@ public class WuDevice implements Comparable<WuDevice>{
 		List<Integer> ids = new ArrayList<Integer>();
 		
 		for (WuObject wuObject : wuObjects) {
-			ids.add(wuObject.wuClassId);
+			ids.add(wuObject.getWuClassId());
 		}
 		
 		return ImmutableList.<Integer>builder().addAll(ids).build();
@@ -199,8 +171,8 @@ public class WuDevice implements Comparable<WuDevice>{
 	public ImmutableList<Integer> getAllActiveWuObjectId() {
 		List<Integer> ids = new ArrayList<Integer>();
 		for (WuObject wuObject : wuObjects) {
-			if (wuObject.active) {
-				ids.add(wuObject.wuClassId);
+			if (wuObject.isActive()) {
+				ids.add(wuObject.getWuClassId());
 			}
 		}
 		
@@ -327,11 +299,15 @@ public class WuDevice implements Comparable<WuDevice>{
 	}
 	
 	public void addWuObject(int wuObjectId) {
-		WuObject object = new WuObject(wuObjectId, this);
+		WuObject object = new WuObject(wuObjectId);
 		this.wuObjects.add(object);
 		this.wuObjectMap.put(wuObjectId, object);
 	}
 
+	public void addWuObject(WuObject wuObject) {
+		this.wuObjects.add(wuObject);
+		this.wuObjectMap.put(wuObject.getWuClassId(), wuObject);
+	}
 	public int getWuDeviceId() {
 		return wuDeviceId;
 	}

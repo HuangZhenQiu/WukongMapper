@@ -3,9 +3,9 @@ package edu.uci.eecs.wukong.energy;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
+import edu.uci.eecs.wukong.energy.common.CollocationGraphTest;
 import edu.uci.eecs.wukong.energy.mapper.GreedyBasedMapper;
 import edu.uci.eecs.wukong.energy.mapper.Mapper.MapType;
-import edu.uci.eecs.wukong.energy.mapper.GreedyBasedMapper;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper.GreedyType;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper;
 import edu.uci.eecs.wukong.util.FlowBasedProcessFactory;
@@ -106,63 +106,63 @@ public class MEDES2014Simulator {
 			 * GMIN2 test
 			 */
 			
-//			fbp.reset();
-//			system.reset();
-//			
-//			System.out.println("Gmin2 test: " + i);
-//			System.out.println("FBP orignial energy consumption: "+ fbp.getTotalEnergyConsumption());
-//			
-//			Gmin2ExecutionTime += GMIN2Simulation(system, fbp);
-//			System.out.println("Largest Device Energy Consumption: " + system.getLargestDeviceEnergtConsumption());
-//			System.out.println("System Total Energy Consumption: " + system.getTotalEnergyConsumption());
-//			System.out.println("");
-//			
-//			double gmin2Total = system.getTotalEnergyConsumption();
-//			double gmin2Largest = system.getLargestDeviceEnergtConsumption();
-//			Gmin2SavingRatio += gmin2Total / initialTotal;
+			fbp.reset();
+			system.reset();
+			
+			System.out.println("Gmin2 test: " + i);
+			System.out.println("FBP orignial energy consumption: "+ fbp.getTotalEnergyConsumption());
+			
+			Gmin2ExecutionTime += GMIN2Simulation(system, fbp);
+			System.out.println("Largest Device Energy Consumption: " + system.getLargestDeviceEnergtConsumption());
+			System.out.println("System Total Energy Consumption: " + system.getTotalEnergyConsumption());
+			System.out.println("");
+			
+			double gmin2Total = system.getTotalEnergyConsumption();
+			double gmin2Largest = system.getLargestDeviceEnergtConsumption();
+			Gmin2SavingRatio += gmin2Total / initialTotal;
 			
 			/* 
 			 * GMAX test
 			 */
 			
-//			fbp.reset();
-//			system.reset();
-//			System.out.println("Gmax test: " + i);
-//			System.out.println("FBP orignial energy consumption: "+ fbp.getTotalEnergyConsumption());
-//			
-//			GmaxExecutionTime += GMAXSimulation(system, fbp);
-//			System.out.println("Largest Device Energy Consumption: " + system.getLargestDeviceEnergtConsumption());
-//			System.out.println("System Total Energy Consumption: " + system.getTotalEnergyConsumption());
-//			System.out.println("");
-//			double gmaxTotal = system.getTotalEnergyConsumption();
-//			double gmaxLargest = system.getLargestDeviceEnergtConsumption();
-//			
-//			GmaxSavingRatio += gmaxTotal / initialTotal;
+			fbp.reset();
+			system.reset();
+			System.out.println("Gmax test: " + i);
+			System.out.println("FBP orignial energy consumption: "+ fbp.getTotalEnergyConsumption());
+			
+			GmaxExecutionTime += GMAXSimulation(system, fbp);
+			System.out.println("Largest Device Energy Consumption: " + system.getLargestDeviceEnergtConsumption());
+			System.out.println("System Total Energy Consumption: " + system.getTotalEnergyConsumption());
+			System.out.println("");
+			double gmaxTotal = system.getTotalEnergyConsumption();
+			double gmaxLargest = system.getLargestDeviceEnergtConsumption();
+			
+			GmaxSavingRatio += gmaxTotal / initialTotal;
 			
 			/* 
 			 * Greedy test
 			 */
 			
-//			fbp.reset();
-//			system.reset();
-//			
-//			System.out.println("Greedy test: " + i);
-//			System.out.println("FBP orignial energy consumption: "+ fbp.getTotalEnergyConsumption());
-//			
-//			GreedyExecutionTime += GreedySimulation(system, fbp);
-//			System.out.println("Largest Device Energy Consumption: " + system.getLargestDeviceEnergtConsumption());
-//			System.out.println("System Total Energy Consumption: " + system.getTotalEnergyConsumption());
-//			System.out.println("");
-//			
-//			double greedyTotal = system.getTotalEnergyConsumption();
-//			double greedyLargest = system.getLargestDeviceEnergtConsumption();
-//			GreedySavingRatio += greedyTotal / initialTotal;
-//			
-//			double largest = Math.max(Math.max(greedyLargest, Math.max(gmaxLargest, gmin2Largest)), gminLargest);
-//			GminLargestRatio += gminLargest / largest;
-//			Gmin2LargestRatio += gmin2Largest / largest;
-//			GmaxLargestRatio += gmaxLargest / largest;
-//			GreedyLargestRatio += greedyLargest / largest;
+			fbp.reset();
+			system.reset();
+			
+			System.out.println("Greedy test: " + i);
+			System.out.println("FBP orignial energy consumption: "+ fbp.getTotalEnergyConsumption());
+			
+			GreedyExecutionTime += GreedySimulation(system, fbp);
+			System.out.println("Largest Device Energy Consumption: " + system.getLargestDeviceEnergtConsumption());
+			System.out.println("System Total Energy Consumption: " + system.getTotalEnergyConsumption());
+			System.out.println("");
+			
+			double greedyTotal = system.getTotalEnergyConsumption();
+			double greedyLargest = system.getLargestDeviceEnergtConsumption();
+			GreedySavingRatio += greedyTotal / initialTotal;
+			
+			double largest = Math.max(Math.max(greedyLargest, Math.max(gmaxLargest, gmin2Largest)), gminLargest);
+			GminLargestRatio += gminLargest / largest;
+			Gmin2LargestRatio += gmin2Largest / largest;
+			GmaxLargestRatio += gmaxLargest / largest;
+			GreedyLargestRatio += greedyLargest / largest;
 			
 		}
 
@@ -174,6 +174,11 @@ public class MEDES2014Simulator {
 		System.out.println("Average Execution Time for Gmin2 method:" + Gmin2ExecutionTime / ITERATION);
 		System.out.println("Average Execution Time for Gmax method:" + GmaxExecutionTime / ITERATION);
 		System.out.println("Average Execution Time for Greedy method:" + GreedyExecutionTime / ITERATION);
+		
+		CollocationGraphTest test = new CollocationGraphTest();
+		test.run();
+		
+		
 	}
 
 	/**

@@ -1,13 +1,12 @@
 package edu.uci.eecs.wukong.colocation;
 
-import edu.uci.eecs.wukong.common.FlowBasedProcess;
-import edu.uci.eecs.wukong.common.WuClass;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
+
+import edu.uci.eecs.wukong.common.WuClass;
+import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 
 public class FlowGraph {
 	

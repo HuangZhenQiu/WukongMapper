@@ -20,20 +20,26 @@ public class ColocationGraphNode {
 
 	private Set<Edge> mMergeEdges;
 	private double mWeight = 0.0;
-	private int deployDevice = -1;
 
 	/*
 	 * 
 	 * Neighbors of this colocation graph node
 	 * 
 	 */
+	
 	private List<ColocationGraphNode> mNeighbors = new ArrayList<ColocationGraphNode>();
 
+	public List<ColocationGraphNode> getNeighbors() {
+		return mNeighbors;
+	}
+	
 	public void addNeighbors(ColocationGraphNode node) {
-		mNeighbors.add(node);
+		if (!isNeighborExist(node)) {
+			getNeighbors().add(node);
+		}
 	}
 
-	public boolean isNeighborExist(ColocationGraphNode node){
+	public boolean isNeighborExist(ColocationGraphNode node) {
 		for (ColocationGraphNode neigobor : getNeighbors()) {
 			if (neigobor.equal(node)) {
 				return true;
@@ -41,23 +47,19 @@ public class ColocationGraphNode {
 		}
 		return false;
 	}
-	public List<ColocationGraphNode> getNeighbors() {
-		return mNeighbors;
-	}
-
+	
 	public void removeNeighbors(ColocationGraphNode node) {
-		for (ColocationGraphNode iter : mNeighbors) {
-			if (iter.equal(node)) {
-				mNeighbors.remove(node);
-			}
+		if(isNeighborExist(node)){
+			getNeighbors().remove(node);
 		}
 	}
 	
 	/*
 	 * 
-	 * Parents
+	 * Parents of this colocation graph node
 	 * 
 	 */
+	
 	private List<ColocationGraphNode> mParents = new ArrayList<ColocationGraphNode>();
 	
 	public List<ColocationGraphNode> getParents() {
@@ -87,15 +89,19 @@ public class ColocationGraphNode {
 	
 	
 	/*
-	 * Constructor
+	 * Constructors
 	 */
 
-	public ColocationGraphNode(Set<Integer> wuclasses,
-			double amountOfSavingEnergy, Set<Edge> mergingEdges) {
+	public ColocationGraphNode(Set<Integer> wuclasses, double amountOfSavingEnergy, Set<Edge> mergingEdges) {
 		this.mWeight = amountOfSavingEnergy;
 		this.mWuClasses = new HashSet<Integer>(wuclasses);
 		this.nodeId = id++;
 		this.mMergeEdges = mergingEdges;
+	}
+	
+	public ColocationGraphNode(ColocationGraphNode node1, ColocationGraphNode node2){
+		Set<Edge> edges = new HashSet<FlowBasedProcess.Edge>(node1.getMergingEdges());
+		edges.addAll(node2.getMergingEdges());
 	}
 
 	

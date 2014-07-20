@@ -19,8 +19,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
-import edu.uci.eecs.wukong.common.WuDevice.WuObject;
 
 /**
  * 
@@ -48,11 +46,15 @@ public class WukongSystem {
 	
 	private Integer landmarkNumber;
 	
+	private List<WuObject> serviceList;
+	
 	
 	public WukongSystem() {
 		devices = new ArrayList<WuDevice>();
 		deviceMap = new HashMap<Integer, WuDevice>();
 		wuClassDeviceMap = new HashMap<Integer, List<WuDevice>>();
+		
+		serviceList = new ArrayList<WuObject>();
 	}
 	
 	public WukongSystem(List<WuDevice> devices, int wuClassNumber, int landmarkNumber) {
@@ -62,6 +64,7 @@ public class WukongSystem {
 		this.distances = new Double[this.devices.size()][this.devices.size()];
 		this.deviceMap = new HashMap<Integer, WuDevice>();
 		this.wuClassDeviceMap = new HashMap<Integer, List<WuDevice>>();
+		this.serviceList = new ArrayList<WuObject>();
 		initializeMap(this.devices);
 	}
 	
@@ -74,6 +77,7 @@ public class WukongSystem {
 		initializeMap(this.devices);
 	}
 	
+	static int index = 0;
 	
 	private void initializeMap(List<WuDevice> devices) {
 		Iterator<WuDevice> iterator =  devices.iterator();
@@ -91,9 +95,22 @@ public class WukongSystem {
 				}
 			}
 			
+			List<WuObject> wuObjects = device.getServices();
+			for(WuObject object: wuObjects){
+				serviceList.add(object);
+			}
+			
 		}
 	}
 	
+	public void printServices(){
+		for(WuObject o : serviceList){
+			System.out.println("index: " + serviceList.indexOf(o) + ", wuobject id is: " + o.getWuClassId());
+		}
+	}
+	public List<WuObject> getServiceList() {
+		return serviceList;
+	}
 	//read data from file
 	public void initialize(BufferedReader input){
 		 

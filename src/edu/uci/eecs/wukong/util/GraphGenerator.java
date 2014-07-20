@@ -9,6 +9,7 @@ import org.jgrapht.generate.ScaleFreeGraphGenerator;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.ClassBasedVertexFactory;
+import org.jgrapht.Graphs;
 import org.jgrapht.VertexFactory;
 
 
@@ -17,6 +18,17 @@ public class GraphGenerator {
 	public GraphGenerator() {
 		
 	}
+	
+	public SimpleDirectedGraph<Object, DefaultEdge> generateHierarchicalClass(int vSize, int eSize, int depth) {
+		SimpleDirectedGraph <Object, DefaultEdge> treeGraph = new SimpleDirectedGraph<Object, DefaultEdge>(DefaultEdge.class);
+		
+		StarGraphGenerator<Object, DefaultEdge> starGraphGenerator = new StarGraphGenerator<Object, DefaultEdge>(3);		
+		VertexFactory<Object> vFactory = new ClassBasedVertexFactory<Object>(Object.class);
+		starGraphGenerator.generateGraph(treeGraph, vFactory, null);
+	
+		return treeGraph;
+	}
+	
 	
 	public SimpleDirectedGraph<Object, DefaultEdge> generateRandomGraph(int vSize, int eSize) {
         //Create the graph object; it is null at this point

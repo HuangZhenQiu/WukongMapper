@@ -61,7 +61,7 @@ public class FlowBasedProcessFactory {
 			
 		}
 		
-		HashMap<Object, WuClass> nodeMap = assignClassIdToGraphNode(graph);
+		HashMap<Object, WuClass> nodeMap = assignClassIdToGraphNode(graph, 1);
 		List<Edge> edges = buildEdges(nodeMap, graph);
 		
 		HashMap<Integer, WuClass> classMap =  new HashMap<Integer, WuClass>();
@@ -97,7 +97,7 @@ public class FlowBasedProcessFactory {
 		return edges;
 	}
 	
-	private HashMap<Object, WuClass> assignClassIdToGraphNode(SimpleDirectedGraph<Object, DefaultEdge> graph) {
+	private HashMap<Object, WuClass> assignClassIdToGraphNode(SimpleDirectedGraph<Object, DefaultEdge> graph, int replica) {
 		
 		HashMap<Object, WuClass> idMap = new HashMap<Object, WuClass>();
 		Random random = new Random();
@@ -109,16 +109,32 @@ public class FlowBasedProcessFactory {
 			Object object= objects.next();
 			random.setSeed(classNumber + System.nanoTime());
 			Integer classId = Math.abs(random.nextInt() % classNumber);
-			while(classMap[classId] == 1) {
+			while(classMap[classId] == replica) {
 				classId = Math.abs(random.nextInt() % classNumber);
 			}
-			classMap[classId] = 1;
+			classMap[classId]++;
 			WuClass wuclass = new WuClass(classId, generatRandomLocationConstraint(distanceRange));
 			idMap.put(object, wuclass);
 		}
 		
 		return idMap;
 	}
+	
+	private HashMap<Object, WuClass> assignClassIdToGraphNode(SimpleDirectedGraph<Object, DefaultEdge> graph) {
+		HashMap<Object, WuClass> idMap = new HashMap<Object, WuClass>();
+		Random random = new Random();
+		Set<Object> vertexes = graph.vertexSet();
+		Iterator<Object> objects = vertexes.iterator();
+		while(objects.hasNext()) {
+			Object object= objects.next();
+			random.setSeed(classNumber + System.nanoTime());
+			Integer classId = Math.abs(random.nextInt() % classNumber);
+			WuClass wuclass = new WuClass(classId, generatRandomLocationConstraint(distanceRange));
+			idMap.put(object, wuclass);
+		}
+		return idMap;
+	}
+
 	
 	private LocationConstraint generatRandomLocationConstraint(int range) {
 		
@@ -132,4 +148,56 @@ public class FlowBasedProcessFactory {
 		return new LocationConstraint(landMarkId, distance);
 	}
 
+	public FlowBasedProcess createFlowBasedProcess(TYPE type, int dimension, int number_of_component) {
+		
+		SimpleDirectedGraph<Object, DefaultEdge> graph;
+		
+		switch (type) {
+			case LINEAR:
+				graph = generator.generateLinearGraph(number_of_component);
+				break;
+			case STAR:
+				graph = generator.generateStarGraph(number_of_component);
+				break;
+			case RANDOM:
+				graph = generator.generateRandomGraph(number_of_component , number_of_component-1);
+				break;
+			case SCALE_FREE:
+				graph = generator.generateScaleFreeGraph(number_of_component);
+				break;
+			default:
+				graph = generator.generateRandomGraph(number_of_component, number_of_component - 1);
+			
+		}
+		
+		HashMap<Object, WuClass> nodeMap = assignClassIdToGraphNode(graph);
+		List<Edge> edges = buildEdges(nodeMap, graph);
+		
+		HashMap<Integer, WuClass> classMap =  new HashMap<Integer, WuClass>();
+		ArrayList<WuClass> wuClasses = new ArrayList<WuClass>();
+		Iterator<WuClass> classIterator = nodeMap.values().iterator();
+		while(classIterator.hasNext()) {
+			WuClass wuclass = classIterator.next();
+			double[] preferences = new double[dimension];
+			Random random = new Random();
+			random.setSeed(landMarkNumber + System.nanoTime());
+			
+			double sum = 0;
+			for(int i = 0; i < dimension; i++){
+				double preference = Math.abs(random.nextInt()) % 100;
+				preferences[i] = preference / 100.0;
+				sum += preferences[i];
+			}
+			for(int i = 0; i < dimension; i++){
+				preferences[i] = preferences[i] / sum;
+			}
+			wuclass.setPreference(preferences);
+			classMap.put(wuclass.getWuClassId(), wuclass);
+			wuClasses.add(wuclass);
+		}
+		
+		FlowBasedProcess fbp = new FlowBasedProcess(classMap, edges, FlowBasedProcess.TYPE.LINEAR); 
+		fbp.setWuClassList(wuClasses);
+		return fbp;
+	}
 }
