@@ -36,6 +36,16 @@ public class WukongSystem {
 	
 	private Double[][] distances;
 	
+	private Double[][] channel_transmit;
+	private Double[][] channel_receive;
+	
+	private int[][] channels;
+	
+	public void setChannel(int[][] channel){
+		this.channels = channel;
+	}
+	
+	
 	private HashMap<Integer, WuDevice> deviceMap;
 	
 	private HashMap<Integer, List<WuDevice>> wuClassDeviceMap;

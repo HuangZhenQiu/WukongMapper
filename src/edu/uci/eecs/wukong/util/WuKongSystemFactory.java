@@ -103,6 +103,13 @@ public class WuKongSystemFactory {
 		return createRandomWukongSystem(6, 1);
 	}
 	
+	public WukongSystem createRandomMultiProtocolWuKongSystem(){
+		WukongSystem system = createRandomWukongSystem(6, 1);
+		int[][] channels = getRandomDeviceChannelMatrix(deviceNumber, 5);
+		system.setChannel(channels);
+		return system;
+	}
+	
 	private int findClassId(int[] glabalClassMap, int number) {
 		if(glabalClassMap[number] == 0) {
 			glabalClassMap[number] = 1;
@@ -152,4 +159,21 @@ public class WuKongSystemFactory {
 		
 		return matrix;
 	}
+	
+	public int[][] getRandomDeviceChannelMatrix(int deviceNumber, int channelNumber) { 
+		Random random = new Random();
+		int[][] matrix = new int[deviceNumber][deviceNumber];
+		
+		for(int i = 0; i < deviceNumber; i++){
+			for(int j=i+1; j < deviceNumber; j++) {
+				random.setSeed(System.nanoTime() + i*2);
+				int channel = Math.abs(random.nextInt()) % channelNumber + 1;
+				matrix[i][j] = channel;
+				matrix[j][i] = channel;
+			}
+			matrix[i][i] = 0;
+		}
+		return matrix;
+	}
+	
 }
