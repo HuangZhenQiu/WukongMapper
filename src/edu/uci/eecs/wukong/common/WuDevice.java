@@ -211,7 +211,7 @@ public class WuDevice implements Comparable<WuDevice>{
 
 		WuObject node = wuObjectMap.get(nodeId); 
 		if (node != null){
-			FlowBasedProcess.LocationConstraint nodeConstraint = system.getCurrentFBP().getLocationConstraintByWuClassId(nodeId);
+			LocationConstraint nodeConstraint = system.getCurrentFBP().getLocationConstraintByWuClassId(nodeId);
 			
 			if (nodeConstraint == null || (nodeConstraint != null
 					&& distances.get(nodeConstraint.getLandMarkId()) <= nodeConstraint.getDistance())) {
@@ -239,8 +239,8 @@ public class WuDevice implements Comparable<WuDevice>{
 		WuObject outNode = wuObjectMap.get(outNodeId);
 		if (inNode != null && outNode != null) {
 			
-			FlowBasedProcess.LocationConstraint inNodeConstraint = system.getCurrentFBP().getLocationConstraintByWuClassId(inNodeId);
-			FlowBasedProcess.LocationConstraint outNodeConstraint = system.getCurrentFBP().getLocationConstraintByWuClassId(outNodeId);
+			LocationConstraint inNodeConstraint = system.getCurrentFBP().getLocationConstraintByWuClassId(inNodeId);
+			LocationConstraint outNodeConstraint = system.getCurrentFBP().getLocationConstraintByWuClassId(outNodeId);
 			
 			//Apply Location Constraint
 			if ((inNodeConstraint == null || (inNodeConstraint != null 
