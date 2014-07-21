@@ -12,8 +12,8 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.LocationConstraint;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
+import edu.uci.eecs.wukong.common.LocationConstraint;
 import edu.uci.eecs.wukong.common.WuClass;
 
 public class FlowBasedProcessFactory {
@@ -62,7 +62,7 @@ public class FlowBasedProcessFactory {
 		}
 		
 		HashMap<Object, WuClass> nodeMap = assignClassIdToGraphNode(graph);
-		List<Edge> edges = buildEdges(nodeMap, graph);
+		List<FlowBasedProcessEdge> edges = buildEdges(nodeMap, graph);
 		
 		HashMap<Integer, WuClass> classMap =  new HashMap<Integer, WuClass>();
 		Iterator<WuClass> classIterator = nodeMap.values().iterator();
@@ -75,9 +75,9 @@ public class FlowBasedProcessFactory {
 		return new FlowBasedProcess(classMap, edges, FlowBasedProcess.TYPE.LINEAR);
 	}
 	
-	private List<Edge> buildEdges(HashMap<Object, WuClass> objectMap, SimpleDirectedGraph<Object, DefaultEdge> graph) {
+	private List<FlowBasedProcessEdge> buildEdges(HashMap<Object, WuClass> objectMap, SimpleDirectedGraph<Object, DefaultEdge> graph) {
 		Iterator<DefaultEdge> edgeIterator = graph.edgeSet().iterator();
-		List<Edge> edges = new ArrayList<Edge>();
+		List<FlowBasedProcessEdge> edges = new ArrayList<FlowBasedProcessEdge>();
 		Random random = new Random();
 		
 		while(edgeIterator.hasNext()) {
@@ -90,7 +90,7 @@ public class FlowBasedProcessFactory {
 			while(weight == 0) {
 				weight = Math.abs(random.nextInt()) % dataVolumnRange;
 			}
-			Edge fbpEdge = new Edge(objectMap.get(source), objectMap.get(target), weight);
+			FlowBasedProcessEdge fbpEdge = new FlowBasedProcessEdge(objectMap.get(source), objectMap.get(target), weight);
 			edges.add(fbpEdge);
 		}
 		

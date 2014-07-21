@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableSet;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.LocationConstraint;
+import edu.uci.eecs.wukong.common.LocationConstraint;
 import edu.uci.eecs.wukong.util.Util;
 
 public abstract class AbstractSelectionMapper extends AbstractMapper {
@@ -77,7 +77,7 @@ public abstract class AbstractSelectionMapper extends AbstractMapper {
 		ImmutableList<WuDevice> wuDevices= system.getDevices();
 		
 		for(WuDevice device : wuDevices) {
-			ImmutableList<Integer> classIds= device.getAllWuObjectId();
+			ImmutableList<Integer> classIds= device.getAllWuObjectClassId();
 			
 			Linear linear = new Linear();
 			for(Integer classId : classIds) {
@@ -130,7 +130,7 @@ public abstract class AbstractSelectionMapper extends AbstractMapper {
 		ImmutableList<WuDevice> wuDevices= system.getDevices();
 		
 		for(WuDevice device : wuDevices) {
-			ImmutableList<Integer> classIds= device.getAllWuObjectId();
+			ImmutableList<Integer> classIds= device.getAllWuObjectClassId();
 
 			for(Integer classId : classIds) {
 				Linear linear =  new Linear();

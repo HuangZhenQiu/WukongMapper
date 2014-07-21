@@ -28,208 +28,44 @@ import edu.uci.eecs.wukong.util.Util;
  */
 public class FlowBasedProcess {
 	
-	public static class LocationConstraint {
-		private int landMarkId;
-		private Double distance;
-		
-		public LocationConstraint(int landMarkId, Double distance) {
-			this.landMarkId = landMarkId;
-			this.distance = distance;
-		}
-
-		public int getLandMarkId() {
-			return landMarkId;
-		}
-
-		public void setLandMarkId(int landMarkId) {
-			this.landMarkId = landMarkId;
-		}
-
-		public Double getDistance() {
-			return distance;
-		}
-
-		public void setDistance(Double distance) {
-			this.distance = distance;
-		}
-		
-	}
 	
-	public static class Edge implements Comparable<Edge>{
-
-		private WuClass inWuClass;
-		private WuClass outWuClass;
-		private List<WuDevice> targetDevices;
-		private int dataVolumn; //bits
-		private double transmissionEnergy;  //distance unaware energy consumption
-		private double receivingEnergy;
-		private double weight;
-		private boolean isMerged;
-		
-		public Edge(WuClass inWuClass, WuClass outWuClass, int dataVolumn) {
-			this.inWuClass = inWuClass;
-			this.outWuClass = outWuClass;
-			this.dataVolumn = dataVolumn;
-			this.transmissionEnergy = 50 /*nJ/bit*/ * this.dataVolumn * 1.4 /*layout parameter*/ ;
-			this.receivingEnergy = 50 /*nJ/bit*/ * this.dataVolumn;
-			this.weight = this.transmissionEnergy + this.receivingEnergy;
-			this.isMerged = false;
-		}
-		
-		@Override
-		public int compareTo(Edge edge){
-			
-			if(this.weight > edge.weight) {
-				return -1;
-			} else if (this.weight < edge.weight) {
-				return 1;
-			} else 
-				return 0;
-		}
-		
-		public void merge() {
-			
-			if(inWuClass.isDeployed() && outWuClass.isDeployed() 
-					&& inWuClass.getDeviceId() == outWuClass.getDeviceId()) {
-				//this.transmissionEnergy = 0.0;
-				//this.receivingEnergy = 0.0;
-				//this.weight = 0.0;
-				this.isMerged = true;
-			}
-		}
-		
-		public List<WuDevice> getTargetDevices() {
-			return targetDevices;
-		}
-
-		public void setTargetDevices(List<WuDevice> targetDevices) {
-			this.targetDevices = targetDevices;
-		}
-
-		public int getDataVolumn() {
-			return dataVolumn;
-		}
-
-		public void setDataVolumn(int dataVolumn) {
-			this.dataVolumn = dataVolumn;
-		}
-		
-		public WuClass getInWuClass() {
-			return inWuClass;
-		}
-
-		public void setInWuClass(WuClass inWuClass) {
-			this.inWuClass = inWuClass;
-		}
-
-		public WuClass getOutWuClass() {
-			return outWuClass;
-		}
-
-		public void setOutWuClass(WuClass outWuClass) {
-			this.outWuClass = outWuClass;
-		}
-		
-		public boolean isUndeployed() {
-			
-			return !inWuClass.deployed && !outWuClass.deployed;
-		}
-		
-		public boolean isFullDeployed() {
-			
-			return inWuClass.deployed && outWuClass.deployed;
-		}
-		
-		public boolean isPartialDeployed() {
-			
-			return !isFullDeployed() && (inWuClass.deployed || outWuClass.deployed);
-		}
-		
-		public Integer getUndeployedClassId() {
-			
-			if (isFullDeployed() || !isPartialDeployed()) {
-				return null;
-			} else {
-				
-				if (inWuClass.deployed) {
-					return outWuClass.wuClassId;
-				} else {
-					return inWuClass.wuClassId;
-				}
-				
-			}
-		}
-		
-		public boolean isMerged() {
-			
-			return this.isMerged;
-		}
-		
-		public Integer getPartiallyDeployedDeviceId() {
-			if (isFullDeployed() || !isPartialDeployed()) {
-				return null;
-			} else {
-				if(inWuClass.deployed) {
-					return inWuClass.deviceId;
-				} else {
-					return outWuClass.deviceId;
-				}
-			}
-		}
-
-		public double getWeight() {
-			return weight;
-		}
-
-		public void setWeight(double weight) {
-			this.weight = weight;
-		}
-		
-		public String toString(){
-			return "Edge: " + this.inWuClass.getWuClassId() + ", " + this.outWuClass.getWuClassId();
-		}
-	}
 	
 	public static enum TYPE {LINEAR, STAR, RANDOM, SCALE_FREE};
-	
-	private List<Edge> edges;
+	private List<FlowBasedProcessEdge> edges;
 	
 	private HashMap<Integer, WuClass> wuClassMap;
 	
 	//<WuClassId, Edges End at WuClassId>
-	private HashMap<Integer, List<Edge>> inEdgeMap;
+	private HashMap<Integer, List<FlowBasedProcessEdge>> inEdgeMap;
 	
 	//<WuClassId, Edges begin from WuClassId>
-	private HashMap<Integer, List<Edge>> outEdgeMap;
+	private HashMap<Integer, List<FlowBasedProcessEdge>> outEdgeMap;
 	
 	//WuClassId to LandMarkId distance constraint
 	private HashMap<Integer, LocationConstraint> locationConstraints;
 	
-	private boolean isMerged;
+	
 	
 	private FlowBasedProcess.TYPE type;
 	
 	
-	public FlowBasedProcess(HashMap<Integer, WuClass> wuClassMap, List<Edge> edges, TYPE type) {
-		this.isMerged = false;
+	public FlowBasedProcess(HashMap<Integer, WuClass> wuClassMap, List<FlowBasedProcessEdge> edges, TYPE type) {
 		this.type = type;
 		this.edges = edges;
 		this.wuClassMap = wuClassMap;
-		this.inEdgeMap = new HashMap<Integer, List<Edge>>();
-		this.outEdgeMap = new HashMap<Integer, List<Edge>>();
+		this.inEdgeMap = new HashMap<Integer, List<FlowBasedProcessEdge>>();
+		this.outEdgeMap = new HashMap<Integer, List<FlowBasedProcessEdge>>();
 		this.locationConstraints = new HashMap<Integer, LocationConstraint>();
 		this.setupMaps();
 	}
 	
 	public FlowBasedProcess(TYPE type) {
-		
-		this.edges = new ArrayList<Edge>();
-		this.wuClassMap = new HashMap<Integer, WuClass>();
-		this.inEdgeMap = new HashMap<Integer, List<Edge>>();
-		this.outEdgeMap = new HashMap<Integer, List<Edge>>();
-		this.locationConstraints = new HashMap<Integer, LocationConstraint>();
-		this.isMerged = false;
 		this.type = type;
+		this.edges = new ArrayList<FlowBasedProcessEdge>();
+		this.wuClassMap = new HashMap<Integer, WuClass>();
+		this.inEdgeMap = new HashMap<Integer, List<FlowBasedProcessEdge>>();
+		this.outEdgeMap = new HashMap<Integer, List<FlowBasedProcessEdge>>();
+		this.locationConstraints = new HashMap<Integer, LocationConstraint>();
 	}
 	
 	//Read from file
@@ -271,7 +107,7 @@ public class FlowBasedProcess {
 				Integer inNode = Integer.parseInt(tokenizer.nextToken());
 				Integer outNode = Integer.parseInt(tokenizer.nextToken());
 				Integer dataVolumn = Integer.parseInt(tokenizer.nextToken());
-				Edge edge = new Edge(wuClassMap.get(inNode), wuClassMap.get(outNode), dataVolumn);
+				FlowBasedProcessEdge edge = new FlowBasedProcessEdge(wuClassMap.get(inNode), wuClassMap.get(outNode), dataVolumn);
 				edges.add(edge);
 			}
 			
@@ -288,26 +124,26 @@ public class FlowBasedProcess {
 	
 	private void setupMaps() {
 		
-		for (Edge edge: edges) {
+		for (FlowBasedProcessEdge edge: edges) {
 
 			//Edge a -> b, put a->b into a's output edges
-			List<Edge> outEdges = outEdgeMap.get(edge.inWuClass.wuClassId);
+			List<FlowBasedProcessEdge> outEdges = outEdgeMap.get(edge.getInWuClass().getWuClassId());
 			if (outEdges!=null) {
 				outEdges.add(edge);
 			} else {
-				outEdges = new ArrayList<Edge>();
+				outEdges = new ArrayList<FlowBasedProcessEdge>();
 				outEdges.add(edge);
-				outEdgeMap.put(edge.inWuClass.wuClassId, outEdges);
+				outEdgeMap.put(edge.getInWuClass().getWuClassId(), outEdges);
 			}
 			
 			//Edge a -> b, put a->b into b's input edges
-			List<Edge> inEdges = inEdgeMap.get(edge.outWuClass.wuClassId);
+			List<FlowBasedProcessEdge> inEdges = inEdgeMap.get(edge.getOutWuClass().getWuClassId());
 			if (inEdges!=null) {
 				inEdges.add(edge);
 			} else {
-				inEdges = new ArrayList<Edge>();
+				inEdges = new ArrayList<FlowBasedProcessEdge>();
 				inEdges.add(edge);
-				inEdgeMap.put(edge.outWuClass.wuClassId, inEdges);
+				inEdgeMap.put(edge.getOutWuClass().getWuClassId(), inEdges);
 			}
 		}
 		
@@ -322,18 +158,17 @@ public class FlowBasedProcess {
 	}
 	
 	public void merge() {
-		
-		for(Edge edge : edges) {
+		for(FlowBasedProcessEdge edge : edges) {
 			if(edge.isFullDeployed() && edge.getInWuClass().getDeviceId() == edge.getOutWuClass().getDeviceId())  {
-				edge.isMerged = true;
+				edge.merge();
 			}
 		}
 	}
 	
-	public ImmutableList<Edge> getMergedEdges() {
-		ImmutableList.Builder<Edge> builder = ImmutableList.<Edge>builder();
+	public ImmutableList<FlowBasedProcessEdge> getMergedEdges() {
+		ImmutableList.Builder<FlowBasedProcessEdge> builder = ImmutableList.<FlowBasedProcessEdge>builder();
 		
-		for(Edge edge : edges) {
+		for(FlowBasedProcessEdge edge : edges) {
 			if(edge.isMerged()) {
 				builder.add(edge);
 			}
@@ -343,34 +178,34 @@ public class FlowBasedProcess {
 	
 	public ImmutableList<Integer> getPreDeployedWuClasses() {
 		ImmutableList.Builder<Integer> builder = ImmutableList.<Integer>builder();
-		for(Edge edge : edges) {
+		for(FlowBasedProcessEdge edge : edges) {
 			if(edge.isMerged()) {
-				builder.add(edge.inWuClass.getWuClassId());
-				builder.add(edge.outWuClass.getWuClassId());
+				builder.add(edge.getInWuClass().getWuClassId());
+				builder.add(edge.getOutWuClass().getWuClassId());
 			}
 		}
 		
 		return builder.build();
 	}
 	
-	public ImmutableList<Edge> getInEdge(Integer wuClassId) {
-		List<Edge> edges = this.inEdgeMap.get(wuClassId);
+	public ImmutableList<FlowBasedProcessEdge> getInEdge(Integer wuClassId) {
+		List<FlowBasedProcessEdge> edges = this.inEdgeMap.get(wuClassId);
 		
 		if(edges != null) {
-			return ImmutableList.<Edge>builder().addAll(edges).build();
+			return ImmutableList.<FlowBasedProcessEdge>builder().addAll(edges).build();
 		} 
 		
-		return ImmutableList.<Edge>builder().build();
+		return ImmutableList.<FlowBasedProcessEdge>builder().build();
 	}
 	
-	public ImmutableList<Edge> getOutEdge(Integer wuClassId) {
-		List<Edge> edges = this.outEdgeMap.get(wuClassId);
+	public ImmutableList<FlowBasedProcessEdge> getOutEdge(Integer wuClassId) {
+		List<FlowBasedProcessEdge> edges = this.outEdgeMap.get(wuClassId);
 		
 		if(edges != null) {
-			return ImmutableList.<Edge>builder().addAll(edges).build();
+			return ImmutableList.<FlowBasedProcessEdge>builder().addAll(edges).build();
 		} 
 		
-		return ImmutableList.<Edge>builder().build();
+		return ImmutableList.<FlowBasedProcessEdge>builder().build();
 	}
 	
 	public void reset() {
@@ -381,20 +216,20 @@ public class FlowBasedProcess {
 		}
 		
 		for (int i=0; i < edges.size(); i++) {
-			edges.get(i).isMerged = false;
+			edges.get(i).unmerge();
 		}
 	}
 	
 	public Double getNodeEnergyConsumption(Integer nodeId, List<Integer> deviceNeighbor) {
 		
 		Double energyConsumption = 0.0;
-		List<Edge> inEdges= inEdgeMap.get(nodeId);
+		List<FlowBasedProcessEdge> inEdges= inEdgeMap.get(nodeId);
 		
 		if (inEdges !=null) {
-			for (Edge inEdge : inEdges) {
-				 if (!deviceNeighbor.contains(inEdge.inWuClass.wuClassId)) {
+			for (FlowBasedProcessEdge inEdge : inEdges) {
+				 if (!deviceNeighbor.contains(inEdge.getInWuClass().getWuClassId())) {
 					 
-					 if(!inEdge.isMerged) {
+					 if(!inEdge.isMerged()) {
 						 energyConsumption += inEdge.receivingEnergy;
 					 } 
 				 }
@@ -402,14 +237,47 @@ public class FlowBasedProcess {
 		}
 		
 		
-		List<Edge> outEdges = outEdgeMap.get(nodeId);
+		List<FlowBasedProcessEdge> outEdges = outEdgeMap.get(nodeId);
 		
 		if (outEdges !=null) {
-			for (Edge outEdge : outEdges) {
-				 if (!deviceNeighbor.contains(outEdge.outWuClass.wuClassId)) {
+			for (FlowBasedProcessEdge outEdge : outEdges) {
+				 if (!deviceNeighbor.contains(outEdge.getOutWuClass().getWuClassId())) {
 					 
-					 if(!outEdge.isMerged) {
+					 if(!outEdge.isMerged()) {
 						 energyConsumption += outEdge.transmissionEnergy;
+					 }
+				 }
+			}
+		}
+		
+		return energyConsumption;
+	}
+	
+	public Double getNodeEnergyConsumptionChannel(Integer nodeId, List<Integer> deviceNeighbor, int[][] channels) {
+		
+		Double energyConsumption = 0.0;
+		List<FlowBasedProcessEdge> inEdges= inEdgeMap.get(nodeId);
+		
+		if (inEdges !=null) {
+			for (FlowBasedProcessEdge inEdge : inEdges) {
+				 if (!deviceNeighbor.contains(inEdge.getInWuClass().getWuClassId())) {
+					 
+					 if(!inEdge.isMerged()) {
+						 energyConsumption += channels[inEdge.getInWuClass().getDeviceId()][nodeId] * inEdge.dataVolumn;
+					 } 
+				 }
+			}
+		}
+		
+		
+		List<FlowBasedProcessEdge> outEdges = outEdgeMap.get(nodeId);
+		
+		if (outEdges !=null) {
+			for (FlowBasedProcessEdge outEdge : outEdges) {
+				 if (!deviceNeighbor.contains(outEdge.getOutWuClass().getWuClassId())) {
+					 
+					 if(!outEdge.isMerged()) {
+						 energyConsumption += channels[nodeId][outEdge.getOutWuClass().getDeviceId()] * outEdge.dataVolumn;
 					 }
 				 }
 			}
@@ -443,7 +311,7 @@ public class FlowBasedProcess {
 	}
 	
 	public void print() {
-		for(Edge edge : edges) {
+		for(FlowBasedProcessEdge edge : edges) {
 			System.out.println("Edge<" + edge.getInWuClass().getWuClassId() + ", "
 					+ edge.getOutWuClass().getWuClassId() + ">  -->   Device<"
 					+ edge.getInWuClass().deviceId +", " + edge.getOutWuClass().deviceId + ">" + ", data volumn " + edge.getDataVolumn());
@@ -451,8 +319,8 @@ public class FlowBasedProcess {
 	}
 	
 
-	public ImmutableList<Edge> getEdges() {
-		return ImmutableList.<Edge>builder().addAll(this.edges).build();
+	public ImmutableList<FlowBasedProcessEdge> getEdges() {
+		return ImmutableList.<FlowBasedProcessEdge>builder().addAll(this.edges).build();
 	}
 	
 	public Integer getEdgeNumber() {
@@ -466,18 +334,42 @@ public class FlowBasedProcess {
 	
 	public Double getTotalEnergyConsumption() {
 		Double total = 0.0;
-		for (int i = 0; i < this.edges.size(); i++) {
-			
-			if(!edges.get(i).isMerged) {
-				total += edges.get(i).weight;
+		
+		for(FlowBasedProcessEdge edge: getEdges()){
+			if(!edge.isMerged()){
+				total += edge.weight;
 			}
 		}
 		return total;
 	}
 	
+	public Double getTotalEnergyConsumption(int[][] channel) {
+		double total = 0.0;
+		
+		for(FlowBasedProcessEdge edge: getEdges()){
+			if(!edge.isMerged()){
+				
+				int src_device = edge.getInWuClass().getDeviceId();
+				int dst_device = edge.getOutWuClass().getDeviceId();
+				
+				if(src_device != -1 && dst_device != -1) {
+					total += channel[src_device-1] [dst_device-1] * edge.dataVolumn;
+				}
+						
+//				total += edge.weight;
+			}
+		}
+		return total;
+	}
+	
+	public Double getWorstCaseEnergyConsumption(int max) { 
+		Double total = getTotalEnergyConsumption();
+		return max*total;
+	}
+	
 	public Double getDistanceAwareTotalEnergyConsumption(WukongSystem system) {
 		Double total = 0.0;
-		for (Edge edge: this.edges) {
+		for (FlowBasedProcessEdge edge: this.edges) {
 			
 			if(edge.getInWuClass().isDeployed() && edge.getOutWuClass().isDeployed()) {
 				if(!edge.isMerged()) {
@@ -489,6 +381,7 @@ public class FlowBasedProcess {
 		}
 		return total;
 	}
+	
 	
 	
 	public Double getWuClassEnergyConsumption(Integer classId) {
@@ -503,18 +396,18 @@ public class FlowBasedProcess {
 			return null;
 		} else {
 			double energy = 0;
-			List<Edge> inEdges = inEdgeMap.get(classId);
+			List<FlowBasedProcessEdge> inEdges = inEdgeMap.get(classId);
 			if(inEdges != null) {
-				for(Edge edge : inEdges) {
+				for(FlowBasedProcessEdge edge : inEdges) {
 					if(!edge.isMerged()) {
 						energy += edge.receivingEnergy;
 					}
 				}
 			}
 			
-			List<Edge> outEdges = outEdgeMap.get(classId);
+			List<FlowBasedProcessEdge> outEdges = outEdgeMap.get(classId);
 			if(outEdges != null) {
-				for(Edge edge : outEdges) {
+				for(FlowBasedProcessEdge edge : outEdges) {
 					if(!edge.isMerged()) {
 						energy += edge.transmissionEnergy;
 					}
@@ -531,10 +424,10 @@ public class FlowBasedProcess {
 		return this.wuClassMap.get(id);
 	}
 	
-	public ImmutableList<Edge> getMergableEdges(WukongSystem system) 
+	public ImmutableList<FlowBasedProcessEdge> getMergableEdges(WukongSystem system) 
 	{
-		ImmutableList.Builder<Edge> builder = ImmutableList.<Edge>builder();
-		for(Edge edge :this.edges) {
+		ImmutableList.Builder<FlowBasedProcessEdge> builder = ImmutableList.<FlowBasedProcessEdge>builder();
+		for(FlowBasedProcessEdge edge :this.edges) {
 			if(system.isMergable(edge.getInWuClass(), edge.getOutWuClass())) {
 				builder.add(edge);
 			}
@@ -559,7 +452,7 @@ public class FlowBasedProcess {
 			fileString += line + "\n";
 		}
 		fileString += edges.size() + "\n";
-		for(Edge edge : edges){
+		for(FlowBasedProcessEdge edge : edges){
 			String line = "" + edge.getInWuClass().getWuClassId() + " " + edge.getOutWuClass().getWuClassId() + " " + edge.getDataVolumn();
 			fileString += line + "\n";
 		}

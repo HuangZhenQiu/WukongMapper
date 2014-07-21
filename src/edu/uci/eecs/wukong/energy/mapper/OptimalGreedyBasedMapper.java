@@ -5,7 +5,7 @@ import edu.uci.eecs.wukong.colocation.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.util.WeightedIndependentSetSelector;
 
@@ -54,15 +54,20 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 			ColocationGraphNode node = answers.get(i);
 			WuDevice device = system.getHostableDevice(node.getInvolveWuClasses());
 			
-			for(Edge edge: node.getMergingEdges()){
-				edge.getInWuClass().deploy(device.getWuDeviceId());
-				edge.getOutWuClass().deploy(device.getWuDeviceId());
+			if (device != null){
+				for(FlowBasedProcessEdge edge: node.getMergingEdges()){
+					edge.getInWuClass().deploy(device.getWuDeviceId());
+					edge.getOutWuClass().deploy(device.getWuDeviceId());
+					device.deploy(edge.getInWuClass().wuClassId);
+					device.deploy(edge.getOutWuClass().wuClassId);
+				}
 			}
-			System.out.println("device " + device.getWuDeviceId() + " will merge" + node.getMergingEdges());
+			
+//			System.out.println("device " + device.getWuDeviceId() + " will merge" + node.getMergingEdges());
 		}
 		
-		ArrayList<Edge> temp = new ArrayList<FlowBasedProcess.Edge>();
-		for(Edge edge : fbp.getEdges()){
+		ArrayList<FlowBasedProcessEdge> temp = new ArrayList<FlowBasedProcessEdge>();
+		for(FlowBasedProcessEdge edge : fbp.getEdges()){
 			if(!edge.isFullDeployed()){
 				temp.add(edge);
 			}
@@ -85,7 +90,7 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 	
 	private List<ColocationGraphNode> merge() {
 		List<ColocationGraphNode> answers = new LinkedList<ColocationGraphNode>();
-		ImmutableList<Edge> mergableEdges = this.fbp.getMergableEdges(this.system);
+		ImmutableList<FlowBasedProcessEdge> mergableEdges = this.fbp.getMergableEdges(this.system);
 		
 		ImmutableList<FlowGraph> graphs = split(mergableEdges);
 		for(FlowGraph graph: graphs){
@@ -97,11 +102,11 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 		return answers;
 	}
 	
-	private ImmutableList<FlowGraph> split(ImmutableList<Edge> mergableEdges) {
+	private ImmutableList<FlowGraph> split(ImmutableList<FlowBasedProcessEdge> mergableEdges) {
 		List<FlowGraph> graphs= new LinkedList<FlowGraph>();
 		graphs.add(new FlowGraph());
 		
-		for(Edge edge : mergableEdges) {
+		for(FlowBasedProcessEdge edge : mergableEdges) {
 			FlowGraph first = null;
 			FlowGraph second = null;
 			for(FlowGraph graph : graphs) {

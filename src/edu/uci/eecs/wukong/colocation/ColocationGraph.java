@@ -7,7 +7,7 @@ import java.util.List;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.util.Pair;
 
 public class ColocationGraph extends AbstractColocationGraph{
@@ -40,7 +40,7 @@ public class ColocationGraph extends AbstractColocationGraph{
 					addEdge(edge);
 				} else {
 					// hostable @@
-					Set<Edge> edges = new HashSet<FlowBasedProcess.Edge>(node1.getMergingEdges());
+					Set<FlowBasedProcessEdge> edges = new HashSet<FlowBasedProcessEdge>(node1.getMergingEdges());
 					edges.addAll(node2.getMergingEdges());
 					ColocationGraphNode node = new ColocationGraphNode(union, node1.getWeight() + node2.getWeight(), edges);
 					

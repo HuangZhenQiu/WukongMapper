@@ -17,7 +17,7 @@ import net.sf.javailp.VarType;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.util.Util;
 
@@ -97,7 +97,7 @@ public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper
 		ImmutableList<WuDevice> wuDevices= system.getDevices();
 		
 		for(WuDevice device : wuDevices) {
-			ImmutableList<Integer> classIds= device.getAllWuObjectId();
+			ImmutableList<Integer> classIds= device.getAllWuObjectClassId();
 			
 			Linear linear = new Linear();
 			for(Integer classId : classIds) {
@@ -120,9 +120,9 @@ public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper
 	 * @param problem
 	 */
 	private void applyMergedWuClassConstraints(Problem problem) {
-		ImmutableList<Edge> edges= fbp.getMergedEdges();
+		ImmutableList<FlowBasedProcessEdge> edges= fbp.getMergedEdges();
 
-		for(Edge edge : edges) {
+		for(FlowBasedProcessEdge edge : edges) {
 			
 			Linear inNodeLinear = new Linear();
 			String varName = Util.generateVariableId(edge.getInWuClass().getWuClassId(), edge.getInWuClass().getDeviceId());

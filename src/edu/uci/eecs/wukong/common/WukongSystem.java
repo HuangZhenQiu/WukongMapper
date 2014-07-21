@@ -19,8 +19,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
-import edu.uci.eecs.wukong.common.WuDevice.WuObject;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 
 /**
  * 
@@ -44,20 +43,17 @@ public class WukongSystem {
 	public void setChannel(int[][] channel){
 		this.channels = channel;
 	}
+	public int[][] getChannel(){
+		return this.channels;
+	}
 	
 	
 	private HashMap<Integer, WuDevice> deviceMap;
-	
 	private HashMap<Integer, List<WuDevice>> wuClassDeviceMap;
-	
 	private FlowBasedProcess currentFBP;
-	
 	private Integer deviceNumber;
-	
 	private Integer wuClassNumber;
-	
 	private Integer landmarkNumber;
-	
 	
 	public WukongSystem() {
 		devices = new ArrayList<WuDevice>();
@@ -90,7 +86,7 @@ public class WukongSystem {
 		while(iterator.hasNext()) {
 			WuDevice device = iterator.next();
 			deviceMap.put(device.getWuDeviceId(), device);
-			ImmutableList<Integer> classes= device.getAllWuObjectId();
+			ImmutableList<Integer> classes= device.getAllWuObjectClassId();
 			for (int i=0; i < classes.size(); i ++) {
 				if(wuClassDeviceMap.containsKey(classes.get(i))) {
 					wuClassDeviceMap.get(classes.get(i)).add(device);
@@ -149,7 +145,7 @@ public class WukongSystem {
 		devices.add(device);
 		deviceMap.put(deviceId, device);
 		
-		List<Integer> classIds = device.getAllWuObjectId();
+		List<Integer> classIds = device.getAllWuObjectClassId();
 		for (Integer id : classIds) {
 			List<WuDevice> devices = wuClassDeviceMap.get(id);
 			if (devices == null) {
@@ -173,6 +169,10 @@ public class WukongSystem {
 	 * @param dest
 	 * @return
 	 */
+	
+	public int getDeviceChannel(WuDevice source, WuDevice dest) { 
+		return channels[source.getWuDeviceId() - 1][dest.getWuDeviceId() - 1];
+	}
 	public Double getDistance(WuDevice source, WuDevice dest) {
 		return distances[source.getWuDeviceId() - 1][dest.getWuDeviceId() - 1]; // Ids start from 1
 	}
@@ -189,7 +189,7 @@ public class WukongSystem {
 	public ImmutableList<WuDevice> findWudevice(int wuClassId) {
 		ImmutableList.Builder<WuDevice> builder = ImmutableList.<WuDevice>builder();
 		for(WuDevice device : this.devices) {
-			if (device.hasWuObject(wuClassId)) {
+			if (device.isWuObjectExist(wuClassId)) {
 				builder.add(device);
 			}
 		}
@@ -231,7 +231,15 @@ public class WukongSystem {
 		
 		return cost;
 	}
-
+	public WuDevice getWuDevice(int deviceId){
+		for(WuDevice device : devices) {
+			if(device.getWuDeviceId() == deviceId){
+				return device;
+			}
+		}
+		return null;
+	}
+	
 	public ImmutableList<WuDevice> getDevices() {
 		
 		return ImmutableList.<WuDevice>builder().addAll(this.devices).build();
@@ -261,20 +269,17 @@ public class WukongSystem {
 	}
 	
 	public boolean isMergable(WuClass source, WuClass dest) {
-		for(WuDevice device: devices) {
-			if(device.hasWuObject(source.getWuClassId()) 
-					&& device.hasWuObject(dest.getWuClassId())){
-				return true;
-			}
-		}
+		Set<Integer> done = new HashSet<Integer>();
+		done.add(source.getWuClassId());
+		done.add(dest.getWuClassId());
 		
-		return false;
+		return isHostable(done);
 	}
 	
 	public boolean isHostable(Set<Integer> done){
 		for(WuDevice device: devices){
 			Set<Integer> wuobjects = new HashSet<Integer>();
-			for(Integer integer: device.getAllWuObjectId()){
+			for(Integer integer: device.getAllWuObjectClassId()){
 				wuobjects.add(integer);
 			}
 			
@@ -287,12 +292,7 @@ public class WukongSystem {
 	
 	public WuDevice getHostableDevice(Set<Integer> done){
 		for(WuDevice device: devices){
-			Set<Integer> wuobjects = new HashSet<Integer>();
-			for(Integer integer: device.getAllWuObjectId()){
-				wuobjects.add(integer);
-			}
-			
-			if (wuobjects.containsAll(done)) {
+			if(device.isHostable(done)){
 				return device;
 			}
 		}
@@ -300,18 +300,11 @@ public class WukongSystem {
 	}
 	
 	public boolean isHostable(ColocationGraphNode node) {
-		
-		PriorityQueue<WuDevice> deviceQueue = new PriorityQueue<WuDevice>();
-		deviceQueue.addAll(devices);
-		
+		PriorityQueue<WuDevice> deviceQueue = getPrioritizedDeviceQueue();
 		while (deviceQueue.size() > 0){
 			WuDevice device = deviceQueue.poll();
-			Set<Integer> wuobjects = new HashSet<Integer>();
-			for(Integer integer: device.getAllWuObjectId()){
-				wuobjects.add(integer);
-			}
 			
-			if (wuobjects.containsAll(node.getInvolveWuClasses())) {
+			if(device.isHostable(node.getInvolveWuClasses())){
 				return true;
 			}
 		}
@@ -319,14 +312,13 @@ public class WukongSystem {
 	}
 	
 	public boolean merge(FlowBasedProcess fbp) {
-		List<FlowBasedProcess.Edge> temporaryList = new ArrayList<FlowBasedProcess.Edge>();
-		PriorityQueue<WuDevice> deviceQueue = new PriorityQueue<WuDevice>();
-		deviceQueue.addAll(devices);
+		List<FlowBasedProcessEdge> temporaryList = new ArrayList<FlowBasedProcessEdge>();
+		PriorityQueue<WuDevice> deviceQueue = getPrioritizedDeviceQueue();
 
 		return merge(fbp, temporaryList, deviceQueue);
 	}
 	
-	private boolean merge(FlowBasedProcess fbp, List<FlowBasedProcess.Edge> temporaryList, PriorityQueue<WuDevice> deviceQueue) {
+	private boolean merge(FlowBasedProcess fbp, List<FlowBasedProcessEdge> temporaryList, PriorityQueue<WuDevice> deviceQueue) {
 		
 		if(fbp == null) {
 			return false;
@@ -334,11 +326,11 @@ public class WukongSystem {
 		
 		this.currentFBP = fbp;
 
-		PriorityQueue<FlowBasedProcess.Edge> edgeQueue = new PriorityQueue<FlowBasedProcess.Edge>();
+		PriorityQueue<FlowBasedProcessEdge> edgeQueue = new PriorityQueue<FlowBasedProcessEdge>();
 		edgeQueue.addAll(fbp.getEdges());
 		
 		
-		FlowBasedProcess.Edge currentEdge; 
+		FlowBasedProcessEdge currentEdge; 
 		while (edgeQueue.size() > 0){
 			currentEdge = edgeQueue.poll();
 			
@@ -404,8 +396,8 @@ public class WukongSystem {
 	}
 	
 	public boolean deploy(Integer deviceId, Integer wuClassId) {
-		
-		WuDevice device = this.deviceMap.get(deviceId);
+		WuDevice device = getWuDevice(deviceId);
+//		WuDevice device = this.deviceMap.get(deviceId);
 		if(device == null) {
 			System.out.println("Error Device Id: " + deviceId);
 			return false;
@@ -413,11 +405,16 @@ public class WukongSystem {
 		return device.deploy(wuClassId);
 	}
 
-	public boolean deployWithNoMerge(FlowBasedProcess fbp, ArrayList<FlowBasedProcess.Edge> temporaryList){
-		PriorityQueue<WuDevice> deviceQueue = new PriorityQueue<WuDevice>();
-		deviceQueue.addAll(devices);
+	
+	/* 
+	 * 
+	 * This function address deploying all remaining nodes onto 
+	 * 
+	 */
+	public boolean deployWithNoMerge(FlowBasedProcess fbp, ArrayList<FlowBasedProcessEdge> temporaryList){
+		PriorityQueue<WuDevice> deviceQueue = getPrioritizedDeviceQueue();
 		
-		for (FlowBasedProcess.Edge edge : temporaryList) {
+		for (FlowBasedProcessEdge edge : temporaryList) {
 //			System.out.println("Checking edge: "+edge.getInWuClass().wuClassId + ", " + edge.getOutWuClass().wuClassId);
 			if(edge.isPartialDeployed()) {
 				Integer undeployedClassId  = edge.getUndeployedClassId();
@@ -438,19 +435,25 @@ public class WukongSystem {
 		return true;
 	}
 	
+	
+	public PriorityQueue<WuDevice> getPrioritizedDeviceQueue(){
+		PriorityQueue<WuDevice> deviceQueue = new PriorityQueue<WuDevice>();
+		deviceQueue.addAll(devices);
+		return deviceQueue;
+	}
+	
 	public boolean deploy(FlowBasedProcess fbp) {
 		
 		
-		List<FlowBasedProcess.Edge> temporaryList = new ArrayList<FlowBasedProcess.Edge>();
-		PriorityQueue<WuDevice> deviceQueue = new PriorityQueue<WuDevice>();
-		deviceQueue.addAll(devices);
+		List<FlowBasedProcessEdge> temporaryList = new ArrayList<FlowBasedProcessEdge>();
 		
+		PriorityQueue<WuDevice> deviceQueue = getPrioritizedDeviceQueue();
 		if(!merge(fbp, temporaryList, deviceQueue)) {
 			
 			return false;
 		}
 		
-		for (FlowBasedProcess.Edge edge : temporaryList) {
+		for (FlowBasedProcessEdge edge : temporaryList) {
 				
 			if(edge.isPartialDeployed()) {
 				Integer undeployedClassId  = edge.getUndeployedClassId();
@@ -472,13 +475,13 @@ public class WukongSystem {
 		return true;
 	}
 	
-	private boolean deployOneEnd(FlowBasedProcess.Edge edge, int wuclassId, PriorityQueue<WuDevice> deviceQueue) {
+	private boolean deployOneEnd(FlowBasedProcessEdge edge, int wuclassId, PriorityQueue<WuDevice> deviceQueue) {
 		Iterator<WuDevice> itr = deviceQueue.iterator();
-		System.out.println("finding wuclass for " + wuclassId);
+//		System.out.println("finding wuclass for " + wuclassId);
 		while (itr.hasNext()) {
 			
 			WuDevice currentDevice = itr.next();
-			System.out.println(currentDevice);
+//			System.out.println(currentDevice);
 			if (currentDevice.deploy(wuclassId)) {
 				
 				if (edge.getInWuClass().getWuClassId() == wuclassId) {
@@ -503,7 +506,7 @@ public class WukongSystem {
 		
 		for(WuDevice device: devices) {
 			String line = device.getWuDeviceId() + " " + device.getEnergyConstraint() + "\n";
-			for(Integer object : device.getAllWuObjectId()){
+			for(Integer object : device.getAllWuObjectClassId()){
 				line += object + " "; 
 			}
 			line += "\n";
@@ -540,8 +543,20 @@ public class WukongSystem {
 			str = str +  device.toString() + "\n";
 		}
 		
-		str = str + "Total Energt Consumption is:" + this.getTotalEnergyConsumption();
+		str = str + "Total Energy Consumption is:" + this.getTotalEnergyConsumption();
 		return str;
 	}
 
+	public String LouisToString() {
+		
+		String  str = toString() + "\n";
+		
+		for(int i = 0; i < deviceNumber; i++) { 
+			for ( int j = 0; j < deviceNumber; j ++) {
+				str = str + channels[i][j] + " ";
+			}
+			str = str + "\n";
+		}
+		return str;
+	}
  }

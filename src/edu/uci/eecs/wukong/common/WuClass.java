@@ -1,6 +1,6 @@
 package edu.uci.eecs.wukong.common;
 
-import edu.uci.eecs.wukong.common.FlowBasedProcess.LocationConstraint;
+import edu.uci.eecs.wukong.common.LocationConstraint;
 
 public class WuClass {
 //	private int wuClassId;

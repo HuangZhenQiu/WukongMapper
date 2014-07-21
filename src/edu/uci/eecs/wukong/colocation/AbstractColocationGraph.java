@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 
 public abstract class AbstractColocationGraph {
 	
@@ -28,11 +28,11 @@ public abstract class AbstractColocationGraph {
 	
 	
 	protected void rawInitCollocationGraph(FlowGraph graph) {
-		for (Edge fbpEdge : graph.getEdges()) {
+		for (FlowBasedProcessEdge fbpEdge : graph.getEdges()) {
 			Set<Integer> sets = new HashSet<Integer>();
 			sets.add(fbpEdge.getInWuClass().getWuClassId());
 			sets.add(fbpEdge.getOutWuClass().getWuClassId());
-			Set<Edge> edgeSet = new HashSet<Edge>();
+			Set<FlowBasedProcessEdge> edgeSet = new HashSet<FlowBasedProcessEdge>();
 			edgeSet.add(fbpEdge);
 			ColocationGraphNode node = new ColocationGraphNode(sets, fbpEdge.getWeight(), edgeSet);
 			addNode(node);
@@ -56,8 +56,8 @@ public abstract class AbstractColocationGraph {
 		return union;
 	}
 	
-	protected Set<Edge> getEdgeUnion(ColocationGraphNode node1, ColocationGraphNode node2) {
-		Set<Edge> union = new HashSet<Edge>(node1.getMergingEdges());
+	protected Set<FlowBasedProcessEdge> getEdgeUnion(ColocationGraphNode node1, ColocationGraphNode node2) {
+		Set<FlowBasedProcessEdge> union = new HashSet<FlowBasedProcessEdge>(node1.getMergingEdges());
 		union.addAll(node2.getMergingEdges());
 		return union;
 	}
