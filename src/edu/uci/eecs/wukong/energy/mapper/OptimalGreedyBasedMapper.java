@@ -53,17 +53,20 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 		for(int i = 0; i < answers.size();i++){
 			ColocationGraphNode node = answers.get(i);
 			WuDevice device = system.getHostableDevice(node.getInvolveWuClasses());
+
+//			System.out.println("device " + device.getWuDeviceId() + " will merge" + node.getMergingEdges());
 			
 			if (device != null){
 				for(FlowBasedProcessEdge edge: node.getMergingEdges()){
 					edge.getInWuClass().deploy(device.getWuDeviceId());
 					edge.getOutWuClass().deploy(device.getWuDeviceId());
-					device.deploy(edge.getInWuClass().wuClassId);
-					device.deploy(edge.getOutWuClass().wuClassId);
+					
+					device.deploy(edge.getInWuClass().getWuClassId());
+					device.deploy(edge.getOutWuClass().getWuClassId());
+					
 				}
 			}
 			
-//			System.out.println("device " + device.getWuDeviceId() + " will merge" + node.getMergingEdges());
 		}
 		
 		ArrayList<FlowBasedProcessEdge> temp = new ArrayList<FlowBasedProcessEdge>();

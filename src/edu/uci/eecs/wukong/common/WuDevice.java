@@ -219,8 +219,6 @@ public class WuDevice implements Comparable<WuDevice>{
 	
 	
 	public boolean deploy(Integer nodeId, int[][] channels) {
-
-//		WuObject node = wuObjectMap.get(nodeId);
 		WuObject node = getWuObject(nodeId);
 		if (node != null){
 			List<Integer> nodes = new ArrayList<Integer>();
@@ -234,9 +232,9 @@ public class WuDevice implements Comparable<WuDevice>{
 			return true;
 		}
 		else{
+			// Can't deploy nodeId to this device
 			System.out.println("Can't find out the wuclass" + nodeId);
 		}
-		
 		return false;
 	}
 	

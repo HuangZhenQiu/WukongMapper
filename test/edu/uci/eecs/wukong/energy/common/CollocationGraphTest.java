@@ -23,11 +23,11 @@ public class CollocationGraphTest extends TestCase{
 	public void testCollocationGraphInitization() {
 		String root = System.getProperty("user.dir");
 		try {
-			FileReader inputStream = new FileReader(new File(root + "/data/fbp2.txt"));
+			FileReader inputStream = new FileReader(new File(root + "/data/fbp.txt"));
 			FlowBasedProcess fbp = new FlowBasedProcess(FlowBasedProcess.TYPE.LINEAR);
 			fbp.initialize(new BufferedReader(inputStream));
 			
-			inputStream = new FileReader(new File(root + "/data/wukong2.txt"));
+			inputStream = new FileReader(new File(root + "/data/wukong.txt"));
 			WukongSystem system = new WukongSystem();
 			system.initialize(new BufferedReader(inputStream));
 			FlowGraph graph = new FlowGraph();
@@ -44,13 +44,15 @@ public class CollocationGraphTest extends TestCase{
 			System.out.println("Result from layered Colocation graph");
 			LayeredCollocationGraph collocationGraph2 = new LayeredCollocationGraph(graph, system);
 			collocationGraph2.printLayeredColocationGraph();
-			WeightedIndependentSetSelector selector = new WeightedIndependentSetSelector(system, GreedyType.GWMIN);
+			WeightedIndependentSetSelector selector = new WeightedIndependentSetSelector(system, GreedyType.GWMIN2);
 			List<ColocationGraphNode> nodes = selector.select_layer(graph);
 			
 			for(ColocationGraphNode node: nodes){
 				System.out.println("I am node" + node.getNodeId());
 				System.out.println(node.getInvolveWuClasses());
 			}
+			
+			
 //			WeightedIndependentSetSelector selector = new WeightedIndependentSetSelector(
 //					system, GreedyType.GWMIN);
 //			List<CollocationGraphNode> nodes = selector.select(graph);

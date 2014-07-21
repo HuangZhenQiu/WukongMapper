@@ -416,15 +416,22 @@ public class WukongSystem {
 		
 		for (FlowBasedProcessEdge edge : temporaryList) {
 //			System.out.println("Checking edge: "+edge.getInWuClass().wuClassId + ", " + edge.getOutWuClass().wuClassId);
-			if(edge.isPartialDeployed()) {
-				Integer undeployedClassId  = edge.getUndeployedClassId();
-				deployOneEnd(edge, undeployedClassId, deviceQueue);
-			}
 			
 			if(edge.isUndeployed()) {
-				deployOneEnd(edge, edge.getInWuClass().getWuClassId(), deviceQueue);
-				deployOneEnd(edge, edge.getOutWuClass().getWuClassId(), deviceQueue);
+				deployOneEnd(edge, edge.getInWuClass().getWuClassId());
+				deployOneEnd(edge, edge.getOutWuClass().getWuClassId());
+//				deployOneEnd(edge, edge.getInWuClass().getWuClassId(), deviceQueue);
+//				deployOneEnd(edge, edge.getOutWuClass().getWuClassId(), deviceQueue);
 			}
+			
+			if(edge.isPartialDeployed()) {
+				Integer undeployedClassId  = edge.getUndeployedClassId();
+				
+//				deployOneEnd(edge, undeployedClassId, deviceQueue);
+				deployOneEnd(edge, undeployedClassId);
+			}
+			
+
 			
 			
 			if (!edge.isFullDeployed()) {
@@ -457,12 +464,16 @@ public class WukongSystem {
 				
 			if(edge.isPartialDeployed()) {
 				Integer undeployedClassId  = edge.getUndeployedClassId();
-				deployOneEnd(edge, undeployedClassId, deviceQueue);
+//				deployOneEnd(edge, undeployedClassId, deviceQueue);
+				deployOneEnd(edge, undeployedClassId);
 			}
 			
 			if(edge.isUndeployed()) {
-				deployOneEnd(edge, edge.getInWuClass().getWuClassId(), deviceQueue);
-				deployOneEnd(edge, edge.getOutWuClass().getWuClassId(), deviceQueue);
+				deployOneEnd(edge, edge.getInWuClass().getWuClassId());
+				deployOneEnd(edge, edge.getOutWuClass().getWuClassId());
+
+//				deployOneEnd(edge, edge.getInWuClass().getWuClassId(), deviceQueue);
+//				deployOneEnd(edge, edge.getOutWuClass().getWuClassId(), deviceQueue);
 			}
 			
 			
@@ -495,6 +506,22 @@ public class WukongSystem {
 			}
 		}
 		
+		return false;
+	}
+	
+	private boolean deployOneEnd(FlowBasedProcessEdge edge, int wuclassId){
+		
+		for(WuDevice device : devices){
+			if (device.deploy(wuclassId)) {
+//				System.out.println("Deploying "+ wuclassId + " to " + device.getWuDeviceId());
+				if (edge.getInWuClass().getWuClassId() == wuclassId) {
+					edge.getInWuClass().deploy(device.getWuDeviceId());
+				} else {
+					edge.getOutWuClass().deploy(device.getWuDeviceId());
+				}
+				return true;
+			}
+		}
 		return false;
 	}
 	public String toFileFormat(){ 

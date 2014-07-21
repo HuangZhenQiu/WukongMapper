@@ -91,10 +91,24 @@ public class FlowBasedProcessFactory {
 				weight = Math.abs(random.nextInt()) % dataVolumnRange;
 			}
 			FlowBasedProcessEdge fbpEdge = new FlowBasedProcessEdge(objectMap.get(source), objectMap.get(target), weight);
-			edges.add(fbpEdge);
+			if(!isEdgeExist(edges, fbpEdge)){
+				edges.add(fbpEdge);
+			}
 		}
 		
 		return edges;
+	}
+	
+	public boolean isEdgeExist(List<FlowBasedProcessEdge> edges, FlowBasedProcessEdge fbpedge) { 
+		for(FlowBasedProcessEdge edge: edges) { 
+			if(fbpedge.getInWuClass().equal(edge.getInWuClass()) && fbpedge.getOutWuClass().equal(edge.getOutWuClass())) {
+				return true;
+			}
+			else if(fbpedge.getInWuClass().equal(edge.getOutWuClass()) && fbpedge.getOutWuClass().equal(edge.getInWuClass())){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private HashMap<Object, WuClass> assignClassIdToGraphNode(SimpleDirectedGraph<Object, DefaultEdge> graph) {
