@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 
 import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
-import edu.uci.eecs.wukong.common.WuDevice.WuObject;
 
 /**
  * 
