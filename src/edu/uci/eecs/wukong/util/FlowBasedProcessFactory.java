@@ -68,11 +68,22 @@ public class FlowBasedProcessFactory {
 		Iterator<WuClass> classIterator = nodeMap.values().iterator();
 		while(classIterator.hasNext()) {
 			WuClass wuclass = classIterator.next();
-			classMap.put(wuclass.getWuClassId(), wuclass);
+			if(ifExistInEdges(wuclass, edges)){
+				classMap.put(wuclass.getWuClassId(), wuclass);
+			}
 		}
 		
 		
 		return new FlowBasedProcess(classMap, edges, FlowBasedProcess.TYPE.LINEAR);
+	}
+	
+	public boolean ifExistInEdges(WuClass wuclass, List<Edge> edges) {
+		for( Edge edge : edges) {
+			if(edge.getInWuClass().equal(wuclass) || edge.getOutWuClass().equal(wuclass)){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private List<Edge> buildEdges(HashMap<Object, WuClass> objectMap, SimpleDirectedGraph<Object, DefaultEdge> graph) {
