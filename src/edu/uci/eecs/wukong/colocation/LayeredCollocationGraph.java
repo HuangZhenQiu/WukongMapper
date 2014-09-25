@@ -20,6 +20,57 @@ public class LayeredCollocationGraph extends AbstractColocationGraph{
 		this.init();
 	}
 	
+	public LayeredCollocationGraph(FlowGraph graph, WukongSystem system, boolean one_layer) {
+		super(graph, system);
+		this.layers = new ArrayList<ArrayList<ColocationGraphNode>>();
+		if(one_layer){
+			this.bare_init();
+		}
+		else{
+			this.init();
+		}
+	}
+	
+	public void bare_init() {
+		rawInitCollocationGraph(graph);
+
+		ArrayList<ColocationGraphNode> first = new ArrayList<ColocationGraphNode>();
+		for(ColocationGraphNode node: getNodes()){
+			first.add(node);
+		}
+		
+		layers.add(first);
+		
+		for (int i = 0; i < layers.size(); i++) {
+			
+			ArrayList<Pair<ColocationGraphNode, ColocationGraphNode>> pair_list = new ArrayList<Pair<ColocationGraphNode, ColocationGraphNode>>();
+			
+			for (int k = 0; k < layers.get(i).size() - 1; k++) {
+				for (int j = k + 1; j < layers.get(i).size(); j++) {
+					Pair<ColocationGraphNode, ColocationGraphNode> pair = new Pair<ColocationGraphNode, ColocationGraphNode>(layers.get(i).get(k), layers.get(i).get(j));
+					pair_list.add(pair);
+				}
+			}
+			
+			while(pair_list.size() > 0){
+				Pair<ColocationGraphNode, ColocationGraphNode> pair = pair_list.remove(0);
+				ColocationGraphNode node1 = pair.getFirst();
+				ColocationGraphNode node2 = pair.getSecond();
+				
+			
+				if (getIntersection(node1, node2).size() != 0) {
+					Set<Integer> union = getUnion(node1, node2);
+					
+					if (!system.isHostable(union)){
+						ColocationGraphEdge edge = new ColocationGraphEdge(node1, node2);
+						addEdge(edge);
+					}
+				}
+			}
+			
+		}
+	}
+	
 	public void init() {
 		rawInitCollocationGraph(graph);
 
@@ -84,9 +135,10 @@ public class LayeredCollocationGraph extends AbstractColocationGraph{
 						Set<FlowBasedProcessEdge> edges = new HashSet<FlowBasedProcessEdge>(node1.getMergingEdges());
 						edges.addAll(node2.getMergingEdges());
 						double new_weight = 0;
-						for(FlowBasedProcessEdge e: edges){
-							new_weight += e.getDataVolumn();
-						}
+						new_weight = node1.getWeight() + node2.getWeight();
+//						for(FlowBasedProcessEdge e: edges){
+//							new_weight += e.getDataVolumn();
+//						}
 						 
 						ColocationGraphNode node = new ColocationGraphNode(union, new_weight, edges);
 						node.addParents(node1);

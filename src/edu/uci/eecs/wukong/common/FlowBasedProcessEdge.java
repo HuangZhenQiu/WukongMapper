@@ -111,8 +111,10 @@ public class FlowBasedProcessEdge implements Comparable<FlowBasedProcessEdge>{
 	}
 	
 	public boolean isMerged() {
-		
-		return this.isMerged;
+		if( (this.getInWuClass().getDeviceId() != -1 )&& (this.getOutWuClass().getDeviceId() != -1)){
+			return this.isMerged || this.getInWuClass().getDeviceId() == this.getOutWuClass().getDeviceId();
+		}
+		return false;
 	}
 	
 	public Integer getPartiallyDeployedDeviceId() {

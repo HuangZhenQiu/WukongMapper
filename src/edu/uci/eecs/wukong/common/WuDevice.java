@@ -148,6 +148,9 @@ public class WuDevice implements Comparable<WuDevice>{
 		if(done.containsAll(this.getAllWuObjectClassId())){
 			return true;
 		}
+		else if(this.getAllWuObjectClassId().containsAll(done)){
+			return true;
+		}
 		return false;
 	}
 	public List<WuObject> getWuObjects() {
@@ -233,7 +236,7 @@ public class WuDevice implements Comparable<WuDevice>{
 		}
 		else{
 			// Can't deploy nodeId to this device
-			System.out.println("Can't find out the wuclass" + nodeId);
+//			System.out.println("Can't find out the wuclass" + nodeId);
 		}
 		return false;
 	}
@@ -253,14 +256,17 @@ public class WuDevice implements Comparable<WuDevice>{
 			return true;
 		}
 		else{
-			System.out.println("Can't find out the wuclass" + nodeId);
+			// System.out.println("Can't find out the wuclass" + nodeId);
 		}
 		
 		return false;
 	}
 	
 	public boolean deploy(Integer inNodeId, Integer outNodeId) {
-		if(deploy(inNodeId) && deploy(outNodeId)){
+		
+		if(getWuObject(inNodeId) != null && getWuObject(outNodeId)!=null){
+			deploy(inNodeId);
+			deploy(outNodeId);
 			return true;
 		}
 		return false;

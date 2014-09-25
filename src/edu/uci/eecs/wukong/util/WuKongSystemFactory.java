@@ -58,7 +58,6 @@ public class WuKongSystemFactory {
 			List<Integer> objectIds = new ArrayList<Integer>();
 			WuDevice device = new WuDevice(i + 1, Double.MAX_VALUE, objectIds, getRandomDistance(landMarkNumber, distanceRange), new ArrayList<Double>(Arrays.asList(distances[i])), system);
 			devices.add(device);
-			System.out.println(device);
 		}
 		
 		// distribute replica of non-duplicate wuclasses to devices, all globalclassmap should reach replica after this operation 
@@ -86,7 +85,7 @@ public class WuKongSystemFactory {
 				classMap[objectId.getWuClassId()] ++;
 			}
 			
-			while(devices.get(i).getWuObjects().size() < K){
+			while(devices.get(i).getWuObjects().size() < K || devices.get(i).getWuObjects().size() == 0){
 				ran.setSeed(System.nanoTime() + i * i);
 				int classId = Math.abs(ran.nextInt()) % (classNumber - 1) + 1;
 				

@@ -68,58 +68,7 @@ public class FlowBasedProcess {
 		this.locationConstraints = new HashMap<Integer, LocationConstraint>();
 	}
 	
-	//Read from file
-	public void initialize(BufferedReader input) {
-		
-		String content = "";
-		
-		try {
-			//break the comments
-			while ((content = input.readLine()) != null) {
-				
-				if (content.length() > 0 && !content.startsWith("#")) {
-					break;
-				}
-			}
-			
-			//begin initialization
-			Integer classNumber  = Integer.parseInt(content);
-			
-			for (int i =0; i<classNumber; i++) {
-				content = input.readLine();
-				StringTokenizer tokenizer = new StringTokenizer(content);
-				Integer classId = Integer.parseInt(tokenizer.nextToken());
-				Integer landmarkId = Integer.parseInt(tokenizer.nextToken());
-				Double distanceConstraint= Double.parseDouble(tokenizer.nextToken());
-				LocationConstraint constraint= new LocationConstraint(landmarkId, distanceConstraint);
-				WuClass wuClass = new WuClass(classId, constraint);
-				wuClassMap.put(classId, wuClass);
-				locationConstraints.put(classId, constraint);
-				
-			}
-			
-			content = input.readLine();
-			Integer edgeNumber  = Integer.parseInt(content);
-			
-			for (int i =0; i<edgeNumber; i++) {
-				content = input.readLine();
-				StringTokenizer tokenizer = new StringTokenizer(content);
-				Integer inNode = Integer.parseInt(tokenizer.nextToken());
-				Integer outNode = Integer.parseInt(tokenizer.nextToken());
-				Integer dataVolumn = Integer.parseInt(tokenizer.nextToken());
-				FlowBasedProcessEdge edge = new FlowBasedProcessEdge(wuClassMap.get(inNode), wuClassMap.get(outNode), dataVolumn);
-				edges.add(edge);
-			}
-			
-		} catch(IOException e) {
-			
-			System.out.println("Error in initialize FBP from file");
-			System.exit(-1);
-		} 
-		
-
-		this.setupMaps();
-	}
+	
 	
 	
 	private void setupMaps() {
@@ -228,7 +177,6 @@ public class FlowBasedProcess {
 		if (inEdges !=null) {
 			for (FlowBasedProcessEdge inEdge : inEdges) {
 				 if (!deviceNeighbor.contains(inEdge.getInWuClass().getWuClassId())) {
-					 
 					 if(!inEdge.isMerged()) {
 						 energyConsumption += inEdge.receivingEnergy;
 					 } 
@@ -245,6 +193,7 @@ public class FlowBasedProcess {
 					 
 					 if(!outEdge.isMerged()) {
 						 energyConsumption += outEdge.transmissionEnergy;
+//						 energyConsumption += outEdge.dataVolumn;
 					 }
 				 }
 			}
@@ -338,6 +287,7 @@ public class FlowBasedProcess {
 		for(FlowBasedProcessEdge edge: getEdges()){
 			if(!edge.isMerged()){
 				total += edge.weight;
+//				total += 2* edge.dataVolumn;
 			}
 		}
 		return total;
@@ -471,5 +421,58 @@ public class FlowBasedProcess {
 		
 		bw.write(this.toFileFormat());
 		bw.close();
+	}
+	
+	//Read from file
+	public void initialize(BufferedReader input) {
+		
+		String content = "";
+		
+		try {
+			//break the comments
+			while ((content = input.readLine()) != null) {
+				
+				if (content.length() > 0 && !content.startsWith("#")) {
+					break;
+				}
+			}
+			
+			//begin initialization
+			Integer classNumber  = Integer.parseInt(content);
+			
+			for (int i =0; i<classNumber; i++) {
+				content = input.readLine();
+				StringTokenizer tokenizer = new StringTokenizer(content);
+				Integer classId = Integer.parseInt(tokenizer.nextToken());
+				Integer landmarkId = Integer.parseInt(tokenizer.nextToken());
+				Double distanceConstraint= Double.parseDouble(tokenizer.nextToken());
+				LocationConstraint constraint= new LocationConstraint(landmarkId, distanceConstraint);
+				WuClass wuClass = new WuClass(classId, constraint);
+				wuClassMap.put(classId, wuClass);
+				locationConstraints.put(classId, constraint);
+				
+			}
+			
+			content = input.readLine();
+			Integer edgeNumber  = Integer.parseInt(content);
+			
+			for (int i =0; i<edgeNumber; i++) {
+				content = input.readLine();
+				StringTokenizer tokenizer = new StringTokenizer(content);
+				Integer inNode = Integer.parseInt(tokenizer.nextToken());
+				Integer outNode = Integer.parseInt(tokenizer.nextToken());
+				Integer dataVolumn = Integer.parseInt(tokenizer.nextToken());
+				FlowBasedProcessEdge edge = new FlowBasedProcessEdge(wuClassMap.get(inNode), wuClassMap.get(outNode), dataVolumn);
+				edges.add(edge);
+			}
+			
+		} catch(IOException e) {
+			
+			System.out.println("Error in initialize FBP from file");
+			System.exit(-1);
+		} 
+		
+
+		this.setupMaps();
 	}
 }

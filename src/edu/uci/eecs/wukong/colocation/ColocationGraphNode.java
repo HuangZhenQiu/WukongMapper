@@ -22,6 +22,7 @@ public class ColocationGraphNode {
 	private double mWeight = 0.0;
 	private int deployDevice = -1;
 
+	private int mLayer = 1;
 	/*
 	 * 
 	 * Neighbors of this colocation graph node
@@ -96,6 +97,7 @@ public class ColocationGraphNode {
 		this.mWuClasses = new HashSet<Integer>(wuclasses);
 		this.nodeId = id++;
 		this.mMergeEdges = mergingEdges;
+		this.mLayer = this.mWuClasses.size(); 
 	}
 
 	

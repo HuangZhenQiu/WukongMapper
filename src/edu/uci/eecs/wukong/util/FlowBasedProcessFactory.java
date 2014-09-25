@@ -52,6 +52,8 @@ public class FlowBasedProcessFactory {
 				break;
 			case RANDOM:
 				graph = generator.generateRandomGraph(classNumber / 2 , classNumber / 2 - 1);
+//				graph = generator.generateRandomGraph(classNumber / 2 , classNumber );
+				
 				break;
 			case SCALE_FREE:
 				graph = generator.generateScaleFreeGraph(classNumber / 2);
@@ -68,7 +70,9 @@ public class FlowBasedProcessFactory {
 		Iterator<WuClass> classIterator = nodeMap.values().iterator();
 		while(classIterator.hasNext()) {
 			WuClass wuclass = classIterator.next();
-			classMap.put(wuclass.getWuClassId(), wuclass);
+			if(ifExistInEdges(wuclass, edges)){
+				classMap.put(wuclass.getWuClassId(), wuclass);
+			}
 		}
 		
 		
@@ -98,7 +102,16 @@ public class FlowBasedProcessFactory {
 		
 		return edges;
 	}
-	
+
+	public boolean ifExistInEdges(WuClass wuclass, List<FlowBasedProcessEdge> edges) {
+		for( FlowBasedProcessEdge edge : edges) {
+			if(edge.getInWuClass().equal(wuclass) || edge.getOutWuClass().equal(wuclass)){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public boolean isEdgeExist(List<FlowBasedProcessEdge> edges, FlowBasedProcessEdge fbpedge) { 
 		for(FlowBasedProcessEdge edge: edges) { 
 			if(fbpedge.getInWuClass().equal(edge.getInWuClass()) && fbpedge.getOutWuClass().equal(edge.getOutWuClass())) {

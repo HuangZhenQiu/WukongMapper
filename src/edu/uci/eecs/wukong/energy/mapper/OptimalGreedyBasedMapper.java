@@ -37,6 +37,9 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 		GWMIN,
 		GWMAX,
 		GWMIN2,
+		MAXIMUM,
+		MAX_IMPORTANCE,
+		LIKE_NAIVE,
 	}
 	
 	private GreedyType greedyType;
@@ -52,18 +55,47 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 		
 		for(int i = 0; i < answers.size();i++){
 			ColocationGraphNode node = answers.get(i);
+//			System.out.println("finding device to deploy" + node.getInvolveWuClasses());
 			WuDevice device = system.getHostableDevice(node.getInvolveWuClasses());
-
-//			System.out.println("device " + device.getWuDeviceId() + " will merge" + node.getMergingEdges());
 			
 			if (device != null){
+//				System.out.println("device " + device.getWuDeviceId() + " will merge" + node.getMergingEdges());
 				for(FlowBasedProcessEdge edge: node.getMergingEdges()){
-					edge.getInWuClass().deploy(device.getWuDeviceId());
-					edge.getOutWuClass().deploy(device.getWuDeviceId());
 					
-					device.deploy(edge.getInWuClass().getWuClassId());
-					device.deploy(edge.getOutWuClass().getWuClassId());
-					
+					if(!(greedyType == GreedyType.LIKE_NAIVE)){
+						edge.getInWuClass().deploy(device.getWuDeviceId());
+						edge.getOutWuClass().deploy(device.getWuDeviceId());
+						
+						device.deploy(edge.getInWuClass().getWuClassId());
+						device.deploy(edge.getOutWuClass().getWuClassId());
+					}
+					else{
+						if (edge.isUndeployed()) {
+							edge.getInWuClass().deploy(device.getWuDeviceId());
+							edge.getOutWuClass().deploy(device.getWuDeviceId());
+							
+							device.deploy(edge.getInWuClass().getWuClassId());
+							device.deploy(edge.getOutWuClass().getWuClassId());
+							// deployOneEnd(edge, edge.getInWuClass().getWuClassId(),
+							// deviceQueue);
+							// deployOneEnd(edge, edge.getOutWuClass().getWuClassId(),
+							// deviceQueue);
+						}
+						else if(edge.isPartialDeployed()) {
+							Integer undeployedClassId = edge.getUndeployedClassId();
+							Integer deviceId = edge.getPartiallyDeployedDeviceId();
+							WuDevice device1 = system.getDevice(deviceId);
+							
+//							edge.getInWuClass().deploy(device1.getWuDeviceId());
+//							edge.getOutWuClass().deploy(device1.getWuDeviceId());
+							if (device1.deploy(undeployedClassId)) {
+								edge.getInWuClass().deploy(device1.getWuDeviceId());
+								edge.getOutWuClass().deploy(device1.getWuDeviceId());
+							}
+							
+							
+						}
+					}
 				}
 			}
 			
@@ -100,7 +132,7 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 //			graph.print();
 			WeightedIndependentSetSelector selector = new WeightedIndependentSetSelector(system, greedyType);
 //			System.out.println(selector.select(graph));
-			answers.addAll(selector.select(graph));
+			answers.addAll(selector.select_layer(graph));
 		}
 		return answers;
 	}
