@@ -68,7 +68,7 @@ public class WuClass {
 	}
 
 	//It is only used by FBP itself, after merge.
-	private void setEnergyCost(Double energy) {
+	public void setEnergyCost(Double energy) {
 		this.energyCost = energy;
 	}
 	

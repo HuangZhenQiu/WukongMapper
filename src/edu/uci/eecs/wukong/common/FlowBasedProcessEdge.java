@@ -82,17 +82,17 @@ public class FlowBasedProcessEdge implements Comparable<FlowBasedProcessEdge>{
 	
 	public boolean isUndeployed() {
 		
-		return !inWuClass.deployed && !outWuClass.deployed;
+		return !inWuClass.isDeployed() && !outWuClass.isDeployed();
 	}
 	
 	public boolean isFullDeployed() {
 		
-		return inWuClass.deployed && outWuClass.deployed;
+		return inWuClass.isDeployed() && outWuClass.isDeployed();
 	}
 	
 	public boolean isPartialDeployed() {
 		
-		return !isFullDeployed() && (inWuClass.deployed || outWuClass.deployed);
+		return !isFullDeployed() && (inWuClass.isDeployed() || outWuClass.isDeployed());
 	}
 	
 	public Integer getUndeployedClassId() {
@@ -101,10 +101,10 @@ public class FlowBasedProcessEdge implements Comparable<FlowBasedProcessEdge>{
 			return null;
 		} else {
 			
-			if (inWuClass.deployed) {
-				return outWuClass.wuClassId;
+			if (inWuClass.isDeployed()) {
+				return outWuClass.getWuClassId();
 			} else {
-				return inWuClass.wuClassId;
+				return inWuClass.getWuClassId();
 			}
 			
 		}
@@ -121,10 +121,10 @@ public class FlowBasedProcessEdge implements Comparable<FlowBasedProcessEdge>{
 		if (isFullDeployed() || !isPartialDeployed()) {
 			return null;
 		} else {
-			if(inWuClass.deployed) {
-				return inWuClass.deviceId;
+			if(inWuClass.isDeployed()) {
+				return inWuClass.getDeviceId();
 			} else {
-				return outWuClass.deviceId;
+				return outWuClass.getDeviceId();
 			}
 		}
 	}

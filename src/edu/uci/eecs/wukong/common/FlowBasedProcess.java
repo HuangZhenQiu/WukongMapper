@@ -98,7 +98,7 @@ public class FlowBasedProcess {
 			Iterator<WuClass>  wuClassIterator = wuClassMap.values().iterator();
 			while(wuClassIterator.hasNext()) {
 				WuClass wuclass = wuClassIterator.next();
-				locationConstraints.put(wuclass.wuClassId, wuclass.getLocationConstraint());
+				locationConstraints.put(wuclass.getWuClassId(), wuclass.getLocationConstraint());
 			}
 		}
 	}
@@ -248,7 +248,7 @@ public class FlowBasedProcess {
 		for (WuClass wuclass : classes) {
 			
 			if (!wuclass.isDeployed()) {
-				System.out.println("wuclass " + wuclass.wuClassId + " undeployed");
+				System.out.println("wuclass " + wuclass.getWuClassId() + " undeployed");
 				return false;
 			}
 		}
@@ -260,7 +260,7 @@ public class FlowBasedProcess {
 		for(FlowBasedProcessEdge edge : edges) {
 			System.out.println("Edge<" + edge.getInWuClass().getWuClassId() + ", "
 					+ edge.getOutWuClass().getWuClassId() + ">  -->   Device<"
-					+ edge.getInWuClass().deviceId +", " + edge.getOutWuClass().deviceId + ">" + ", data volumn " + edge.getDataVolumn());
+					+ edge.getInWuClass().getDeviceId() +", " + edge.getOutWuClass().getDeviceId() + ">" + ", data volumn " + edge.getDataVolumn());
 		}
 	}
 	
@@ -361,7 +361,7 @@ public class FlowBasedProcess {
 				}
 			}
 			
-			wuClass.energyCost = energy;
+			wuClass.setEnergyCost(energy);
 			
 			return wuClass.getEnergyCost();
 		}
