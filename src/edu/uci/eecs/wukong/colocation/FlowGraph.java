@@ -1,6 +1,5 @@
 package edu.uci.eecs.wukong.colocation;
 
-import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.common.WuClass;
 

@@ -1,10 +1,11 @@
 package edu.uci.eecs.wukong.util;
 
 import edu.uci.eecs.wukong.colocation.AbstractColocationGraph;
-import edu.uci.eecs.wukong.colocation.ColocationGraph;
+import edu.uci.eecs.wukong.colocation.BruteForceColocationGraph;
 import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
 import edu.uci.eecs.wukong.colocation.FlowGraph;
-import edu.uci.eecs.wukong.colocation.LayeredCollocationGraph;
+import edu.uci.eecs.wukong.colocation.ColocationGraph;
+import edu.uci.eecs.wukong.colocation.OneLayerColocationGraph;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper.GreedyType;
 
@@ -23,7 +24,7 @@ public class WeightedIndependentSetSelector {
 
 	public List<ColocationGraphNode> select(FlowGraph graph) {
 
-		ColocationGraph collocationGraph = new ColocationGraph(graph, system);
+		BruteForceColocationGraph collocationGraph = new BruteForceColocationGraph(graph, system);
 		List<ColocationGraphNode> maxIndependentSet = new ArrayList<ColocationGraphNode>();
 		switch (greedyType) {
 		case GWMAX:
@@ -38,11 +39,11 @@ public class WeightedIndependentSetSelector {
 	}
 	
 	public List<ColocationGraphNode> select_layer(FlowGraph graph) {
-		AbstractColocationGraph collocationGraph = new LayeredCollocationGraph(graph, system);
+		AbstractColocationGraph collocationGraph = new ColocationGraph(graph, system);
 		List<ColocationGraphNode> maxIndependentSet = new ArrayList<ColocationGraphNode>();
 		
 		if(greedyType == GreedyType.LIKE_NAIVE) {
-			collocationGraph = new LayeredCollocationGraph(graph, system, true);
+			collocationGraph = new OneLayerColocationGraph(graph, system);
 		}
 		switch (greedyType) {
 		case GWMAX:

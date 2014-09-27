@@ -20,7 +20,6 @@ public class WuKongSystemFactory {
 	private int K;
 	
 	public WuKongSystemFactory(int classNumber, int deviceNumber, int landMarkNumber, int distanceRange) {
-		
 		this.landMarkNumber = landMarkNumber;
 		this.classNumber = classNumber;
 		this.deviceNumber = deviceNumber;
