@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 
 /*
  * Each collocation node represents a way to do merge on original FBP.
@@ -18,10 +18,11 @@ public class ColocationGraphNode {
 	private int nodeId;
 	private Set<Integer> mWuClasses;
 
-	private Set<Edge> mMergeEdges;
+	private Set<FlowBasedProcessEdge> mMergeEdges;
 	private double mWeight = 0.0;
 	private int deployDevice = -1;
 
+	private int mLayer = 1;
 	/*
 	 * 
 	 * Neighbors of this colocation graph node
@@ -91,16 +92,17 @@ public class ColocationGraphNode {
 	 */
 
 	public ColocationGraphNode(Set<Integer> wuclasses,
-			double amountOfSavingEnergy, Set<Edge> mergingEdges) {
+			double amountOfSavingEnergy, Set<FlowBasedProcessEdge> mergingEdges) {
 		this.mWeight = amountOfSavingEnergy;
 		this.mWuClasses = new HashSet<Integer>(wuclasses);
 		this.nodeId = id++;
 		this.mMergeEdges = mergingEdges;
+		this.mLayer = this.mWuClasses.size(); 
 	}
 
 	
 	/* Getter and Setter */
-	public Set<Edge> getMergingEdges() {
+	public Set<FlowBasedProcessEdge> getMergingEdges() {
 		return mMergeEdges;
 	}
 	public Set<Integer> getInvolveWuClasses() {

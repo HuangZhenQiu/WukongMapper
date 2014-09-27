@@ -77,7 +77,7 @@ public abstract class AbstractSelectionMapper extends AbstractMapper {
 		ImmutableList<WuDevice> wuDevices= system.getDevices();
 		
 		for(WuDevice device : wuDevices) {
-			ImmutableList<Integer> classIds= device.getAllWuObjectId();
+			ImmutableList<Integer> classIds= device.getAllWuObjectClassId();
 			
 			Linear linear = new Linear();
 			for(Integer classId : classIds) {
@@ -130,7 +130,7 @@ public abstract class AbstractSelectionMapper extends AbstractMapper {
 		ImmutableList<WuDevice> wuDevices= system.getDevices();
 		
 		for(WuDevice device : wuDevices) {
-			ImmutableList<Integer> classIds= device.getAllWuObjectId();
+			ImmutableList<Integer> classIds= device.getAllWuObjectClassId();
 
 			for(Integer classId : classIds) {
 				Linear linear =  new Linear();

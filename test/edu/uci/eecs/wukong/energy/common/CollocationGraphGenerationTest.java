@@ -1,24 +1,10 @@
 package edu.uci.eecs.wukong.energy.common;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashSet;
-
-import com.google.common.collect.ImmutableList;
-
 import junit.framework.TestCase;
-import edu.uci.eecs.wukong.colocation.ColocationGraph;
-import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
-import edu.uci.eecs.wukong.colocation.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.util.FlowBasedProcessFactory;
-import edu.uci.eecs.wukong.util.WeightedIndependentSetSelector;
 import edu.uci.eecs.wukong.util.WuKongSystemFactory;
 
 public class CollocationGraphGenerationTest extends TestCase{
@@ -33,15 +19,19 @@ public class CollocationGraphGenerationTest extends TestCase{
 			WuKongSystemFactory wukongFactory = new WuKongSystemFactory(30 /* class number */, 20 /* device number */, 10 /* landmark number */, 100 /* distance range */);
 			
 			FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(TYPE.STAR);
-			WukongSystem system = wukongFactory.createRandomWuKongSystem();
+//			WukongSystem system = wukongFactory.createRandomWuKongSystem();
+			WukongSystem system = wukongFactory.createRandomWukongSystem(6, 1, 1000);
 			
-			fbp.toFile(root + "/data/fbp2.txt");
-			system.toFile(root + "/data/wukong2.txt");
+			
+			fbp.print();
+			System.out.println(system);
+//			fbp.toFile(root + "/data/fbp2.txt");
+//			system.toFile(root + "/data/wukong2.txt");
 			
 			System.out.println("Finish generating random fbp and system");
 			
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 		} finally {
 			
 		}

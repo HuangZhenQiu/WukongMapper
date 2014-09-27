@@ -24,5 +24,4 @@ public class LocationConstraint {
 	public void setDistance(Double distance) {
 		this.distance = distance;
 	}
-	
 }

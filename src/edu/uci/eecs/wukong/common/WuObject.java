@@ -29,5 +29,4 @@ public class WuObject {
 	protected void deactivate() {
 		this.active = false;
 	}
-	
 }

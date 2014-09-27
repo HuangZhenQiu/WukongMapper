@@ -9,7 +9,7 @@ import net.sf.javailp.VarType;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WuClass;
 import edu.uci.eecs.wukong.common.WuDevice;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.util.Util;
 
@@ -143,11 +143,11 @@ public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 			
 			//add consumption of wuclasses together
 			for(WuClass wuClass : device.getHostableWuClass(this.fbp)) {
-				ImmutableList<Edge> inEdges = this.fbp.getInEdge(wuClass.getWuClassId());
-				ImmutableList<Edge> outEdges = this.fbp.getOutEdge(wuClass.getWuClassId());
+				ImmutableList<FlowBasedProcessEdge> inEdges = this.fbp.getInEdge(wuClass.getWuClassId());
+				ImmutableList<FlowBasedProcessEdge> outEdges = this.fbp.getOutEdge(wuClass.getWuClassId());
 				
 				//add receiving cost of inlink
-				for(Edge edge: inEdges) {
+				for(FlowBasedProcessEdge edge: inEdges) {
 					ImmutableList<WuDevice> outDevices = this.system.getPossibleHostDevice(edge.getInWuClass().getWuClassId());
 					for(WuDevice outDevice: outDevices) {
 						if(!outDevice.equals(device)) {
@@ -170,7 +170,7 @@ public class DistanceAwareSelectionBasedMapper extends AbstractSelectionMapper{
 				}
 				
 				//add transmission cost of outlink
-				for(Edge edge: outEdges) {
+				for(FlowBasedProcessEdge edge: outEdges) {
 					ImmutableList<WuDevice> inDevices = this.system.getPossibleHostDevice(edge.getOutWuClass().getWuClassId());
 					for(WuDevice inDevice: inDevices) {
 						if(!inDevice.equals(device)) {

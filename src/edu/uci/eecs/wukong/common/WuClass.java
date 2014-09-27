@@ -76,4 +76,7 @@ public class WuClass {
 		this.energyCost = energy;
 	}
 	
+	public boolean equal(WuClass wuclass){
+		return this.wuClassId == wuclass.wuClassId;
+	}
 }
