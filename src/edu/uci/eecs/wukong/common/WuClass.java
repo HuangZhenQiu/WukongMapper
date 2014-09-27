@@ -3,17 +3,13 @@ package edu.uci.eecs.wukong.common;
 import edu.uci.eecs.wukong.common.LocationConstraint;
 
 public class WuClass {
-//	private int wuClassId;
-//	private int deviceId;
-//	private LocationConstraint locationConstraint;
-//	private boolean deployed;
-//	private Double energyCost; //It is used after merge.
 
-	public int wuClassId;
-	public int deviceId;
-	public LocationConstraint locationConstraint;
-	public boolean deployed;
-	public Double energyCost; //It is used after merge.
+	private int wuClassId;
+	private int deviceId;
+	private LocationConstraint locationConstraint;
+	private boolean deployed;
+	private Double energyCost; //It is used after merge.
+
 
 	
 	public WuClass(int wuClassId, LocationConstraint locationConstraint) {
