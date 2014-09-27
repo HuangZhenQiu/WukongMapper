@@ -13,57 +13,10 @@ import edu.uci.eecs.wukong.util.Pair;
 public class ColocationGraph extends AbstractColocationGraph{
 
 	List<ArrayList<ColocationGraphNode>> layers;
-	private boolean one_layer = false;
 	public ColocationGraph(FlowGraph graph, WukongSystem system) {
 		super(graph, system);
 		this.layers = new ArrayList<ArrayList<ColocationGraphNode>>();
-		if(!one_layer){
-			this.init();
-		}
-		else{
-			this.bare_init();
-		}
-	}
-	
-	public void bare_init() {
-		
-		rawInitCollocationGraph(graph);
-
-		ArrayList<ColocationGraphNode> first = new ArrayList<ColocationGraphNode>();
-		for(ColocationGraphNode node: getNodes()){
-			first.add(node);
-		}
-		
-		layers.add(first);
-		
-		for (int i = 0; i < layers.size(); i++) {
-			
-			ArrayList<Pair<ColocationGraphNode, ColocationGraphNode>> pair_list = new ArrayList<Pair<ColocationGraphNode, ColocationGraphNode>>();
-			
-			for (int k = 0; k < layers.get(i).size() - 1; k++) {
-				for (int j = k + 1; j < layers.get(i).size(); j++) {
-					Pair<ColocationGraphNode, ColocationGraphNode> pair = new Pair<ColocationGraphNode, ColocationGraphNode>(layers.get(i).get(k), layers.get(i).get(j));
-					pair_list.add(pair);
-				}
-			}
-			
-			while(pair_list.size() > 0){
-				Pair<ColocationGraphNode, ColocationGraphNode> pair = pair_list.remove(0);
-				ColocationGraphNode node1 = pair.getFirst();
-				ColocationGraphNode node2 = pair.getSecond();
-				
-			
-				if (getIntersection(node1, node2).size() != 0) {
-					Set<Integer> union = getUnion(node1, node2);
-					
-					if (!system.isHostable(union)){
-						ColocationGraphEdge edge = new ColocationGraphEdge(node1, node2);
-						addEdge(edge);
-					}
-				}
-			}
-			
-		}
+		this.init();
 	}
 	
 	public void init() {
