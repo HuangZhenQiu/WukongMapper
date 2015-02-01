@@ -10,10 +10,10 @@ import com.google.common.collect.ImmutableList;
 import junit.framework.TestCase;
 import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
 import edu.uci.eecs.wukong.colocation.FlowGraph;
-import edu.uci.eecs.wukong.colocation.LayeredCollocationGraph;
+import edu.uci.eecs.wukong.colocation.ColocationGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper.GreedyType;
 import edu.uci.eecs.wukong.util.WeightedIndependentSetSelector;
 
@@ -32,8 +32,8 @@ public class CollocationGraphTest extends TestCase{
 			system.initialize(new BufferedReader(inputStream));
 			FlowGraph graph = new FlowGraph();
 			
-			ImmutableList<Edge> mergableEdges = fbp.getMergableEdges(system);
-			for(Edge edge: mergableEdges){
+			ImmutableList<FlowBasedProcessEdge> mergableEdges = fbp.getMergableEdges(system);
+			for(FlowBasedProcessEdge edge: mergableEdges){
 				graph.addEdge(edge);
 			}
 			
@@ -42,8 +42,8 @@ public class CollocationGraphTest extends TestCase{
 //			collocationGraph.print();
 			
 			System.out.println("Result from layered Colocation graph");
-			LayeredCollocationGraph collocationGraph2 = new LayeredCollocationGraph(graph, system);
-			collocationGraph2.printLayeredColocationGraph();
+			ColocationGraph collocationGraph2 = new ColocationGraph(graph, system);
+			collocationGraph2.print();
 			WeightedIndependentSetSelector selector = new WeightedIndependentSetSelector(system, GreedyType.GWMIN2);
 			List<ColocationGraphNode> nodes = selector.select_layer(graph);
 			

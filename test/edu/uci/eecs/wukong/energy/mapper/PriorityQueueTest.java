@@ -3,7 +3,7 @@ package edu.uci.eecs.wukong.energy.mapper;
 import junit.framework.TestCase;
 import org.junit.Test;
 
-import edu.uci.eecs.wukong.common.FlowBasedProcess;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.common.WuDevice;
 
 import java.util.Iterator;
@@ -51,18 +51,18 @@ public class PriorityQueueTest extends TestCase{
 	
 	@Test
 	public void testEdgePriorityQueueUpdate() {
-		PriorityQueue<FlowBasedProcess.Edge> queue = new PriorityQueue<FlowBasedProcess.Edge>();
+		PriorityQueue<FlowBasedProcessEdge> queue = new PriorityQueue<FlowBasedProcessEdge>();
 		
-		FlowBasedProcess.Edge edge1 = new FlowBasedProcess.Edge(null, null, 10);
-		FlowBasedProcess.Edge edge2 = new FlowBasedProcess.Edge(null, null, 15);
+		FlowBasedProcessEdge edge1 = new FlowBasedProcessEdge(null, null, 10);
+		FlowBasedProcessEdge edge2 = new FlowBasedProcessEdge(null, null, 15);
 		
 		queue.add(edge1);
 		queue.add(edge2);
 		
 		
-		Iterator<FlowBasedProcess.Edge> iter = queue.iterator();
+		Iterator<FlowBasedProcessEdge> iter = queue.iterator();
 		while(iter.hasNext()) {
-			FlowBasedProcess.Edge edge = iter.next();
+			FlowBasedProcessEdge edge = iter.next();
 			System.out.println(edge.getWeight());
 		}
 	}

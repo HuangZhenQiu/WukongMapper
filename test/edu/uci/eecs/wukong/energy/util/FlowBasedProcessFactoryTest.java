@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import edu.uci.eecs.wukong.util.FlowBasedProcessFactory;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 
 import com.google.common.collect.ImmutableList;
@@ -24,8 +24,8 @@ public class FlowBasedProcessFactoryTest extends TestCase{
 	@Test
 	public void testCreateLinearFBP() {
 		FlowBasedProcess process = factory.createFlowBasedProcess(TYPE.LINEAR);
-		ImmutableList<Edge> lists = process.getEdges();
-		UnmodifiableIterator<Edge> iterator = lists.iterator();
+		ImmutableList<FlowBasedProcessEdge> lists = process.getEdges();
+		UnmodifiableIterator<FlowBasedProcessEdge> iterator = lists.iterator();
 		while(iterator.hasNext()) {
 			assertEquals(true, iterator.next().getWeight() < 50);
 		}

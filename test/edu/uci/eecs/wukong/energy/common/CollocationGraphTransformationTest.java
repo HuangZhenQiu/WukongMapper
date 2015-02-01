@@ -11,7 +11,7 @@ import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
 import edu.uci.eecs.wukong.colocation.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper.GreedyType;
 import edu.uci.eecs.wukong.util.FlowBasedProcessFactory;
@@ -62,19 +62,18 @@ public class CollocationGraphTransformationTest extends TestCase{
 	
 				
 				FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(type);
-				WukongSystem system = wukongFactory.createRandomWukongSystem(K, replica, 1000);
+				WukongSystem system = wukongFactory.createRandomWukongSystem(K, replica);
 				
 				FlowGraph graph = new FlowGraph();
-				ImmutableList<Edge> mergableEdges = fbp.getMergableEdges(system);
-				for(Edge edge: mergableEdges){
+				ImmutableList<FlowBasedProcessEdge> mergableEdges = fbp.getMergableEdges(system);
+				for(FlowBasedProcessEdge edge: mergableEdges){
 					graph.addEdge(edge);
 				}
 				long start = System.currentTimeMillis();
 				WeightedIndependentSetSelector selector = new WeightedIndependentSetSelector(system, GreedyType.GWMIN);
-				AbstractColocationGraph colocationGraph = selector.get_layer(graph);
+				List<ColocationGraphNode> nodes = selector.select_layer(graph);
 				
-				node_size += colocationGraph.getNodes().size();
-				edge_size += colocationGraph.getAllEdges().size();
+				node_size += nodes.size();
 				
 //				List<ColocationGraphNode> nodes = selector.select_layer(graph);
 				long end = System.currentTimeMillis();
