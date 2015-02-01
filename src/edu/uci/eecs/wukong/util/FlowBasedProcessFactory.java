@@ -12,8 +12,8 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.LocationConstraint;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
+import edu.uci.eecs.wukong.common.LocationConstraint;
 import edu.uci.eecs.wukong.common.WuClass;
 
 public class FlowBasedProcessFactory {
@@ -52,6 +52,8 @@ public class FlowBasedProcessFactory {
 				break;
 			case RANDOM:
 				graph = generator.generateRandomGraph(classNumber / 2 , classNumber / 2 - 1);
+//				graph = generator.generateRandomGraph(classNumber / 2 , classNumber );
+				
 				break;
 			case SCALE_FREE:
 				graph = generator.generateScaleFreeGraph(classNumber / 2);
@@ -62,22 +64,24 @@ public class FlowBasedProcessFactory {
 		}
 		
 		HashMap<Object, WuClass> nodeMap = assignClassIdToGraphNode(graph);
-		List<Edge> edges = buildEdges(nodeMap, graph);
+		List<FlowBasedProcessEdge> edges = buildEdges(nodeMap, graph);
 		
 		HashMap<Integer, WuClass> classMap =  new HashMap<Integer, WuClass>();
 		Iterator<WuClass> classIterator = nodeMap.values().iterator();
 		while(classIterator.hasNext()) {
 			WuClass wuclass = classIterator.next();
-			classMap.put(wuclass.getWuClassId(), wuclass);
+			if(ifExistInEdges(wuclass, edges)){
+				classMap.put(wuclass.getWuClassId(), wuclass);
+			}
 		}
 		
 		
 		return new FlowBasedProcess(classMap, edges, FlowBasedProcess.TYPE.LINEAR);
 	}
 	
-	private List<Edge> buildEdges(HashMap<Object, WuClass> objectMap, SimpleDirectedGraph<Object, DefaultEdge> graph) {
+	private List<FlowBasedProcessEdge> buildEdges(HashMap<Object, WuClass> objectMap, SimpleDirectedGraph<Object, DefaultEdge> graph) {
 		Iterator<DefaultEdge> edgeIterator = graph.edgeSet().iterator();
-		List<Edge> edges = new ArrayList<Edge>();
+		List<FlowBasedProcessEdge> edges = new ArrayList<FlowBasedProcessEdge>();
 		Random random = new Random();
 		
 		while(edgeIterator.hasNext()) {
@@ -90,11 +94,34 @@ public class FlowBasedProcessFactory {
 			while(weight == 0) {
 				weight = Math.abs(random.nextInt()) % dataVolumnRange;
 			}
-			Edge fbpEdge = new Edge(objectMap.get(source), objectMap.get(target), weight);
-			edges.add(fbpEdge);
+			FlowBasedProcessEdge fbpEdge = new FlowBasedProcessEdge(objectMap.get(source), objectMap.get(target), weight);
+			if(!isEdgeExist(edges, fbpEdge)){
+				edges.add(fbpEdge);
+			}
 		}
 		
 		return edges;
+	}
+
+	public boolean ifExistInEdges(WuClass wuclass, List<FlowBasedProcessEdge> edges) {
+		for( FlowBasedProcessEdge edge : edges) {
+			if(edge.getInWuClass().equal(wuclass) || edge.getOutWuClass().equal(wuclass)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isEdgeExist(List<FlowBasedProcessEdge> edges, FlowBasedProcessEdge fbpedge) { 
+		for(FlowBasedProcessEdge edge: edges) { 
+			if(fbpedge.getInWuClass().equal(edge.getInWuClass()) && fbpedge.getOutWuClass().equal(edge.getOutWuClass())) {
+				return true;
+			}
+			else if(fbpedge.getInWuClass().equal(edge.getOutWuClass()) && fbpedge.getOutWuClass().equal(edge.getInWuClass())){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private HashMap<Object, WuClass> assignClassIdToGraphNode(SimpleDirectedGraph<Object, DefaultEdge> graph) {

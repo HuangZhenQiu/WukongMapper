@@ -5,6 +5,8 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 
 import junit.framework.TestCase;
+import edu.uci.eecs.wukong.colocation.AbstractColocationGraph;
+import edu.uci.eecs.wukong.colocation.ColocationGraph;
 import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
 import edu.uci.eecs.wukong.colocation.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
@@ -50,6 +52,8 @@ public class CollocationGraphTransformationTest extends TestCase{
 		
 		int iteration = 1000; 
 		int duration = 0;
+		int node_size = 0;
+		int edge_size = 0;
 		FlowBasedProcessFactory fbpFactory = new FlowBasedProcessFactory(10 /* landmark number */, classNumber, 100 /* distance range */, 100 /* weight */);
 		WuKongSystemFactory wukongFactory = new WuKongSystemFactory(classNumber, deviceNumber, 10 /* landmark number */, 100 /* distance range */);
 		
@@ -58,7 +62,7 @@ public class CollocationGraphTransformationTest extends TestCase{
 	
 				
 				FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(type);
-				WukongSystem system = wukongFactory.createRandomWukongSystem(K, replica);
+				WukongSystem system = wukongFactory.createRandomWukongSystem(K, replica, 1000);
 				
 				FlowGraph graph = new FlowGraph();
 				ImmutableList<Edge> mergableEdges = fbp.getMergableEdges(system);
@@ -67,7 +71,12 @@ public class CollocationGraphTransformationTest extends TestCase{
 				}
 				long start = System.currentTimeMillis();
 				WeightedIndependentSetSelector selector = new WeightedIndependentSetSelector(system, GreedyType.GWMIN);
-				List<ColocationGraphNode> nodes = selector.select_layer(graph);
+				AbstractColocationGraph colocationGraph = selector.get_layer(graph);
+				
+				node_size += colocationGraph.getNodes().size();
+				edge_size += colocationGraph.getAllEdges().size();
+				
+//				List<ColocationGraphNode> nodes = selector.select_layer(graph);
 				long end = System.currentTimeMillis();
 //				System.out.println("Running time: " + (end-start));
 				duration += (end-start);
@@ -83,6 +92,7 @@ public class CollocationGraphTransformationTest extends TestCase{
 				
 			}
 		}
+		System.out.println("Average node space: " + (double) node_size / (double) iteration + ", average edge space: " + (double) edge_size / (double) iteration);
 		System.out.println("Time elapsed: " + (double) duration / (double) iteration);
 	}
 	

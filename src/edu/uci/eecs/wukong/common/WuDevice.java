@@ -2,9 +2,11 @@ package edu.uci.eecs.wukong.common;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.lang.Comparable;
 
@@ -18,41 +20,9 @@ import com.google.common.collect.ImmutableList;
  */
 public class WuDevice implements Comparable<WuDevice>{
 
-	public class WuObject {
-		
-		private Integer wuClassId;
-		private WuDevice device;
-		private boolean active;
-		
-		public WuObject(Integer wuClassId, WuDevice device) {
-			this.wuClassId = wuClassId;
-			this.device = device;
-			this.active = false;
-		}
-		
-		public Integer getWuClassId() {
-			return this.wuClassId;
-		}
-		
-		public boolean isActive() {
-			return active;
-		}
-		
-		
-		//They are only accessible by WuDevice
-		protected void activate() {
-			this.active = true;
-		}
-		
-		protected void deactivate() {
-			this.active = false;
-		}
-		
-	}
-
 	private int wuDeviceId;
 	private List<WuObject> wuObjects;
-	private HashMap<Integer, WuObject> wuObjectMap;
+//	private HashMap<Integer, WuObject> wuObjectMap;
 	private WukongSystem system;
 	
 	//Distance to landmark
@@ -69,13 +39,14 @@ public class WuDevice implements Comparable<WuDevice>{
 	 * @param wuDeviceId
 	 * @param energyConstraint
 	 */
+	
 	public WuDevice(int wuDeviceId, Double energyConstraint, WukongSystem system) {
 		this.wuDeviceId =  wuDeviceId;
 		this.energyConstraint = energyConstraint;
 		this.initialConsumption = 0.0;
 		this.currentConsumption = 0.0;
 		this.wuObjects = new ArrayList<WuObject>();
-		this.wuObjectMap = new HashMap<Integer, WuObject>();
+//		this.wuObjectMap = new HashMap<Integer, WuObject>();
 		this.distances = new ArrayList<Double>();
 		this.deviceDistances = new ArrayList<Double>();
 		this.system = system;
@@ -95,15 +66,15 @@ public class WuDevice implements Comparable<WuDevice>{
 		this.currentConsumption = 0.0;
 		this.initialConsumption = 0.0;
 		this.wuObjects = new ArrayList<WuObject>();
-		this.wuObjectMap = new HashMap<Integer, WuObject>();
+//		this.wuObjectMap = new HashMap<Integer, WuObject>();
 		this.distances = distances;
 		this.deviceDistances = deviceDistances;
 		this.system = system;
 		
-		for (Integer id: wuClassIds) {
-			WuObject object = new WuObject(id, this);
-			wuObjects.add(object);
-			wuObjectMap.put(id, object);
+		for (Integer wuclassId: wuClassIds) {
+			WuObject wuObject = new WuObject(wuclassId, this);
+			wuObjects.add(wuObject);
+//			wuObjectMap.put(id, object);
 		}
 		
 	}
@@ -147,7 +118,7 @@ public class WuDevice implements Comparable<WuDevice>{
 			Integer classId = Integer.parseInt(tokenizer.nextToken());
 			WuObject object = new WuObject(classId, this);
 			wuObjects.add(object);
-			wuObjectMap.put(classId, object);
+//			wuObjectMap.put(classId, object);
 		}
 		
 		//read distance to landmarks
@@ -168,79 +139,69 @@ public class WuDevice implements Comparable<WuDevice>{
 	}
 	
 	
-	public boolean isWuObjectExist(Integer wuclassId) {
-		for (Integer wuobject : getWuObjects()) {
-			if (wuclassId == wuobject) {
-				return true;
-			}
+	/* 
+	 * 
+	 * Operations for WuObject list
+	 * 
+	 */
+	public boolean isHostable(Set<Integer> done){
+		if(done.containsAll(this.getAllWuObjectClassId())){
+			return true;
+		}
+		else if(this.getAllWuObjectClassId().containsAll(done)){
+			return true;
 		}
 		return false;
 	}
-	
-	public List<Integer> getWuObjects() {
-		List<Integer> ids = new ArrayList<Integer>();
-		
-		for (WuObject wuObject : wuObjects) {
-			ids.add(wuObject.wuClassId);
-		}
-		return ids;
-	}
-	
-	public ImmutableList<Integer> getAllWuObjectId() {
-		List<Integer> ids = new ArrayList<Integer>();
-		
-		for (WuObject wuObject : wuObjects) {
-			ids.add(wuObject.wuClassId);
-		}
-		
-		return ImmutableList.<Integer>builder().addAll(ids).build();
-	}
-	
-	public ImmutableList<Integer> getAllActiveWuObjectId() {
-		List<Integer> ids = new ArrayList<Integer>();
-		for (WuObject wuObject : wuObjects) {
-			if (wuObject.active) {
-				ids.add(wuObject.wuClassId);
-			}
-		}
-		
-		return ImmutableList.<Integer>builder().addAll(ids).build();
-	}
-	
-	public boolean deploy(Integer nodeId) {
 
-		WuObject node = wuObjectMap.get(nodeId); 
-		if (node != null){
-			FlowBasedProcess.LocationConstraint nodeConstraint = system.getCurrentFBP().getLocationConstraintByWuClassId(nodeId);
-			
-			if (nodeConstraint == null || (nodeConstraint != null
-					&& distances.get(nodeConstraint.getLandMarkId()) <= nodeConstraint.getDistance())) {
-				List<Integer> nodes = new ArrayList<Integer>();
-				nodes.add(nodeId);
-				Double energyConsumption = getAfterDeploymentEngeryConsumption(nodes);
-				if (energyConsumption < this.energyConstraint) {
-					node.activate();
-					system.getCurrentFBP().deploy(nodeId, wuDeviceId);
-					
-					//update the current energy consumption
-					currentConsumption = energyConsumption;
-					return true;
-				}
-			}
-		}else{
-			System.out.println("Can't find out the wuclass" + nodeId);
+	public List<WuObject> getWuObjects() {
+		return wuObjects;
+	}
+	
+	public ImmutableList<Integer> getAllWuObjectClassId() {
+		List<Integer> ids = new ArrayList<Integer>();
+		
+		for (WuObject wuObject : getWuObjects()) {
+			ids.add(wuObject.getWuClassId());
 		}
 		
-		return false;
+		return ImmutableList.<Integer>builder().addAll(ids).build();
+	}
+	
+	public ImmutableList<Integer> getAllActiveWuObjectClassId() {
+		List<Integer> ids = new ArrayList<Integer>();
+		for (WuObject wuObject : getWuObjects()) {
+			if (wuObject.isActive()) {
+				ids.add(wuObject.getWuClassId());
+			}
+		}
+		
+		return ImmutableList.<Integer>builder().addAll(ids).build();
+	}
+	
+	private List<Integer> getCopiedAllActiveWuObjectId() {
+		List<Integer> copy = new ArrayList<Integer>();
+		copy.addAll(getAllActiveWuObjectClassId());
+		
+		return copy;
+	}
+	
+	public WuObject getWuObject(int wuclassId) {
+		for(WuObject object: getWuObjects()){
+			if(object.getWuClassId() == wuclassId) {
+				return object;
+			}
+		}
+		return null;
 	}
 	
 	public boolean deploy(Integer inNodeId, Integer outNodeId) {
-		WuObject inNode = wuObjectMap.get(inNodeId);
-		WuObject outNode = wuObjectMap.get(outNodeId);
+		WuObject inNode = getWuObject(inNodeId);
+		WuObject outNode = getWuObject(outNodeId);
 		if (inNode != null && outNode != null) {
 			
-			FlowBasedProcess.LocationConstraint inNodeConstraint = system.getCurrentFBP().getLocationConstraintByWuClassId(inNodeId);
-			FlowBasedProcess.LocationConstraint outNodeConstraint = system.getCurrentFBP().getLocationConstraintByWuClassId(outNodeId);
+			LocationConstraint inNodeConstraint = system.getCurrentFBP().getLocationConstraintByWuClassId(inNodeId);
+			LocationConstraint outNodeConstraint = system.getCurrentFBP().getLocationConstraintByWuClassId(outNodeId);
 			
 			//Apply Location Constraint
 			if ((inNodeConstraint == null || (inNodeConstraint != null 
@@ -264,35 +225,101 @@ public class WuDevice implements Comparable<WuDevice>{
 					currentConsumption = energyConsumption;
 					return true;
 				}
-				
 			}
 		}
-		
 		return false;
 	}
-	
-	public boolean hasWuObject(int wuClassId) {
-		for(WuObject object : wuObjects) {
-			if(object.getWuClassId().equals(wuClassId)) {
+				
+	public boolean isWuObjectExist(WuObject object){
+		for (WuObject wuObject: getWuObjects()){
+			if(wuObject.getWuClassId() == object.getWuClassId()){
 				return true;
 			}
 		}
+		return false;
+	}
+	
+	public boolean isWuObjectExist(Integer wuclassId) {
+		for (WuObject wuobject : getWuObjects()) {
+			if (wuobject.getWuClassId() == wuclassId) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addWuObject(int wuClassId) {
+		if(!isWuObjectExist(wuClassId)){
+			WuObject object = new WuObject(wuClassId, this);
+			this.wuObjects.add(object);
+		}
+	}
+	
+	
+	
+	public boolean deploy(Integer nodeId, int[][] channels) {
+		WuObject node = getWuObject(nodeId);
+		if (node != null){
+			List<Integer> nodes = new ArrayList<Integer>();
+			nodes.add(nodeId);
+			Double energyConsumption = getAfterDeploymentEngeryConsumption(nodes);
+			node.activate();
+			system.getCurrentFBP().deploy(nodeId, wuDeviceId);
+				
+				//update the current energy consumption
+			currentConsumption = energyConsumption;
+			return true;
+		}
+		else{
+			// Can't deploy nodeId to this device
+//			System.out.println("Can't find out the wuclass" + nodeId);
+		}
+		return false;
+	}
+	
+	public boolean deploy(Integer nodeId) {
+
+		WuObject node = getWuObject(nodeId);
+		if (node != null){
+			List<Integer> nodes = new ArrayList<Integer>();
+			nodes.add(nodeId);
+			Double energyConsumption = getAfterDeploymentEngeryConsumption(nodes);
+			node.activate();
+			system.getCurrentFBP().deploy(nodeId, wuDeviceId);
+				
+				//update the current energy consumption
+			currentConsumption = energyConsumption;
+			return true;
+		}
+		else{
+			// System.out.println("Can't find out the wuclass" + nodeId);
+		}
 		
 		return false;
 	}
 	
+//	public boolean deploy(Integer inNodeId, Integer outNodeId) {
+//		
+//		if(getWuObject(inNodeId) != null && getWuObject(outNodeId)!=null){
+//			deploy(inNodeId);
+//			deploy(outNodeId);
+//			return true;
+//		}
+//		return false;
+//	}
+//	
 	public void updateEnergyConsumption() {
 		currentConsumption = getAfterDeploymentEngeryConsumption(null);
 	}
 	
-	private Double getAfterDeploymentEngeryConsumption(List<Integer> nodes) {
+	private Double getAfterDeploymentEngeryConsumption(List<Integer> wuclassesToBeDeployed) {
 		
 		//TODO: modify it to make it good for initial energtConsumption;
 		Double energyConsumption = initialConsumption;
 		List<Integer> activeIds = getCopiedAllActiveWuObjectId();
 		
-		if(nodes != null) {
-			activeIds.addAll(nodes);
+		if(wuclassesToBeDeployed != null) {
+			activeIds.addAll(wuclassesToBeDeployed);
 		}
 
 		for (Integer id : activeIds) {
@@ -302,12 +329,7 @@ public class WuDevice implements Comparable<WuDevice>{
 		return energyConsumption;
 	}
 	
-	private List<Integer> getCopiedAllActiveWuObjectId() {
-		List<Integer> copy = new ArrayList<Integer>();
-		copy.addAll(getAllActiveWuObjectId());
-		
-		return copy;
-	}
+	
 	
 	@Override
 	public String toString() {
@@ -326,11 +348,7 @@ public class WuDevice implements Comparable<WuDevice>{
 		return builder.toString();
 	}
 	
-	public void addWuObject(int wuObjectId) {
-		WuObject object = new WuObject(wuObjectId, this);
-		this.wuObjects.add(object);
-		this.wuObjectMap.put(wuObjectId, object);
-	}
+
 
 	public int getWuDeviceId() {
 		return wuDeviceId;

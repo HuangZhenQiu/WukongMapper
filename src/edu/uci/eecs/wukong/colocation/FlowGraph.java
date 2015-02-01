@@ -1,8 +1,7 @@
 package edu.uci.eecs.wukong.colocation;
 
-import edu.uci.eecs.wukong.common.FlowBasedProcess;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.common.WuClass;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,16 +13,16 @@ public class FlowGraph {
 	
 	
 	private Set<Integer> wuClassSet;
-	private List<Edge> edges;
-	public List<Edge> getEdges(){
+	private List<FlowBasedProcessEdge> edges;
+	public List<FlowBasedProcessEdge> getEdges(){
 		return edges;
 	}
 	public FlowGraph() {
 		wuClassSet = new HashSet<Integer>();
-		edges =  new ArrayList<Edge>();
+		edges =  new ArrayList<FlowBasedProcessEdge>();
 	}
 	
-	public void addEdge(Edge edge) {
+	public void addEdge(FlowBasedProcessEdge edge) {
 		if(!edges.contains(edge)) {
 //		if(!edges.contains(edge) && isConnect(edge)) {
 			edges.add(edge);
@@ -40,7 +39,7 @@ public class FlowGraph {
 		return false;
 	}
 	
-	public boolean isConnect(Edge edge) {
+	public boolean isConnect(FlowBasedProcessEdge edge) {
 		if(isConnect(edge.getInWuClass()) || isConnect(edge.getOutWuClass())) {
 			return true;
 		}

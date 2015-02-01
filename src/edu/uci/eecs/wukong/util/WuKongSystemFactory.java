@@ -1,5 +1,6 @@
 package edu.uci.eecs.wukong.util;
 
+import edu.uci.eecs.wukong.common.WuObject;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.WuDevice;
 
@@ -19,7 +20,6 @@ public class WuKongSystemFactory {
 	private int K;
 	
 	public WuKongSystemFactory(int classNumber, int deviceNumber, int landMarkNumber, int distanceRange) {
-		
 		this.landMarkNumber = landMarkNumber;
 		this.classNumber = classNumber;
 		this.deviceNumber = deviceNumber;
@@ -67,23 +67,24 @@ public class WuKongSystemFactory {
 				int deviceId = Math.abs(ran.nextInt()) % deviceNumber;
 				
 				if (!devices.get(deviceId).isWuObjectExist(i)){
-					if(devices.get(deviceId).getAllWuObjectId().size() < K){
+					if(devices.get(deviceId).getAllWuObjectClassId().size() < K){
 						devices.get(deviceId).addWuObject(i);
 						globalClassMap[i] ++;
 					}
 				}
+				
 			}
 		}
 		
 		for (int i = 0; i < deviceNumber; i++) {
 			Util.reset(classMap);
 			
-			List<Integer> objectIds = devices.get(i).getWuObjects();
-			for( Integer objectId: objectIds){
-				classMap[objectId] ++;
+			List<WuObject> objectIds = devices.get(i).getWuObjects();
+			for( WuObject objectId: objectIds){
+				classMap[objectId.getWuClassId()] ++;
 			}
 			
-			while(devices.get(i).getWuObjects().size() < K){
+			while(devices.get(i).getWuObjects().size() < K || devices.get(i).getWuObjects().size() == 0){
 				ran.setSeed(System.nanoTime() + i * i);
 				int classId = Math.abs(ran.nextInt()) % (classNumber - 1) + 1;
 				
@@ -103,33 +104,11 @@ public class WuKongSystemFactory {
 		return createRandomWukongSystem(6, 1);
 	}
 	
-	public WukongSystem createRandomMultiProtocolWuKongSystem(){
-		WukongSystem system = createRandomWukongSystem(6, 1);
-		int[][] channels = getRandomDeviceChannelMatrix(deviceNumber, 5);
+	public WukongSystem createRandomMultiProtocolWuKongSystem(int numberChannel){
+		WukongSystem system = createRandomWukongSystem(10, 1);
+		int[][] channels = getRandomDeviceChannelMatrix(deviceNumber, numberChannel);
 		system.setChannel(channels);
 		return system;
-	}
-	
-	private int findClassId(int[] glabalClassMap, int number) {
-		if(glabalClassMap[number] == 0) {
-			glabalClassMap[number] = 1;
-			return number;
-		} else {
-			int i = number;
-			while(glabalClassMap[number] == 1 && i <= classNumber) {
-				i = (i + 1)% classNumber;
-				if(i == number) {
-					break;
-				}
-			}
-			
-			if(i!= number && i <= classNumber) {
-				glabalClassMap[i] = 1;
-				return i;
-			} else {
-				return number;
-			}
-		}
 	}
 	
 	public List<Double> getRandomDistance(int landMarkNumber, int distanceRange) {
@@ -168,8 +147,39 @@ public class WuKongSystemFactory {
 			for(int j=i+1; j < deviceNumber; j++) {
 				random.setSeed(System.nanoTime() + i*2);
 				int channel = Math.abs(random.nextInt()) % channelNumber + 1;
-				matrix[i][j] = channel;
-				matrix[j][i] = channel;
+				
+				switch (channel) {
+				case 1:
+//					matrix[i][j] = 70;
+//					matrix[j][i] = 70;
+					matrix[i][j] = 50;
+					matrix[j][i] = 50;
+					break;
+				case 2: 
+					matrix[i][j] = 50;
+					matrix[j][i] = 50;
+					break;
+				case 3:
+					matrix[i][j] = 50;
+					matrix[j][i] = 50;
+//					matrix[i][j] = 90;
+//					matrix[j][i] = 90;
+					break;
+				case 4: 
+					matrix[i][j] = 50;
+					matrix[j][i] = 50;
+//					matrix[i][j] = 110;
+//					matrix[j][i] = 110;
+					break;
+				case 5:
+					matrix[i][j] = 50;
+					matrix[j][i] = 50;
+//					matrix[i][j] = 70;
+//					matrix[j][i] = 70;
+					break;
+				default:
+					break;
+				}
 			}
 			matrix[i][i] = 0;
 		}

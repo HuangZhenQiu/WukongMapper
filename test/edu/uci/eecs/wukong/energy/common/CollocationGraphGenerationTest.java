@@ -1,6 +1,5 @@
 package edu.uci.eecs.wukong.energy.common;
 
-
 import junit.framework.TestCase;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
@@ -22,13 +21,16 @@ public class CollocationGraphGenerationTest extends TestCase{
 			FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(TYPE.STAR);
 			WukongSystem system = wukongFactory.createRandomWuKongSystem();
 			
-			fbp.toFile(root + "/data/fbp2.txt");
-			system.toFile(root + "/data/wukong2.txt");
+			
+			fbp.print();
+			System.out.println(system);
+//			fbp.toFile(root + "/data/fbp2.txt");
+//			system.toFile(root + "/data/wukong2.txt");
 			
 			System.out.println("Finish generating random fbp and system");
 			
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 		} finally {
 			
 		}

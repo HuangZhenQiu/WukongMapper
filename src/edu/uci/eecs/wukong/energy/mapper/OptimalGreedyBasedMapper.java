@@ -5,7 +5,7 @@ import edu.uci.eecs.wukong.colocation.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.util.WeightedIndependentSetSelector;
 
@@ -37,6 +37,9 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 		GWMIN,
 		GWMAX,
 		GWMIN2,
+		MAXIMUM,
+		MAX_IMPORTANCE,
+		LIKE_NAIVE,
 	}
 	
 	private GreedyType greedyType;
@@ -52,17 +55,54 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 		
 		for(int i = 0; i < answers.size();i++){
 			ColocationGraphNode node = answers.get(i);
+//			System.out.println("finding device to deploy" + node.getInvolveWuClasses());
 			WuDevice device = system.getHostableDevice(node.getInvolveWuClasses());
 			
-			for(Edge edge: node.getMergingEdges()){
-				edge.getInWuClass().deploy(device.getWuDeviceId());
-				edge.getOutWuClass().deploy(device.getWuDeviceId());
+			if (device != null){
+//				System.out.println("device " + device.getWuDeviceId() + " will merge" + node.getMergingEdges());
+				for(FlowBasedProcessEdge edge: node.getMergingEdges()){
+					
+					if(!(greedyType == GreedyType.LIKE_NAIVE)){
+						edge.getInWuClass().deploy(device.getWuDeviceId());
+						edge.getOutWuClass().deploy(device.getWuDeviceId());
+						
+						device.deploy(edge.getInWuClass().getWuClassId());
+						device.deploy(edge.getOutWuClass().getWuClassId());
+					}
+					else{
+						if (edge.isUndeployed()) {
+							edge.getInWuClass().deploy(device.getWuDeviceId());
+							edge.getOutWuClass().deploy(device.getWuDeviceId());
+							
+							device.deploy(edge.getInWuClass().getWuClassId());
+							device.deploy(edge.getOutWuClass().getWuClassId());
+							// deployOneEnd(edge, edge.getInWuClass().getWuClassId(),
+							// deviceQueue);
+							// deployOneEnd(edge, edge.getOutWuClass().getWuClassId(),
+							// deviceQueue);
+						}
+						else if(edge.isPartialDeployed()) {
+							Integer undeployedClassId = edge.getUndeployedClassId();
+							Integer deviceId = edge.getPartiallyDeployedDeviceId();
+							WuDevice device1 = system.getDevice(deviceId);
+							
+//							edge.getInWuClass().deploy(device1.getWuDeviceId());
+//							edge.getOutWuClass().deploy(device1.getWuDeviceId());
+							if (device1.deploy(undeployedClassId)) {
+								edge.getInWuClass().deploy(device1.getWuDeviceId());
+								edge.getOutWuClass().deploy(device1.getWuDeviceId());
+							}
+							
+							
+						}
+					}
+				}
 			}
-			System.out.println("device " + device.getWuDeviceId() + " will merge" + node.getMergingEdges());
+			
 		}
 		
-		ArrayList<Edge> temp = new ArrayList<FlowBasedProcess.Edge>();
-		for(Edge edge : fbp.getEdges()){
+		ArrayList<FlowBasedProcessEdge> temp = new ArrayList<FlowBasedProcessEdge>();
+		for(FlowBasedProcessEdge edge : fbp.getEdges()){
 			if(!edge.isFullDeployed()){
 				temp.add(edge);
 			}
@@ -85,23 +125,23 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 	
 	private List<ColocationGraphNode> merge() {
 		List<ColocationGraphNode> answers = new LinkedList<ColocationGraphNode>();
-		ImmutableList<Edge> mergableEdges = this.fbp.getMergableEdges(this.system);
+		ImmutableList<FlowBasedProcessEdge> mergableEdges = this.fbp.getMergableEdges(this.system);
 		
 		ImmutableList<FlowGraph> graphs = split(mergableEdges);
 		for(FlowGraph graph: graphs){
 //			graph.print();
 			WeightedIndependentSetSelector selector = new WeightedIndependentSetSelector(system, greedyType);
 //			System.out.println(selector.select(graph));
-			answers.addAll(selector.select(graph));
+			answers.addAll(selector.select_layer(graph));
 		}
 		return answers;
 	}
 	
-	private ImmutableList<FlowGraph> split(ImmutableList<Edge> mergableEdges) {
+	private ImmutableList<FlowGraph> split(ImmutableList<FlowBasedProcessEdge> mergableEdges) {
 		List<FlowGraph> graphs= new LinkedList<FlowGraph>();
 		graphs.add(new FlowGraph());
 		
-		for(Edge edge : mergableEdges) {
+		for(FlowBasedProcessEdge edge : mergableEdges) {
 			FlowGraph first = null;
 			FlowGraph second = null;
 			for(FlowGraph graph : graphs) {
