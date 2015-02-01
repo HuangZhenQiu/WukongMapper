@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableList;
 import junit.framework.TestCase;
 import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
 import edu.uci.eecs.wukong.colocation.FlowGraph;
-import edu.uci.eecs.wukong.colocation.LayeredCollocationGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcess.Edge;

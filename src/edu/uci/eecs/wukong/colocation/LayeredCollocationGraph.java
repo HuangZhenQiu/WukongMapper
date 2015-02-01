@@ -30,6 +30,11 @@ public class LayeredCollocationGraph extends AbstractColocationGraph{
 		
 		layers.add(first);
 		
+		for(int i = 0; i < 9; i ++) {
+			ArrayList<ColocationGraphNode> layer = new ArrayList<ColocationGraphNode>();
+			layers.add(layer);
+		}
+		
 		for (int i = 0; i < layers.size(); i++) {
 			
 			ArrayList<ColocationGraphEdge> edgesToBeAdd = new ArrayList<ColocationGraphEdge>();
@@ -66,6 +71,7 @@ public class LayeredCollocationGraph extends AbstractColocationGraph{
 				ColocationGraphNode node1 = pair.getFirst();
 				ColocationGraphNode node2 = pair.getSecond();
 				
+			
 				if (getIntersection(node1, node2).size() != 0) {
 					Set<Integer> union = getUnion(node1, node2);
 					
@@ -77,15 +83,23 @@ public class LayeredCollocationGraph extends AbstractColocationGraph{
 						
 						Set<Edge> edges = new HashSet<FlowBasedProcess.Edge>(node1.getMergingEdges());
 						edges.addAll(node2.getMergingEdges());
-						
-						ColocationGraphNode node = new ColocationGraphNode(union, node1.getWeight() + node2.getWeight(), edges);
+						double new_weight = 0;
+						for(Edge e: edges){
+							new_weight += e.getDataVolumn();
+						}
+						 
+						ColocationGraphNode node = new ColocationGraphNode(union, new_weight, edges);
 						node.addParents(node1);
 						node.addParents(node2);
 						
 						int layer_index = node.getInvolveWuClasses().size()-2;
+						
 						if(layers.size()-1 < layer_index) {
-							ArrayList<ColocationGraphNode> layer = new ArrayList<ColocationGraphNode>();
-							layers.add(layer);
+							System.out.println(layer_index + ", " + (layers.size()-1));
+							for(int k = 0; k < layer_index - layers.size() + 1; k ++) {
+								ArrayList<ColocationGraphNode> layer = new ArrayList<ColocationGraphNode>();
+								layers.add(layer);
+							}
 						}
 						
 						ColocationGraphNode check = null;
