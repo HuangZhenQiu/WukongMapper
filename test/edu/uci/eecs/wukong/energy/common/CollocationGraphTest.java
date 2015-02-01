@@ -16,6 +16,7 @@ import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper.GreedyType;
 import edu.uci.eecs.wukong.util.WeightedIndependentSetSelector;
+import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
 
 public class CollocationGraphTest extends TestCase{
 	
@@ -24,7 +25,7 @@ public class CollocationGraphTest extends TestCase{
 		String root = System.getProperty("user.dir");
 		try {
 			FileReader inputStream = new FileReader(new File(root + "/data/fbp.txt"));
-			FlowBasedProcess fbp = new FlowBasedProcess(FlowBasedProcess.TYPE.LINEAR);
+			FlowBasedProcess fbp = new FlowBasedProcess(TYPE.LINEAR);
 			fbp.initialize(new BufferedReader(inputStream));
 			
 			inputStream = new FileReader(new File(root + "/data/wukong.txt"));

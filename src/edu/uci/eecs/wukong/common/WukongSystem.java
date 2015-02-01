@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Iterator;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.io.BufferedReader;
@@ -32,12 +31,7 @@ import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 public class WukongSystem {
 
 	private List<WuDevice> devices;
-
 	private Double[][] distances;
-
-	private Double[][] channel_transmit;
-	private Double[][] channel_receive;
-
 	private int[][] channels;
 
 	public void setChannel(int[][] channel) {

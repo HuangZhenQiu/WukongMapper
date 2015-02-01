@@ -3,9 +3,9 @@ package edu.uci.eecs.wukong.energy.common;
 import junit.framework.TestCase;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.util.FlowBasedProcessFactory;
 import edu.uci.eecs.wukong.util.WuKongSystemFactory;
+import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
 
 public class CollocationGraphGenerationTest extends TestCase{
 	

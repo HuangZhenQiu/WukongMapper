@@ -1,6 +1,16 @@
 package edu.uci.eecs.wukong.util;
 
 import java.lang.StringBuilder;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
+
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import edu.uci.eecs.wukong.common.WuClass;
 
 public class Util {
 	
@@ -74,10 +84,57 @@ public class Util {
 
 	}
 	
-	public static void reset(int[] classMap) {
-		for(int i=0; i < classMap.length; i++) {
-			classMap[i] = 0;
+	public static HashMap<Object, Integer> assignIdToGraphNode(
+			SimpleDirectedGraph<Object, DefaultEdge> graph) {
+		Set<Object> vertexes = graph.vertexSet();
+		int idSize = vertexes.size();
+		HashMap<Object, Integer> idMap = new HashMap<Object, Integer>();
+		Random random = new Random();
+		
+		Iterator<Object> objects = vertexes.iterator();
+		int[] classMap = new int[idSize];
+		Arrays.fill(classMap, 0);
+		while(objects.hasNext()) {
+			Object object= objects.next();
+			random.setSeed(idSize + System.nanoTime());
+			Integer classId = Math.abs(random.nextInt() % idSize);
+			while(classMap[classId] == 1) {
+				classId = Math.abs(random.nextInt() % idSize);
+			}
+			classMap[classId] = 1;
+			idMap.put(object, classId);
 		}
+		
+		return idMap;
+	}
+	
+	/**
+	 * It is an implementation of Bellman Ford algorithm
+	 * @param graph
+	 * @return
+	 */
+	public static Double[][] findShortestPath(Double[][] graph) {
+		int length = graph.length;
+		Double[][] distance = new Double[length][length];
+		
+		for(int i=0; i<length; i++) {
+			for(int j=0; j<length; j++) {
+				distance[i][j] = graph[i][j];
+			}
+		}
+		
+		for(int k=0; k<length; k++) {
+			for (int i=0; i<length; i++) {
+				for (int j=0; j<length; j++) {
+					if(graph[i][k] !=Double.MAX_VALUE && graph[k][j] !=Double.MAX_VALUE && distance[i][j] > graph[i][k] + graph[k][j]) {
+						distance[i][j] = graph[i][k] + graph[k][j];
+						//distance[j][i] = graph[i][k] + graph[k][j];
+					}
+				}
+			}
+		}
+		
+		return distance;
 	}
 
 }

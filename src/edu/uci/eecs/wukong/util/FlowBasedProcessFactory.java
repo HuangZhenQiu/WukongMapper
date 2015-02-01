@@ -1,5 +1,6 @@
 package edu.uci.eecs.wukong.util;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,10 +12,10 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.common.LocationConstraint;
 import edu.uci.eecs.wukong.common.WuClass;
+import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
 
 public class FlowBasedProcessFactory {
 	
@@ -51,9 +52,7 @@ public class FlowBasedProcessFactory {
 				graph = generator.generateStarGraph(classNumber / 2);
 				break;
 			case RANDOM:
-				graph = generator.generateRandomGraph(classNumber / 2 , classNumber / 2 - 1);
-//				graph = generator.generateRandomGraph(classNumber / 2 , classNumber );
-				
+				graph = generator.generateRandomGraph(classNumber / 2 , classNumber / 2 - 1);			
 				break;
 			case SCALE_FREE:
 				graph = generator.generateScaleFreeGraph(classNumber / 2);
@@ -75,9 +74,9 @@ public class FlowBasedProcessFactory {
 			}
 		}
 		
-		
-		return new FlowBasedProcess(classMap, edges, FlowBasedProcess.TYPE.LINEAR);
+		return new FlowBasedProcess(classMap, edges, type);
 	}
+	
 	
 	private List<FlowBasedProcessEdge> buildEdges(HashMap<Object, WuClass> objectMap, SimpleDirectedGraph<Object, DefaultEdge> graph) {
 		Iterator<DefaultEdge> edgeIterator = graph.edgeSet().iterator();
@@ -131,7 +130,7 @@ public class FlowBasedProcessFactory {
 		Set<Object> vertexes = graph.vertexSet();
 		Iterator<Object> objects = vertexes.iterator();
 		int[] classMap = new int[classNumber];
-		Util.reset(classMap);
+		Arrays.fill(classMap, 0);
 		while(objects.hasNext()) {
 			Object object= objects.next();
 			random.setSeed(classNumber + System.nanoTime());

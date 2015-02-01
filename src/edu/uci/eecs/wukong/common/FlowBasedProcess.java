@@ -17,6 +17,7 @@ import java.io.IOException;
 import com.google.common.collect.ImmutableList;
 
 import edu.uci.eecs.wukong.util.Util;
+import edu.uci.eecs.wukong.util.GraphGenerator;
 
 
 /**
@@ -26,8 +27,7 @@ import edu.uci.eecs.wukong.util.Util;
  *
  */
 public class FlowBasedProcess {
-	
-	public static enum TYPE {LINEAR, STAR, RANDOM, SCALE_FREE};
+
 	private List<FlowBasedProcessEdge> edges;
 	
 	private HashMap<Integer, WuClass> wuClassMap;
@@ -43,10 +43,10 @@ public class FlowBasedProcess {
 	
 	
 	
-	private FlowBasedProcess.TYPE type;
+	private GraphGenerator.TYPE type;
 	
 	
-	public FlowBasedProcess(HashMap<Integer, WuClass> wuClassMap, List<FlowBasedProcessEdge> edges, TYPE type) {
+	public FlowBasedProcess(HashMap<Integer, WuClass> wuClassMap, List<FlowBasedProcessEdge> edges, GraphGenerator.TYPE type) {
 		this.type = type;
 		this.edges = edges;
 		this.wuClassMap = wuClassMap;
@@ -56,7 +56,7 @@ public class FlowBasedProcess {
 		this.setupMaps();
 	}
 	
-	public FlowBasedProcess(TYPE type) {
+	public FlowBasedProcess(GraphGenerator.TYPE type) {
 		this.type = type;
 		this.edges = new ArrayList<FlowBasedProcessEdge>();
 		this.wuClassMap = new HashMap<Integer, WuClass>();

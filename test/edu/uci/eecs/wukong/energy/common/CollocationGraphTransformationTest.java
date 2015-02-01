@@ -5,18 +5,16 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 
 import junit.framework.TestCase;
-import edu.uci.eecs.wukong.colocation.AbstractColocationGraph;
-import edu.uci.eecs.wukong.colocation.ColocationGraph;
 import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
 import edu.uci.eecs.wukong.colocation.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper.GreedyType;
 import edu.uci.eecs.wukong.util.FlowBasedProcessFactory;
 import edu.uci.eecs.wukong.util.WeightedIndependentSetSelector;
 import edu.uci.eecs.wukong.util.WuKongSystemFactory;
+import edu.uci.eecs.wukong.util.GraphGenerator.TYPE; 
 
 public class CollocationGraphTransformationTest extends TestCase{
 	
@@ -27,7 +25,7 @@ public class CollocationGraphTransformationTest extends TestCase{
 	private int classNumber; 
 	private int deviceNumber;
 	
-	private FlowBasedProcess.TYPE type;
+	private TYPE type;
 	public CollocationGraphTransformationTest(int K, int replica){
 		super();
 		this.K = K;
@@ -35,7 +33,7 @@ public class CollocationGraphTransformationTest extends TestCase{
 		this.type = TYPE.RANDOM;
 	}
 	
-	public void setType(FlowBasedProcess.TYPE type) {
+	public void setType(TYPE type) {
 		this.type = type;
 	}
 	

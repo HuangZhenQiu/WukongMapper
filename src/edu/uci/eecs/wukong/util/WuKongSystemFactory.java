@@ -1,14 +1,25 @@
 package edu.uci.eecs.wukong.util;
 
+import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
+import edu.uci.eecs.wukong.common.WuClass;
 import edu.uci.eecs.wukong.common.WuObject;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.WuDevice;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
 
+import org.jgrapht.EdgeFactory;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import edu.uci.eecs.wukong.util.GraphGenerator;
+import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
 
 public class WuKongSystemFactory {
 
@@ -16,8 +27,7 @@ public class WuKongSystemFactory {
 	private int classNumber;
 	private int deviceNumber;
 	private int distanceRange;
-	
-	private int K;
+	private int K; /** Colocation Parameter **/
 	
 	public WuKongSystemFactory(int classNumber, int deviceNumber, int landMarkNumber, int distanceRange) {
 		this.landMarkNumber = landMarkNumber;
@@ -34,7 +44,37 @@ public class WuKongSystemFactory {
 		this.K = K;
 	}
 	
-	public WukongSystem createRandomWukongSystem(int K, int replica){
+	public WukongSystem createMultiHopWukongSystem(int k, int replica, TYPE type) {		
+		SimpleDirectedGraph<Object, DefaultEdge> graph;
+		
+		switch (type) {
+			case LINEAR:
+				graph = GraphGenerator.generateLinearGraph(classNumber / 2);
+				break;
+			case STAR:
+				graph = GraphGenerator.generateStarGraph(classNumber / 2);
+				break;
+			case RANDOM:
+				graph = GraphGenerator.generateRandomGraph(classNumber / 2 , classNumber / 2 - 1);			
+				break;
+			case SCALE_FREE:
+				graph = GraphGenerator.generateScaleFreeGraph(classNumber / 2);
+				break;
+			default:
+				graph = GraphGenerator.generateRandomGraph(classNumber, classNumber - 1);
+			
+		}
+		
+		Double[][] distances = getDistanceMatrixBasedOnGraph(graph, distanceRange);
+		return createWukongSystemWithDistance(k, replica, distances);
+	}
+	
+	public WukongSystem createRandomWukongSystem(int k, int replica) {
+		Double[][] distances = getRandomDeviceDistanceMatrix(deviceNumber, distanceRange);
+		return createWukongSystemWithDistance(k, replica, distances);
+	}
+	
+	private WukongSystem createWukongSystemWithDistance(int K, int replica, Double[][] distances){
 		
 		
 		if(replica * classNumber >= K * deviceNumber) {
@@ -48,9 +88,8 @@ public class WuKongSystemFactory {
 		Random ran = new Random();
 		
 		int[] globalClassMap = new int[classNumber]; // used for global recording wuclasses.
-		Util.reset(globalClassMap);
+		Arrays.fill(globalClassMap, 0);
 		int[] classMap = new int[classNumber]; // used for recording wuclasses on a device. 
-		Double[][] distances = getRandomDeviceDistanceMatrix(deviceNumber, distanceRange);
 		
 		/* initial all devices */ 
 		for(int i = 0; i < deviceNumber; i++) {
@@ -60,9 +99,8 @@ public class WuKongSystemFactory {
 		}
 		
 		// distribute replica of non-duplicate wuclasses to devices, all globalclassmap should reach replica after this operation 
-		for (int i = 0; i < classNumber; i ++) {
-			
-			while(globalClassMap[i] < replica ) {
+		for (int i = 0; i < classNumber; i++) {
+			while(globalClassMap[i] < replica) {
 				ran.setSeed(System.nanoTime() + i * i);
 				int deviceId = Math.abs(ran.nextInt()) % deviceNumber;
 				
@@ -72,12 +110,11 @@ public class WuKongSystemFactory {
 						globalClassMap[i] ++;
 					}
 				}
-				
 			}
 		}
 		
 		for (int i = 0; i < deviceNumber; i++) {
-			Util.reset(classMap);
+			Arrays.fill(classMap, 0);
 			
 			List<WuObject> objectIds = devices.get(i).getWuObjects();
 			for( WuObject objectId: objectIds){
@@ -121,6 +158,31 @@ public class WuKongSystemFactory {
 		}
 		
 		return distances;
+	}
+	
+	public Double[][] getDistanceMatrixBasedOnGraph(SimpleDirectedGraph<Object, DefaultEdge> graph, int distanceRange) {
+		Random random = new Random();
+		HashMap<Object, Integer> idMap = Util.assignIdToGraphNode(graph);
+		Set<Object> nodes = graph.vertexSet();
+		Double[][] nodeArray = new Double[nodes.size()][nodes.size()];
+		Arrays.fill(nodeArray, Double.MAX_VALUE);
+		for(int i=0; i< nodes.size(); i++) {
+			nodeArray[i][i] = 0.0;
+		}
+		
+		Set<DefaultEdge> edges = graph.edgeSet();
+		for (DefaultEdge edge : edges) {
+			Object source = graph.getEdgeSource(edge);
+			Object target = graph.getEdgeTarget(edge);
+			random.setSeed(System.nanoTime());
+			Double distance = new Double(Math.abs(random.nextInt()) % distanceRange);
+			int sourceId = idMap.get(source);
+			int targetId = idMap.get(target);
+			nodeArray[sourceId][targetId] = distance;
+			nodeArray[targetId][sourceId] = distance;
+		}
+		
+		return Util.findShortestPath(nodeArray);
 	}
 	
 	public Double[][] getRandomDeviceDistanceMatrix(int deviceNumber, int distanceRange) {

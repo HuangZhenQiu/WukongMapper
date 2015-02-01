@@ -9,6 +9,8 @@ import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.energy.mapper.Mapper.MapType;
 import junit.framework.TestCase;
 
+import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
+
 public class DistanceAwareSelectionBasedMapperTest extends TestCase {
 	
 	public void testMapperInitialization() {
@@ -16,7 +18,7 @@ public class DistanceAwareSelectionBasedMapperTest extends TestCase {
 		String root = System.getProperty("user.dir");
 		try {
 			FileReader inputStream = new FileReader(new File(root + "/data/fbp.txt"));
-			FlowBasedProcess fbp = new FlowBasedProcess(FlowBasedProcess.TYPE.LINEAR);
+			FlowBasedProcess fbp = new FlowBasedProcess(TYPE.LINEAR);
 			fbp.initialize(new BufferedReader(inputStream));
 			
 			inputStream = new FileReader(new File(root + "/data/wukong.txt"));

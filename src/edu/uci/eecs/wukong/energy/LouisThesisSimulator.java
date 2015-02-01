@@ -2,14 +2,13 @@ package edu.uci.eecs.wukong.energy;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.energy.mapper.GreedyBasedMapper;
 import edu.uci.eecs.wukong.energy.mapper.Mapper.MapType;
-import edu.uci.eecs.wukong.energy.mapper.GreedyBasedMapper;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper.GreedyType;
 import edu.uci.eecs.wukong.energy.mapper.OptimalGreedyBasedMapper;
 import edu.uci.eecs.wukong.util.FlowBasedProcessFactory;
 import edu.uci.eecs.wukong.util.WuKongSystemFactory;
+import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
 
 public class LouisThesisSimulator {
 	private FlowBasedProcessFactory fbpFactory;

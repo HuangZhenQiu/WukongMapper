@@ -13,12 +13,12 @@ import org.jgrapht.VertexFactory;
 
 
 public class GraphGenerator {
-	
+	public static enum TYPE {LINEAR, STAR, RANDOM, SCALE_FREE};
 	public GraphGenerator() {
 		
 	}
 	
-	public SimpleDirectedGraph<Object, DefaultEdge> generateRandomGraph(int vSize, int eSize) {
+	public static SimpleDirectedGraph<Object, DefaultEdge> generateRandomGraph(int vSize, int eSize) {
         //Create the graph object; it is null at this point
 		SimpleDirectedGraph<Object, DefaultEdge> randomGraph = new SimpleDirectedGraph<Object, DefaultEdge>(DefaultEdge.class);
 
@@ -37,7 +37,7 @@ public class GraphGenerator {
         return randomGraph;
 	}
 	
-	public SimpleDirectedGraph<Object, DefaultEdge> generateLinearGraph(int vSize) {
+	public static SimpleDirectedGraph<Object, DefaultEdge> generateLinearGraph(int vSize) {
 		 //Create the graph object; it is null at this point
 		SimpleDirectedGraph<Object, DefaultEdge> randomGraph = new SimpleDirectedGraph<Object, DefaultEdge>(DefaultEdge.class);
 
@@ -56,7 +56,7 @@ public class GraphGenerator {
         return randomGraph;
 	}
 	
-	public SimpleDirectedGraph<Object, DefaultEdge> generateStarGraph(int vSize) {
+	public static SimpleDirectedGraph<Object, DefaultEdge> generateStarGraph(int vSize) {
 		 //Create the graph object; it is null at this point
 		SimpleDirectedGraph<Object, DefaultEdge> randomGraph = new SimpleDirectedGraph<Object, DefaultEdge>(DefaultEdge.class);
 
@@ -75,7 +75,7 @@ public class GraphGenerator {
        return randomGraph;
 	}
 	
-	public SimpleDirectedGraph<Object, DefaultEdge> generateScaleFreeGraph(int vSize) {
+	public static SimpleDirectedGraph<Object, DefaultEdge> generateScaleFreeGraph(int vSize) {
 
 		 //Create the graph object; it is null at this point
 		SimpleDirectedGraph<Object, DefaultEdge> randomGraph = new SimpleDirectedGraph<Object, DefaultEdge>(DefaultEdge.class);

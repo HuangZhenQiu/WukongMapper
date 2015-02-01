@@ -1,4 +1,4 @@
-package edu.uci.eecs.wukong.energy.util;
+package edu.uci.eecs.wukong.util;
 
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -6,10 +6,11 @@ import org.junit.Test;
 import edu.uci.eecs.wukong.util.FlowBasedProcessFactory;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.UnmodifiableIterator;
+
+import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
 
 public class FlowBasedProcessFactoryTest extends TestCase{
 	

@@ -10,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
+import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
+
 public class BasicMapperTest extends TestCase {
 	
 	@Test
@@ -17,7 +19,7 @@ public class BasicMapperTest extends TestCase {
 		String root = System.getProperty("user.dir");
 		try {
 			FileReader inputStream = new FileReader(new File(root + "/data/fbp.txt"));
-			FlowBasedProcess fbp = new FlowBasedProcess(FlowBasedProcess.TYPE.LINEAR);
+			FlowBasedProcess fbp = new FlowBasedProcess(TYPE.LINEAR);
 			fbp.initialize(new BufferedReader(inputStream));
 			TestCase.assertEquals(fbp.getEdgeNumber().intValue(), 2);
 			

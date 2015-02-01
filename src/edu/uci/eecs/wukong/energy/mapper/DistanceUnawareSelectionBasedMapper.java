@@ -18,8 +18,8 @@ import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
-import edu.uci.eecs.wukong.common.FlowBasedProcess.TYPE;
 import edu.uci.eecs.wukong.util.Util;
+import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
 
 public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper{
 	
