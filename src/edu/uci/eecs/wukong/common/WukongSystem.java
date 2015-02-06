@@ -19,19 +19,20 @@ import com.google.common.collect.ImmutableMap;
 
 import edu.uci.eecs.wukong.colocation.ColocationGraphNode;
 import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
+import edu.uci.eecs.wukong.common.ShortestNetworkPath;
 
 /**
  * 
  * 
  * @author Peter Huang
  * 
- *         TODO: Split out the binding between system and fbp TODO: Support
- *         deploy multiple FBP into WukongSystem
+ *         TODO: Split out the binding between system and fbp
+ *         TODO: Support deploy multiple FBP into WukongSystem
  */
 public class WukongSystem {
 
 	private List<WuDevice> devices;
-	private Double[][] distances;
+	private ShortestNetworkPath shortestNetworkPath;
 	private int[][] channels;
 
 	public void setChannel(int[][] channel) {
@@ -59,18 +60,18 @@ public class WukongSystem {
 		this.wuClassNumber = wuClassNumber;
 		this.landmarkNumber = landmarkNumber;
 		this.devices = devices;
-		this.distances = new Double[this.devices.size()][this.devices.size()];
+		this.shortestNetworkPath = new ShortestNetworkPath(new Double[this.devices.size()][this.devices.size()], false);
 		this.deviceMap = new HashMap<Integer, WuDevice>();
 		this.wuClassDeviceMap = new HashMap<Integer, List<WuDevice>>();
 		initializeMap(this.devices);
 	}
 
-	public void initialize(List<WuDevice> devices, Double[][] distances, int wuClassNumber, int landmarkNumber) {
+	public void initialize(List<WuDevice> devices, Double[][] distances, boolean multipleHop, int wuClassNumber, int landmarkNumber) {
 		this.wuClassNumber = wuClassNumber;
 		this.landmarkNumber = landmarkNumber;
 		this.devices.addAll(devices);
 		this.deviceNumber = this.devices.size();
-		this.distances = distances;
+		this.shortestNetworkPath = new ShortestNetworkPath(distances, multipleHop);
 		initializeMap(this.devices);
 	}
 
@@ -117,11 +118,11 @@ public class WukongSystem {
 			this.landmarkNumber = Integer.parseInt(tokenizer.nextToken());
 
 			// initialize the distance matrix;
-			this.distances = new Double[deviceNumber][deviceNumber];
-
+			Double[][] distances = new Double[deviceNumber][deviceNumber];
 			for (int i = 0; i < deviceNumber; i++) {
-				initializeWuDevice(input);
+				initializeWuDevice(input, distances);
 			}
+			this.shortestNetworkPath = new ShortestNetworkPath(distances, false);
 
 		} catch (IOException e) {
 			System.out.println("Wukong System initialization error!");
@@ -129,7 +130,7 @@ public class WukongSystem {
 		}
 	}
 
-	private WuDevice initializeWuDevice(BufferedReader input)
+	private WuDevice initializeWuDevice(BufferedReader input, Double[][] distances)
 			throws IOException {
 		String content = input.readLine();
 		StringTokenizer tokenizer = new StringTokenizer(content);
@@ -170,19 +171,20 @@ public class WukongSystem {
 	}
 
 	public Double getDistance(WuDevice source, WuDevice dest) {
-		return distances[source.getWuDeviceId() - 1][dest.getWuDeviceId() - 1]; // Ids
-																				// start
-																				// from
-																				// 1
+		return shortestNetworkPath.getShortestDistance(source.getWuDeviceId() - 1, dest.getWuDeviceId() - 1);
 	}
 
 	public Double getDistance(int source, int dest) {
 		if ((1 <= source && source <= this.deviceNumber.intValue())
 				&& (1 <= dest && dest <= this.deviceNumber)) {
-			return distances[source - 1][dest - 1]; // Ids start from 1
+			return shortestNetworkPath.getShortestDistance(source - 1, dest - 1); // Ids start from 1
 		}
 
 		return 0.0;
+	}
+	
+	public List<Double> getDistanceOnShortestPath(int source, int dest) {
+		return shortestNetworkPath.getDistanceOnShortestPath(source - 1, dest - 1); 
 	}
 
 	public ImmutableList<WuDevice> findWudevice(int wuClassId) {
@@ -205,7 +207,6 @@ public class WukongSystem {
 	}
 
 	public FlowBasedProcess getCurrentFBP() {
-
 		return currentFBP;
 	}
 

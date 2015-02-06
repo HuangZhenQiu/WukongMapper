@@ -116,10 +116,17 @@ public class Util {
 	public static Double[][] findShortestPath(Double[][] graph) {
 		int length = graph.length;
 		Double[][] distance = new Double[length][length];
+		Integer[][] precedence = new Integer[length][length];
 		
 		for(int i=0; i<length; i++) {
 			for(int j=0; j<length; j++) {
 				distance[i][j] = graph[i][j];
+				
+				if (graph[i][j] != Double.MAX_VALUE) {
+					precedence[i][j] = i;
+				} else {
+					precedence[i][j] = -1;
+				}
 			}
 		}
 		
@@ -128,6 +135,7 @@ public class Util {
 				for (int j=0; j<length; j++) {
 					if(graph[i][k] !=Double.MAX_VALUE && graph[k][j] !=Double.MAX_VALUE && distance[i][j] > graph[i][k] + graph[k][j]) {
 						distance[i][j] = graph[i][k] + graph[k][j];
+						precedence[i][j] = k;
 						//distance[j][i] = graph[i][k] + graph[k][j];
 					}
 				}
