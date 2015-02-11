@@ -133,7 +133,7 @@ public class WuKongSystemFactory {
 			
 		}
 		
-		system.initialize(devices, distances, classNumber, landMarkNumber);
+		system.initialize(devices, distances, false, classNumber, landMarkNumber);
 		return system;
 	}
 	
