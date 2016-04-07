@@ -24,6 +24,10 @@ public class WuDevice implements Comparable<WuDevice>{
 	private List<WuObject> wuObjects;
 //	private HashMap<Integer, WuObject> wuObjectMap;
 	private WukongSystem system;
+	private Gateway gateway;
+	private Region region;
+	private boolean enabled;
+	
 	
 	//Distance to landmark
 	private List<Double> distances;
@@ -50,6 +54,24 @@ public class WuDevice implements Comparable<WuDevice>{
 		this.distances = new ArrayList<Double>();
 		this.deviceDistances = new ArrayList<Double>();
 		this.system = system;
+	}
+	
+	public void setRegion(Region region) {
+		this.region = region;
+	}
+	
+	public void setGateway(Gateway gateway) {
+		this.gateway = gateway;
+	}
+	
+	public boolean isEnabled() {
+		for(WuObject object : wuObjects) {
+			if (object.isActive()) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	/**

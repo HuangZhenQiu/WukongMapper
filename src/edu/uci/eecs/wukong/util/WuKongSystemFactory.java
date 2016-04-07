@@ -1,20 +1,18 @@
 package edu.uci.eecs.wukong.util;
 
-import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
-import edu.uci.eecs.wukong.common.WuClass;
 import edu.uci.eecs.wukong.common.WuObject;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.common.WuDevice;
+import edu.uci.eecs.wukong.common.Gateway;
+import edu.uci.eecs.wukong.common.Region;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 
-import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
@@ -26,22 +24,19 @@ public class WuKongSystemFactory {
 	private int landMarkNumber;
 	private int classNumber;
 	private int deviceNumber;
+	private int gatewayNumber;
+	private int regionNumber;
 	private int distanceRange;
 	private int K; /** Colocation Parameter **/
 	
-	public WuKongSystemFactory(int classNumber, int deviceNumber, int landMarkNumber, int distanceRange) {
+	public WuKongSystemFactory(int classNumber, int deviceNumber, int landMarkNumber, int distanceRange,
+			int gatewayNumber, int regionNumber) {
 		this.landMarkNumber = landMarkNumber;
 		this.classNumber = classNumber;
 		this.deviceNumber = deviceNumber;
 		this.distanceRange = distanceRange;
-	}
-	
-	public WuKongSystemFactory(int classNumber, int deviceNumber, int landMarkNumber, int distanceRange, int K){
-		this.landMarkNumber = landMarkNumber;
-		this.classNumber = classNumber;
-		this.deviceNumber = deviceNumber;
-		this.distanceRange = distanceRange;
-		this.K = K;
+		this.gatewayNumber = gatewayNumber;
+		this.regionNumber = regionNumber;
 	}
 	
 	public WukongSystem createMultiHopWukongSystem(int k, int replica, TYPE type) {		
@@ -84,6 +79,8 @@ public class WuKongSystemFactory {
 		
 		WukongSystem system = new WukongSystem();
 		List<WuDevice> devices = new ArrayList<WuDevice>();
+		List<Region> regions = new ArrayList<Region>();
+		List<Gateway> gateways = new ArrayList<Gateway>();
 		
 		Random ran = new Random();
 		
@@ -113,11 +110,23 @@ public class WuKongSystemFactory {
 			}
 		}
 		
+		// create regions
+		for (int i = 0; i < regionNumber; i++) {
+			Region region = new Region(i);
+			regions.add(region);
+		}
+		
+		// create gateways
+		for (int i = 0; i < gatewayNumber; i++) {
+			Gateway gateway = new Gateway(i);
+			gateways.add(gateway);
+		}
+		
 		for (int i = 0; i < deviceNumber; i++) {
 			Arrays.fill(classMap, 0);
 			
 			List<WuObject> objectIds = devices.get(i).getWuObjects();
-			for( WuObject objectId: objectIds){
+			for ( WuObject objectId: objectIds) {
 				classMap[objectId.getWuClassId()] ++;
 			}
 			
@@ -131,6 +140,15 @@ public class WuKongSystemFactory {
 				}
 			}
 			
+			// set region
+			ran.setSeed(System.nanoTime() + i * i);
+			int regionId = Math.abs(ran.nextInt()) % regionNumber;
+			regions.get(regionId).addDevice(devices.get(i));
+			
+			// set gateway
+			ran.setSeed(System.nanoTime() + i * i);
+			int gatewayId = Math.abs(ran.nextInt()) % gatewayNumber;
+			gateways.get(gatewayId).addDevice(devices.get(i));
 		}
 		
 		system.initialize(devices, distances, false, classNumber, landMarkNumber);

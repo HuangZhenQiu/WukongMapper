@@ -32,6 +32,8 @@ import edu.uci.eecs.wukong.common.ShortestNetworkPath;
 public class WukongSystem {
 
 	private List<WuDevice> devices;
+	private List<Region> regions;
+	private List<Gateway> gateways;
 	private ShortestNetworkPath shortestNetworkPath;
 	private int[][] channels;
 
@@ -52,8 +54,17 @@ public class WukongSystem {
 
 	public WukongSystem() {
 		devices = new ArrayList<WuDevice>();
+		regions = new ArrayList<Region>();
+		gateways = new ArrayList<Gateway>();
 		deviceMap = new HashMap<Integer, WuDevice>();
 		wuClassDeviceMap = new HashMap<Integer, List<WuDevice>>();
+	}
+	
+	public WukongSystem(List<WuDevice> devices, List<Region> regions, List<Gateway> gateways,
+			int wuClassNumber, int landmarkNumber) {
+		this(devices, wuClassNumber, landmarkNumber);
+		this.regions = regions;
+		this.gateways = gateways;
 	}
 
 	public WukongSystem(List<WuDevice> devices, int wuClassNumber, int landmarkNumber) {
@@ -66,10 +77,13 @@ public class WukongSystem {
 		initializeMap(this.devices);
 	}
 
-	public void initialize(List<WuDevice> devices, Double[][] distances, boolean multipleHop, int wuClassNumber, int landmarkNumber) {
+	public void initialize(List<WuDevice> devices, List<Region> regions, List<Gateway> gateways,
+			Double[][] distances, boolean multipleHop, int wuClassNumber, int landmarkNumber) {
 		this.wuClassNumber = wuClassNumber;
 		this.landmarkNumber = landmarkNumber;
 		this.devices.addAll(devices);
+		this.regions.addAll(regions);
+		this.gateways.addAll(gateways);
 		this.deviceNumber = this.devices.size();
 		this.shortestNetworkPath = new ShortestNetworkPath(distances, multipleHop);
 		initializeMap(this.devices);
