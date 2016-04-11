@@ -31,4 +31,21 @@ public class Gateway {
 		
 		return number;
 	}
+	
+	/**
+	 * Check whether a gateway connects with a target device
+	 * 
+	 * @param process the given process need to map
+	 * 
+	 * @return
+	 */
+	public boolean isTargetGateway(FlowBasedProcess process) {
+		for (WuDevice device : devices.values()) {
+			if (process.isTarget(device)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 }

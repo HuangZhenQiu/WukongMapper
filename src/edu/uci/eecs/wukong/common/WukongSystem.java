@@ -1,8 +1,10 @@
 package edu.uci.eecs.wukong.common;
 
 import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
@@ -107,9 +109,54 @@ public class WukongSystem {
 
 		}
 	}
+	
+	/**
+	 * Given a FlowBasedProcess, find out all of the distinguish congestion zones
+	 * that each of them will be mapping target.
+	 * 
+	 * @param process
+	 * @return
+	 */
+	public List<CongestionZone> getCongestionZones(FlowBasedProcess process) {
+		List<CongestionZone> zones = new ArrayList<CongestionZone> ();
+		Queue<CongestionZone> zoneQueue = new ArrayDeque<CongestionZone>();
+		for (Region region : regions) {
+			zoneQueue.add(region.createCongestionZone(process));
+		}
+
+		List<CongestionZone> removedZone = new ArrayList<CongestionZone> ();
+		while(!zoneQueue.isEmpty()) {
+			CongestionZone zone = zoneQueue.poll();
+			Iterator<CongestionZone> zoneIter = zoneQueue.iterator();
+
+			while(zoneIter.hasNext()) {
+				CongestionZone newZone = zoneIter.next();
+				if (zone.isCongestable(newZone)) {
+					zone.join(zone);
+					removedZone.add(newZone);
+				}
+			}
+			
+			if (removedZone.isEmpty()) {
+				// Add the stand alone zone into list as final result.
+				zones.add(zone);
+			} else {
+				// Add the merged zone into queue
+				zoneQueue.add(zone);
+				for (CongestionZone removed : removedZone) {
+					zoneQueue.remove(removed);
+				}
+			}
+		}
+		
+		return zones;
+	}
+	
+	
 	public WuDevice getDevice(int wudeviceId) { 
 		return deviceMap.get(wudeviceId);
 	}
+
 	// read data from file
 	public void initialize(BufferedReader input) {
 

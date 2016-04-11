@@ -65,8 +65,19 @@ public class FlowBasedProcess {
 		this.locationConstraints = new HashMap<Integer, LocationConstraint>();
 	}
 	
-	
-	
+	/**
+	 * Check whether a device is a mapping target
+	 * 
+	 * @param device
+	 * @return
+	 */
+	public boolean isTarget(WuDevice device) {
+		if (device.getHostableWuClass(this).size() > 0) {
+			return true;
+		}
+		
+		return false;
+	}
 	
 	private void setupMaps() {
 		

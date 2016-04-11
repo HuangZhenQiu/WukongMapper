@@ -151,7 +151,7 @@ public class WuKongSystemFactory {
 			gateways.get(gatewayId).addDevice(devices.get(i));
 		}
 		
-		system.initialize(devices, distances, false, classNumber, landMarkNumber);
+		system.initialize(devices, regions, gateways, distances, false, classNumber, landMarkNumber);
 		return system;
 	}
 	

@@ -2,10 +2,8 @@ package edu.uci.eecs.wukong.common;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.lang.Comparable;
@@ -60,8 +58,16 @@ public class WuDevice implements Comparable<WuDevice>{
 		this.region = region;
 	}
 	
+	public Region getRegion() {
+		return this.region;
+	}
+	
 	public void setGateway(Gateway gateway) {
 		this.gateway = gateway;
+	}
+	
+	public Gateway getGateway() {
+		return this.gateway;
 	}
 	
 	public boolean isEnabled() {
