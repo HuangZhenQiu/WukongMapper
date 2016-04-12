@@ -2,16 +2,23 @@ package edu.uci.eecs.wukong.common;
 
 import edu.uci.eecs.wukong.common.WuDevice;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Gateway {
+	private static int id = 0;
 	private int gatewayId;
 	private Map<Integer, WuDevice> devices;
 	
-	public Gateway(int gatewayId) {
-		this.gatewayId = gatewayId;
+	public Gateway() {
+		this.gatewayId = id ++;
 		this.devices = new HashMap<Integer, WuDevice> ();
+	}
+	
+	public int getRegionId() {
+		return gatewayId;
 	}
 	
 	public void addDevice(WuDevice device) {
@@ -47,5 +54,17 @@ public class Gateway {
 		}
 		
 		return false;
+	}
+	
+	public List<WuDevice> getTargetDevice(FlowBasedProcess process) {
+		List<WuDevice> devices = new ArrayList<WuDevice> ();
+		
+		for (WuDevice device : devices) {
+			if (process.isTarget(device)) {
+				devices.add(device);
+			}
+		}
+		
+		return devices;
 	}
 }

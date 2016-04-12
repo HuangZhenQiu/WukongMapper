@@ -39,6 +39,14 @@ public class CongestionZone {
 		}
 	}
 	
+	public Set<Gateway> getGateways() {
+		return this.gateways;
+	}
+	
+	public Set<Region> getRegions() {
+		return this.regions;
+	}
+	
 	public boolean isCongestable(CongestionZone zone) {
 		for (Region region : regions) {
 			if (zone.regions.contains(region)) {

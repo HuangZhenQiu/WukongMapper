@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableList;
  * It is the algorithm for MEDES 2014 paper which consider the energy consumption 
  * of transmission distance.
  * 
- * Use rule to reduce Mixed Integer None-linear Programming Problem to MIP problem.
+ * Use rule to reduce Mixed Integer None-linear Programming Problem to ILP problem.
  * 
  * Assume that one link of l_i_j FBP can map to a set H<i,j> of pair of devices p<dn, dm> 
  * within the system. Then we can define the optimization problem as below:

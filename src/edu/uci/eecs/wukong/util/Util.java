@@ -14,6 +14,12 @@ import edu.uci.eecs.wukong.common.WuClass;
 
 public class Util {
 	
+	public static String generateDeviceVariable(Integer deviceId) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("d_").append(deviceId.toString());
+		return builder.toString();
+	}
+	
 	public static String generateVariableId(Integer classId, Integer deviceId) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("x_").append(classId.toString())

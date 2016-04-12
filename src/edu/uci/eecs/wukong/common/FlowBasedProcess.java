@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
 import java.util.Collection;
 import java.util.Set;
 import java.util.Iterator;
@@ -27,6 +31,8 @@ import edu.uci.eecs.wukong.util.GraphGenerator;
  *
  */
 public class FlowBasedProcess {
+	
+	private SimpleDirectedGraph<Object, DefaultEdge> graph;
 
 	private List<FlowBasedProcessEdge> edges;
 	
@@ -46,8 +52,9 @@ public class FlowBasedProcess {
 	private GraphGenerator.TYPE type;
 	
 	
-	public FlowBasedProcess(HashMap<Integer, WuClass> wuClassMap, List<FlowBasedProcessEdge> edges, GraphGenerator.TYPE type) {
+	public FlowBasedProcess(SimpleDirectedGraph<Object, DefaultEdge> graph, HashMap<Integer, WuClass> wuClassMap, List<FlowBasedProcessEdge> edges, GraphGenerator.TYPE type) {
 		this.type = type;
+		this.graph = graph;
 		this.edges = edges;
 		this.wuClassMap = wuClassMap;
 		this.inEdgeMap = new HashMap<Integer, List<FlowBasedProcessEdge>>();
@@ -482,5 +489,16 @@ public class FlowBasedProcess {
 		
 
 		this.setupMaps();
+	}
+	
+	/**
+	 * Find out the dominant path from the fbp
+	 * 
+	 * @return
+	 */
+	public List<Path> getDominatePaths() {
+		List<Path> paths = new ArrayList<Path> ();
+		
+		return paths;
 	}
 }

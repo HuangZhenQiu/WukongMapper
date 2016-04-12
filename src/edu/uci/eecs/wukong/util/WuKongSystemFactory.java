@@ -112,13 +112,13 @@ public class WuKongSystemFactory {
 		
 		// create regions
 		for (int i = 0; i < regionNumber; i++) {
-			Region region = new Region(i);
+			Region region = new Region();
 			regions.add(region);
 		}
 		
 		// create gateways
 		for (int i = 0; i < gatewayNumber; i++) {
-			Gateway gateway = new Gateway(i);
+			Gateway gateway = new Gateway();
 			gateways.add(gateway);
 		}
 		

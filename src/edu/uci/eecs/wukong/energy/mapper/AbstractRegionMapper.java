@@ -55,6 +55,13 @@ public abstract class AbstractRegionMapper extends AbstractMapper {
 	protected abstract Problem buildCongestionZoneProblem(CongestionZone zone);
 	
 	/**
+	 * Apply latency constraints for FBP
+	 * 
+	 */
+	protected abstract void applyEndToEndLatencyConstraints(CongestionZone zone, Problem problem);
+	
+	
+	/**
 	 * 
 	 * Apply selection result into Wukong System, then caculate the final energy consumption
 	 * 
