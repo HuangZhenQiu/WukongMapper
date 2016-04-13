@@ -48,12 +48,29 @@ public class Region {
 		return this.regionId;
 	}
 	
+	public boolean hostFirstDevice(WuClass wuClass) {
+		if (classToDeviceMap.containsKey(wuClass.getWuClassId())) {
+			for (WuDevice device : classToDeviceMap.get(wuClass.getWuClassId())) {
+				if (device.deployComponent(wuClass.getWuClassId())) {
+					wuClass.deploy(device.getWuDeviceId());
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	public Map<Integer, List<WuDevice>> getWuClassToDeviceMap() {
 		return this.classToDeviceMap;
 	}
 	
 	public List<WuDevice> getHostableDevice(Integer wuClassId) {
 		return classToDeviceMap.get(wuClassId);
+	}
+	
+	public List<Gateway> getAllGateways() {
+		return new ArrayList<Gateway>(this.gateways);
 	}
 	
 	public Set<Gateway> getPotentialTargetGateways(FlowBasedProcess process) {

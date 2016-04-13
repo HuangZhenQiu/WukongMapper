@@ -125,6 +125,18 @@ public class WuDevice implements Comparable<WuDevice>{
 		this.currentConsumption = 0.0;
 	}
 	
+	public boolean deployComponent(Integer wuClassId) {
+		for (WuObject object : wuObjects) {
+			if (object.getWuClassId() == wuClassId &&
+					! object.isActive()) {
+				object.activate();
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	public int compareTo(WuDevice device) {
 		if (this.getCurrentConsumption() > device.getCurrentConsumption()) {
 			return 1;
@@ -300,7 +312,7 @@ public class WuDevice implements Comparable<WuDevice>{
 		}
 		else{
 			// Can't deploy nodeId to this device
-//			System.out.println("Can't find out the wuclass" + nodeId);
+			System.out.println("Can't find out the wuclass" + nodeId);
 		}
 		return false;
 	}
@@ -315,27 +327,16 @@ public class WuDevice implements Comparable<WuDevice>{
 			node.activate();
 			system.getCurrentFBP().deploy(nodeId, wuDeviceId);
 				
-				//update the current energy consumption
+			//update the current energy consumption
 			currentConsumption = energyConsumption;
 			return true;
-		}
-		else{
-			// System.out.println("Can't find out the wuclass" + nodeId);
+		} else{
+			System.out.println("Can't find out the wuclass" + nodeId);
 		}
 		
 		return false;
 	}
-	
-//	public boolean deploy(Integer inNodeId, Integer outNodeId) {
-//		
-//		if(getWuObject(inNodeId) != null && getWuObject(outNodeId)!=null){
-//			deploy(inNodeId);
-//			deploy(outNodeId);
-//			return true;
-//		}
-//		return false;
-//	}
-//	
+		
 	public void updateEnergyConsumption() {
 		currentConsumption = getAfterDeploymentEngeryConsumption(null);
 	}

@@ -152,6 +152,10 @@ public class FlowBasedProcess {
 		return builder.build();
 	}
 	
+	public ImmutableList<WuClass> getAllComponents() {
+		return ImmutableList.<WuClass>builder().addAll(wuClassMap.values()).build(); 
+	}
+	
 	public ImmutableList<FlowBasedProcessEdge> getInEdge(Integer wuClassId) {
 		List<FlowBasedProcessEdge> edges = this.inEdgeMap.get(wuClassId);
 		

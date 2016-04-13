@@ -4,6 +4,7 @@ import edu.uci.eecs.wukong.common.WuDevice;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,18 @@ public class Gateway {
 			this.devices.put(device.getWuDeviceId(), device);
 			device.setGateway(this);
 		}
+	}
+	
+	public boolean deploy(WuClass wuClass) {
+		Iterator<WuDevice> deviceIter = devices.values().iterator();
+		while(deviceIter.hasNext()) {
+			WuDevice device = deviceIter.next();
+			if (device.deployComponent(wuClass.getWuClassId())) {
+				wuClass.deploy(device.getWuDeviceId());
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public int reprogramDeviceNumber() {
