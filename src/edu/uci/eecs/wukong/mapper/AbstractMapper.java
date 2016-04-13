@@ -1,4 +1,4 @@
-package edu.uci.eecs.wukong.energy.mapper;
+package edu.uci.eecs.wukong.mapper;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;

@@ -1,4 +1,4 @@
-package edu.uci.eecs.wukong.energy.mapper;
+package edu.uci.eecs.wukong.scalability.mapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import edu.uci.eecs.wukong.common.CongestionZone;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;

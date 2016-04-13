@@ -74,7 +74,7 @@ public class FlowBasedProcessFactory {
 			}
 		}
 		
-		return new FlowBasedProcess(classMap, edges, type);
+		return new FlowBasedProcess(graph, classMap, edges, type);
 	}
 	
 	

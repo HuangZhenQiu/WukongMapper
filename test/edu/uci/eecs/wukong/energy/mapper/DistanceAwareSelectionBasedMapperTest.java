@@ -6,7 +6,7 @@ import java.io.FileReader;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
-import edu.uci.eecs.wukong.energy.mapper.Mapper.MapType;
+import edu.uci.eecs.wukong.mapper.Mapper.MapType;
 import junit.framework.TestCase;
 
 import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;

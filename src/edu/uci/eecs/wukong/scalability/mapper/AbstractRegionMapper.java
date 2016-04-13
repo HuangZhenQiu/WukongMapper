@@ -1,10 +1,11 @@
-package edu.uci.eecs.wukong.energy.mapper;
+package edu.uci.eecs.wukong.scalability.mapper;
 
 import java.util.HashMap;
 
 import edu.uci.eecs.wukong.common.CongestionZone;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
+import edu.uci.eecs.wukong.mapper.AbstractMapper;
 import net.sf.javailp.Problem;
 import net.sf.javailp.Result;
 import net.sf.javailp.Solver;

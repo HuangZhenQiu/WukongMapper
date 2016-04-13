@@ -5,6 +5,7 @@ import edu.uci.eecs.wukong.colocation.FlowGraph;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
+import edu.uci.eecs.wukong.mapper.AbstractMapper;
 import edu.uci.eecs.wukong.common.FlowBasedProcessEdge;
 import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
 import edu.uci.eecs.wukong.util.WeightedIndependentSetSelector;

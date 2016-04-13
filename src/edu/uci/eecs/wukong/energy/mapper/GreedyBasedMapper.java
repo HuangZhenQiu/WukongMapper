@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.WukongSystem;
+import edu.uci.eecs.wukong.mapper.AbstractMapper;
 import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
 
 
