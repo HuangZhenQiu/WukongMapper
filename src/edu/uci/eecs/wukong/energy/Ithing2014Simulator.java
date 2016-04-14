@@ -20,7 +20,7 @@ public class Ithing2014Simulator {
 	public Ithing2014Simulator() {
 		//WukongProperties.getProperty();
 		this.fbpFactory = new FlowBasedProcessFactory(10, 20, 100 /**distance range**/, 100 /**weight**/);
-		this.wukongFactory = new WuKongSystemFactory(20, 20, 10, 100, 0, 0);
+		this.wukongFactory = new WuKongSystemFactory(20, 20, 10, 100, 0, 0, true);
 	}
 	
 	public void run() {

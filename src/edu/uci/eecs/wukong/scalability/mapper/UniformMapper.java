@@ -39,21 +39,23 @@ public class UniformMapper extends AbstractMapper {
 				Region region = regIter.next();
 				List<Gateway> gateways = region.getAllGateways();
 				for (WuClass wuClass : this.fbp.getAllComponents()) {
-					while (true) {
-						int gatewayIndex = Math.abs(random.nextInt()) % gateways.size();
+					while (!wuClass.isDeployed()) {
+						int gatewayIndex = Math.abs(random.nextInt() % gateways.size());
 						Gateway gateway = gateways.get(gatewayIndex);
 						if (gateway.deploy(wuClass)) {
 							break;
 						}
 					}
 					
-					if (wuClass.getDeviceId() == -1) {
+					if (!wuClass.isDeployed()) {
 						success = false;
 						System.out.println("Can't find mapping for Component "
 								+ wuClass.getWuClassId() + " in region " + region.getRegionId()
 								+ " congestion zone " + zone.getZoneId());
 					}
-				}	
+				}
+				
+				fbp.reset();
 			}
 		}
 		

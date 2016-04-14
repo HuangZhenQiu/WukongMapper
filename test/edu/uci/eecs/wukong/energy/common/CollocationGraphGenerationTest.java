@@ -18,7 +18,7 @@ public class CollocationGraphGenerationTest extends TestCase{
 			FlowBasedProcessFactory fbpFactory =
 					new FlowBasedProcessFactory(10 /* landmark number */, 30 /* class number */, 100 /* distance range */, 100 /* weight */);
 			WuKongSystemFactory wukongFactory =
-					new WuKongSystemFactory(30 /* class number */, 20 /* device number */, 10 /* landmark number */, 100 /* distance range */, 0, 0);
+					new WuKongSystemFactory(30 /* class number */, 20 /* device number */, 10 /* landmark number */, 100 /* distance range */, 0, 0, true);
 			
 			FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(TYPE.STAR);
 			WukongSystem system = wukongFactory.createRandomWuKongSystem();

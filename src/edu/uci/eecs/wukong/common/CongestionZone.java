@@ -52,7 +52,7 @@ public class CongestionZone {
 	}
 	
 	public boolean isCongestable(CongestionZone zone) {
-		/*for (Gateway gateway : zone.getGateways()) {
+	   /*for (Gateway gateway : zone.getGateways()) {
 			if (gateways.contains(gateway)) {
 				return true;
 			}

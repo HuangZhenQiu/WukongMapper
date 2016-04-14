@@ -53,29 +53,34 @@ public class WukongSystem {
 	private Integer deviceNumber;
 	private Integer wuClassNumber;
 	private Integer landmarkNumber;
+	private boolean isDistanceAware;
 
-	public WukongSystem() {
-		devices = new ArrayList<WuDevice>();
-		regions = new ArrayList<Region>();
-		gateways = new ArrayList<Gateway>();
-		deviceMap = new HashMap<Integer, WuDevice>();
-		wuClassDeviceMap = new HashMap<Integer, List<WuDevice>>();
+	public WukongSystem(boolean isDistanceAware) {
+		this.devices = new ArrayList<WuDevice>();
+		this.regions = new ArrayList<Region>();
+		this.gateways = new ArrayList<Gateway>();
+		this.deviceMap = new HashMap<Integer, WuDevice>();
+		this.wuClassDeviceMap = new HashMap<Integer, List<WuDevice>>();
+		this.isDistanceAware = isDistanceAware;
 	}
 	
 	public WukongSystem(List<WuDevice> devices, List<Region> regions, List<Gateway> gateways,
-			int wuClassNumber, int landmarkNumber) {
-		this(devices, wuClassNumber, landmarkNumber);
+			int wuClassNumber, int landmarkNumber, boolean isDistanceAware) {
+		this(devices, wuClassNumber, landmarkNumber, isDistanceAware);
 		this.regions = regions;
 		this.gateways = gateways;
 	}
 
-	public WukongSystem(List<WuDevice> devices, int wuClassNumber, int landmarkNumber) {
+	public WukongSystem(List<WuDevice> devices, int wuClassNumber, int landmarkNumber, boolean isDistanceAware) {
 		this.wuClassNumber = wuClassNumber;
 		this.landmarkNumber = landmarkNumber;
 		this.devices = devices;
-		this.shortestNetworkPath = new ShortestNetworkPath(new Double[this.devices.size()][this.devices.size()], false);
+		if (isDistanceAware) {
+			this.shortestNetworkPath = new ShortestNetworkPath(new Double[this.devices.size()][this.devices.size()], false);
+		}
 		this.deviceMap = new HashMap<Integer, WuDevice>();
 		this.wuClassDeviceMap = new HashMap<Integer, List<WuDevice>>();
+		this.isDistanceAware = isDistanceAware;
 		initializeMap(this.devices);
 	}
 
@@ -87,7 +92,9 @@ public class WukongSystem {
 		this.regions.addAll(regions);
 		this.gateways.addAll(gateways);
 		this.deviceNumber = this.devices.size();
-		this.shortestNetworkPath = new ShortestNetworkPath(distances, multipleHop);
+		if (this.isDistanceAware) {
+			this.shortestNetworkPath = new ShortestNetworkPath(distances, multipleHop);
+		}
 		initializeMap(this.devices);
 	}
 
@@ -162,7 +169,7 @@ public class WukongSystem {
 		return deviceMap.get(wudeviceId);
 	}
 	
-	public void deploy(int wuDeviceId, int wuClassId) {
+	public void deployComponent(int wuDeviceId, int wuClassId) {
 		deviceMap.get(wuDeviceId).deployComponent(wuClassId);
 	}
 

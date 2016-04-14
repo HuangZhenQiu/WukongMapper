@@ -70,7 +70,7 @@ public class GreedyBasedMapper extends AbstractMapper{
 			
 			File systemConfig = new File(argues[1]);
 			BufferedReader systemConfigReader = new BufferedReader(new FileReader(systemConfig));
-			WukongSystem system = new WukongSystem();
+			WukongSystem system = new WukongSystem(true);
 			
 			try {
 

@@ -22,7 +22,7 @@ public class DistanceAwareSelectionBasedMapperTest extends TestCase {
 			fbp.initialize(new BufferedReader(inputStream));
 			
 			inputStream = new FileReader(new File(root + "/data/wukong.txt"));
-			WukongSystem system = new WukongSystem();
+			WukongSystem system = new WukongSystem(true);
 			system.initialize(new BufferedReader(inputStream));
 			
 			

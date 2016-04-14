@@ -55,7 +55,7 @@ public class CollocationGraphTransformationTest extends TestCase{
 		FlowBasedProcessFactory fbpFactory =
 				new FlowBasedProcessFactory(10 /* landmark number */, classNumber, 100 /* distance range */, 100 /* weight */);
 		WuKongSystemFactory wukongFactory =
-				new WuKongSystemFactory(classNumber, deviceNumber, 10 /* landmark number */, 100 /* distance range */, 0, 0);
+				new WuKongSystemFactory(classNumber, deviceNumber, 10 /* landmark number */, 100 /* distance range */, 0, 0, true);
 		
 		for(int i = 0; i < iteration; i++){
 			try {

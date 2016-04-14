@@ -34,7 +34,7 @@ public class BasicMapperTest extends TestCase {
 		String root = System.getProperty("user.dir");
 		try {
 			FileReader inputStream = new FileReader(new File(root + "/data/wukong.txt"));
-			WukongSystem system = new WukongSystem();
+			WukongSystem system = new WukongSystem(true);
 			system.initialize(new BufferedReader(inputStream));
 			TestCase.assertEquals(system.getDeviceNumber(), 4);
 			

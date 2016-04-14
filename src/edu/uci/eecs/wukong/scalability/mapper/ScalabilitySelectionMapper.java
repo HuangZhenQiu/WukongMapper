@@ -179,7 +179,7 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 				Integer wuClassId = Util.getWuClassIdFromVariableId(variableId);
 				Integer wuDeviceId = Util.getWuDeviceIdFromVariableId(variableId);
 				System.out.println("Deploy wuClassId " + wuClassId + " at device" + wuDeviceId);
-				system.deploy(wuDeviceId, wuClassId);
+				system.deployComponent(wuDeviceId, wuClassId);
 			}
 		}
 		

@@ -63,7 +63,7 @@ public class MEDES2014Simulator {
 		this.fbpFactory =
 				new FlowBasedProcessFactory(10 /* landmark number */, classNumber /* class number */, 100 /* distance range */, transmissionWeight /* weight */);
 		this.wukongFactory =
-				new WuKongSystemFactory(classNumber /* class number */, deviceNumber /* device number */, 10 /* landmark number */, 100 /* distance range */, 0, 0);
+				new WuKongSystemFactory(classNumber /* class number */, deviceNumber /* device number */, 10 /* landmark number */, 100 /* distance range */, 0, 0, true);
 		
 		double GreedyExecutionTime = 0;
 		double GminExecutionTime = 0;

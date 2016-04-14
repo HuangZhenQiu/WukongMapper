@@ -28,18 +28,20 @@ public class WuKongSystemFactory {
 	private int regionNumber;
 	private int distanceRange;
 	private int K; /** Colocation Parameter **/
+	private boolean withDistance;
 	
 	public WuKongSystemFactory(int classNumber, int deviceNumber, int landMarkNumber, int distanceRange,
-			int gatewayNumber, int regionNumber) {
+			int gatewayNumber, int regionNumber, boolean withDistance) {
 		this.landMarkNumber = landMarkNumber;
 		this.classNumber = classNumber;
 		this.deviceNumber = deviceNumber;
 		this.distanceRange = distanceRange;
 		this.gatewayNumber = gatewayNumber;
 		this.regionNumber = regionNumber;
+		this.withDistance = withDistance;
 	}
 	
-	public WukongSystem createMultiHopWukongSystem(int k, int replica, TYPE type) {		
+	public WukongSystem createMultiHopWukongSystem(int k, int replica, TYPE type, boolean withDistance) {		
 		SimpleDirectedGraph<Object, DefaultEdge> graph;
 		
 		switch (type) {
@@ -60,16 +62,25 @@ public class WuKongSystemFactory {
 			
 		}
 		
-		Double[][] distances = getDistanceMatrixBasedOnGraph(graph, distanceRange);
-		return createWukongSystemWithDistance(k, replica, distances);
+		if (withDistance) {
+			Double[][] distances = getDistanceMatrixBasedOnGraph(graph, distanceRange);
+			return createWukongSystemWithDistance(k, replica, distances, withDistance);
+		} else {
+			return createWukongSystemWithDistance(k, replica, null, withDistance);
+		}
 	}
 	
 	public WukongSystem createRandomWukongSystem(int k, int replica) {
-		Double[][] distances = getRandomDeviceDistanceMatrix(deviceNumber, distanceRange);
-		return createWukongSystemWithDistance(k, replica, distances);
+		if (withDistance) {
+			Double[][] distances = getRandomDeviceDistanceMatrix(deviceNumber, distanceRange);
+			return createWukongSystemWithDistance(k, replica, distances, withDistance);
+		} else {
+			return createWukongSystemWithDistance(k, replica, null, withDistance);
+		}
+		
 	}
 	
-	private WukongSystem createWukongSystemWithDistance(int K, int replica, Double[][] distances){
+	private WukongSystem createWukongSystemWithDistance(int K, int replica, Double[][] distances, boolean withDistance){
 		
 		
 		if(replica * classNumber >= K * deviceNumber) {
@@ -77,7 +88,7 @@ public class WuKongSystemFactory {
 			return null;
 		}
 		
-		WukongSystem system = new WukongSystem();
+		WukongSystem system = new WukongSystem(false);
 		List<WuDevice> devices = new ArrayList<WuDevice>();
 		List<Region> regions = new ArrayList<Region>();
 		List<Gateway> gateways = new ArrayList<Gateway>();
@@ -106,7 +117,14 @@ public class WuKongSystemFactory {
 		/* initial all devices */ 
 		for(int i = 0; i < deviceNumber; i++) {
 			List<Integer> objectIds = new ArrayList<Integer>();
-			WuDevice device = new WuDevice(i + 1, Double.MAX_VALUE, objectIds, getRandomDistance(landMarkNumber, distanceRange), new ArrayList<Double>(Arrays.asList(distances[i])), system);
+			WuDevice device;
+			if (withDistance) {
+				device = new WuDevice(i + 1, Double.MAX_VALUE, objectIds,
+					getRandomDistance(landMarkNumber, distanceRange), new ArrayList<Double>(Arrays.asList(distances[i])), system);
+			} else {
+				device = new WuDevice(i + 1, Double.MAX_VALUE, objectIds,
+					getRandomDistance(landMarkNumber, distanceRange), null, system);
+			}
 			devices.add(device);
 			
 			// set gateway
@@ -124,17 +142,19 @@ public class WuKongSystemFactory {
 		// distribute replica of non-duplicate wuclasses to devices, all globalclassmap should reach replica after this operation
 		for (int i = 0; i < regionNumber; i++) {
 			for (int j = 0; j < classNumber; j++) {
+				int time = 0;
 				while(globalClassMap[i][j] < replica) {
 					ran.setSeed(System.nanoTime() + i * i);
-					int index = Math.abs(ran.nextInt()) % regions.get(i).getDeviceNumber();
+					int index = Math.abs(ran.nextInt() % regions.get(i).getDeviceNumber());
 					
 					WuDevice device = regions.get(i).getWuDevice(index);
-					if (!device.isWuObjectExist(j)){
-						if(device.getAllWuObjectClassId().size() < K){
+					if (!device.isWuObjectExist(j) || time >10){
+						if(device.getAllWuObjectClassId().size() < K || time >10){
 							device.addWuObject(j);
 							globalClassMap[i][j] ++;
 						}
 					}
+					time++;
 				}
 			}
 		}
@@ -168,13 +188,15 @@ public class WuKongSystemFactory {
 	}
 	
 	public WukongSystem createRandomWuKongSystem() {
-		return createRandomWukongSystem(2, 1);
+		return createRandomWukongSystem(3, 1);
 	}
 	
 	public WukongSystem createRandomMultiProtocolWuKongSystem(int numberChannel){
 		WukongSystem system = createRandomWukongSystem(10, 1);
-		int[][] channels = getRandomDeviceChannelMatrix(deviceNumber, numberChannel);
-		system.setChannel(channels);
+		if (withDistance) {
+			int[][] channels = getRandomDeviceChannelMatrix(deviceNumber, numberChannel);
+			system.setChannel(channels);
+		}
 		return system;
 	}
 	
