@@ -15,22 +15,41 @@ import java.util.Set;
 public class Region {
 	private static int id = 0;
 	private int regionId;
-	private Map<Integer, WuDevice> devices;
+	private Map<Integer, WuDevice> deviceMap;
+	private List<WuDevice> devices;
 	private Map<Integer, List<WuDevice>> classToDeviceMap;
 	private Set<Gateway> gateways;
-	
+	   
 	public Region() {
 		this.regionId = id ++;
-		this.devices = new HashMap<Integer, WuDevice> ();
+		this.deviceMap = new HashMap<Integer, WuDevice> ();
+		this.devices = new ArrayList<WuDevice> ();
 		this.gateways = new HashSet<Gateway> ();
 		this.classToDeviceMap = new HashMap<Integer, List<WuDevice>> ();
 	}
 	
+	
+	public int getRegionId() {
+		return this.regionId;
+	}
+	
+	
+	public int getDeviceNumber() {
+		return deviceMap.size();
+	}
+	
 	public void addDevice(WuDevice device) {
-		if (!devices.containsKey(device.getWuDeviceId())) {
-			this.devices.put(device.getWuDeviceId(), device);
+		if (!deviceMap.containsKey(device.getWuDeviceId())) {
+			this.deviceMap.put(device.getWuDeviceId(), device);
 			device.setRegion(this);
-			
+			this.devices.add(device);
+		}
+		
+		gateways.add(device.getGateway());
+	}
+	
+	public void loadClassMap() {
+		for (WuDevice device : devices) {
 			for (Integer wuClassId : device.getAllWuObjectClassId()) {
 				if(!classToDeviceMap.containsKey(wuClassId)) {
 					List<WuDevice> devices = new ArrayList<WuDevice> ();
@@ -40,24 +59,24 @@ public class Region {
 				classToDeviceMap.get(wuClassId).add(device);
 			}
 		}
-		
-		gateways.add(device.getGateway());
 	}
 	
-	public int getRegionId() {
-		return this.regionId;
+	public WuDevice getWuDevice(int index) {
+		return this.devices.get(index);
 	}
 	
 	public boolean hostFirstDevice(WuClass wuClass) {
 		if (classToDeviceMap.containsKey(wuClass.getWuClassId())) {
 			for (WuDevice device : classToDeviceMap.get(wuClass.getWuClassId())) {
 				if (device.deployComponent(wuClass.getWuClassId())) {
+					System.out.println("Deploy wuClassId " + wuClass.getWuClassId() + " at device" + device.getWuDeviceId());
 					wuClass.deploy(device.getWuDeviceId());
 					return true;
 				}
 			}
 		}
 		
+		System.out.println("Fail to find host device for WuClass " + wuClass.getWuClassId());
 		return false;
 	}
 	
@@ -75,7 +94,7 @@ public class Region {
 	
 	public Set<Gateway> getPotentialTargetGateways(FlowBasedProcess process) {
 		Set<Gateway> gateways = new HashSet<Gateway> ();
-		for (WuDevice device : this.devices.values()){
+		for (WuDevice device : this.devices){
 			if (process.isTarget(device)) {
 				gateways.add(device.getGateway());
 			}
@@ -86,7 +105,7 @@ public class Region {
 	
 	public CongestionZone createCongestionZone(FlowBasedProcess process) {
 		CongestionZone zone =  new CongestionZone();
-		for (WuDevice device : this.devices.values()){
+		for (WuDevice device : this.devices){
 			if (process.isTarget(device)) {
 				zone.addDevice(device);
 			}

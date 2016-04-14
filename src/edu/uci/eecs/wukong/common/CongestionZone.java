@@ -27,10 +27,14 @@ public class CongestionZone {
 		this.gateways = new HashSet<Gateway> ();
 	}
 	
+	public int getZoneId() {
+		return this.zoneId;
+	}
+	
 	public void addDevice(WuDevice device) {
 		devices.add(device);
-		regions.add(device.getRegion());
 		gateways.add(device.getGateway());
+		regions.add(device.getRegion());
 	}
 	
 	public void addDevices(List<WuDevice> devices) {
@@ -48,11 +52,11 @@ public class CongestionZone {
 	}
 	
 	public boolean isCongestable(CongestionZone zone) {
-		for (Region region : regions) {
-			if (zone.regions.contains(region)) {
+		/*for (Gateway gateway : zone.getGateways()) {
+			if (gateways.contains(gateway)) {
 				return true;
 			}
-		}
+		}*/
 		
 		return false;
 	}

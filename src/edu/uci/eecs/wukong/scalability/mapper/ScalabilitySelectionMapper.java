@@ -56,13 +56,17 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 		// In region based mapping, we probably need to map to multiple congestion zones
 		// for each of which we need to create a ILP problem and resolve it.
 		for (CongestionZone zone : zones) {
+			variables.clear();
+			System.out.println("Resolving mapping in congestion zone: " + zone.getZoneId());
 			Problem problem = buildCongestionZoneProblem(zone);
 			Solver solver = factory.get(); // you should use this solver only once for one problem
 			Result result = solver.solve(problem);
 			
-			//System.out.println(result);
-			applyResult(zone, result);
-			//System.out.println("System total energy consumption is:" + system.getTotalEnergyConsumption());
+			if (result != null) {
+				//System.out.println(result);
+				applyResult(zone, result);
+				//System.out.println("System total energy consumption is:" + system.getTotalEnergyConsumption());
+			}
 		}
 		
 		return true;
@@ -103,6 +107,8 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 			}
 		}
 		
+		problem.setVarType('g', VarType.REAL);
+		
 		return problem;
 	}
 
@@ -121,10 +127,12 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 				String deviceVariable = Util.generateDeviceVariable(device.getWuDeviceId());
 				List<String> wuClassVariables = new ArrayList<String> ();
 				for (WuClass wuClass : device.getHostableWuClass(fbp)) {
-					wuClassVariables.add(Util.generateVariableId(wuClass.getWuClassId(), wuClass.getDeviceId()));
-					applyDeviceConstraint(deviceVariable, wuClassVariables, problem);
+					String wuClassVariable = Util.generateVariableId(wuClass.getWuClassId(), device.getWuDeviceId());
+					wuClassVariables.add(wuClassVariable);
+					variables.put(wuClassVariable, wuClassVariable);
 				}
-				
+				applyDeviceConstraint(deviceVariable, wuClassVariables, problem);
+				variables.put(deviceVariable, deviceVariable);
 				linear.add(1, deviceVariable);
 			}
 			linear.add(-1, 'g');
@@ -165,6 +173,17 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 
 	@Override
 	protected void applyResult(CongestionZone zone, Result result) {
+		Set<String> variableIds= variables.keySet();
+		for(String variableId : variableIds) {
+			if(result.getBoolean(variableId) && Util.isMappingVariable(variableId)) {
+				Integer wuClassId = Util.getWuClassIdFromVariableId(variableId);
+				Integer wuDeviceId = Util.getWuDeviceIdFromVariableId(variableId);
+				System.out.println("Deploy wuClassId " + wuClassId + " at device" + wuDeviceId);
+				system.deploy(wuDeviceId, wuClassId);
+			}
+		}
+		
+		System.out.println("g value : " + result.get('g'));
 		
 	}
 
@@ -174,12 +193,11 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 		while (regIter.hasNext()) {
 			Region region = regIter.next();
 			Map<Integer, List<WuDevice>> map = region.getWuClassToDeviceMap();
-			Set<Integer> classes = map.keySet();
-			for(Integer classId : classes) {
-				List<WuDevice> devices = map.get(classId);
+			for(WuClass wuClass : fbp.getAllComponents()) {
+				List<WuDevice> devices = map.get(wuClass.getWuClassId());
 				Linear linear = new Linear();
 				for(WuDevice device : devices) {
-					String varName = Util.generateVariableId(classId, device.getWuDeviceId());
+					String varName = Util.generateVariableId(wuClass.getWuClassId(), device.getWuDeviceId());
 					linear.add(1, varName);
 					variables.put(varName, varName);
 				}

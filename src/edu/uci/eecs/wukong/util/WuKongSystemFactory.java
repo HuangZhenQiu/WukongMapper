@@ -84,31 +84,12 @@ public class WuKongSystemFactory {
 		
 		Random ran = new Random();
 		
-		int[] globalClassMap = new int[classNumber]; // used for global recording wuclasses.
-		Arrays.fill(globalClassMap, 0);
+		int[][] globalClassMap = new int[regionNumber][classNumber]; // used for global recording wuclasses.
+		for (int i = 0; i < regionNumber; i++) {
+			Arrays.fill(globalClassMap[i], 0);
+		}
 		int[] classMap = new int[classNumber]; // used for recording wuclasses on a device. 
-		
-		/* initial all devices */ 
-		for(int i = 0; i < deviceNumber; i++) {
-			List<Integer> objectIds = new ArrayList<Integer>();
-			WuDevice device = new WuDevice(i + 1, Double.MAX_VALUE, objectIds, getRandomDistance(landMarkNumber, distanceRange), new ArrayList<Double>(Arrays.asList(distances[i])), system);
-			devices.add(device);
-		}
-		
-		// distribute replica of non-duplicate wuclasses to devices, all globalclassmap should reach replica after this operation 
-		for (int i = 0; i < classNumber; i++) {
-			while(globalClassMap[i] < replica) {
-				ran.setSeed(System.nanoTime() + i * i);
-				int deviceId = Math.abs(ran.nextInt()) % deviceNumber;
-				
-				if (!devices.get(deviceId).isWuObjectExist(i)){
-					if(devices.get(deviceId).getAllWuObjectClassId().size() < K){
-						devices.get(deviceId).addWuObject(i);
-						globalClassMap[i] ++;
-					}
-				}
-			}
-		}
+	
 		
 		// create regions
 		for (int i = 0; i < regionNumber; i++) {
@@ -121,6 +102,43 @@ public class WuKongSystemFactory {
 			Gateway gateway = new Gateway();
 			gateways.add(gateway);
 		}
+		
+		/* initial all devices */ 
+		for(int i = 0; i < deviceNumber; i++) {
+			List<Integer> objectIds = new ArrayList<Integer>();
+			WuDevice device = new WuDevice(i + 1, Double.MAX_VALUE, objectIds, getRandomDistance(landMarkNumber, distanceRange), new ArrayList<Double>(Arrays.asList(distances[i])), system);
+			devices.add(device);
+			
+			// set gateway
+			ran.setSeed(System.nanoTime() + i * i);
+			int gatewayId = Math.abs(ran.nextInt()) % gatewayNumber;
+			gateways.get(gatewayId).addDevice(devices.get(i));
+			
+			// set region
+			ran.setSeed(System.nanoTime() + i * i);
+			int regionId = Math.abs(ran.nextInt()) % regionNumber;
+			regions.get(regionId).addDevice(devices.get(i));
+		}
+		
+		
+		// distribute replica of non-duplicate wuclasses to devices, all globalclassmap should reach replica after this operation
+		for (int i = 0; i < regionNumber; i++) {
+			for (int j = 0; j < classNumber; j++) {
+				while(globalClassMap[i][j] < replica) {
+					ran.setSeed(System.nanoTime() + i * i);
+					int index = Math.abs(ran.nextInt()) % regions.get(i).getDeviceNumber();
+					
+					WuDevice device = regions.get(i).getWuDevice(index);
+					if (!device.isWuObjectExist(j)){
+						if(device.getAllWuObjectClassId().size() < K){
+							device.addWuObject(j);
+							globalClassMap[i][j] ++;
+						}
+					}
+				}
+			}
+		}
+		
 		
 		for (int i = 0; i < deviceNumber; i++) {
 			Arrays.fill(classMap, 0);
@@ -139,16 +157,10 @@ public class WuKongSystemFactory {
 					classMap[classId] ++;
 				}
 			}
-			
-			// set region
-			ran.setSeed(System.nanoTime() + i * i);
-			int regionId = Math.abs(ran.nextInt()) % regionNumber;
-			regions.get(regionId).addDevice(devices.get(i));
-			
-			// set gateway
-			ran.setSeed(System.nanoTime() + i * i);
-			int gatewayId = Math.abs(ran.nextInt()) % gatewayNumber;
-			gateways.get(gatewayId).addDevice(devices.get(i));
+		}
+		
+		for (int i = 0; i < regionNumber; i++) {
+			regions.get(i).loadClassMap();
 		}
 		
 		system.initialize(devices, regions, gateways, distances, false, classNumber, landMarkNumber);
@@ -156,7 +168,7 @@ public class WuKongSystemFactory {
 	}
 	
 	public WukongSystem createRandomWuKongSystem() {
-		return createRandomWukongSystem(6, 1);
+		return createRandomWukongSystem(3, 1);
 	}
 	
 	public WukongSystem createRandomMultiProtocolWuKongSystem(int numberChannel){

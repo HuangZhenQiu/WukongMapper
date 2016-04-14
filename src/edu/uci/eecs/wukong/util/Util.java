@@ -54,6 +54,14 @@ public class Util {
 		return false;
 	}
 	
+	public static boolean isMappingVariable(String name) {
+		if(name.startsWith("x")){
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public static Integer getWuClassIdFromVariableId(String variableId) {
 
 		String[] items = variableId.split("_");

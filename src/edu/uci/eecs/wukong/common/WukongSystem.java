@@ -128,13 +128,18 @@ public class WukongSystem {
 		while(!zoneQueue.isEmpty()) {
 			CongestionZone zone = zoneQueue.poll();
 			Iterator<CongestionZone> zoneIter = zoneQueue.iterator();
-
+			removedZone.clear();
 			while(zoneIter.hasNext()) {
 				CongestionZone newZone = zoneIter.next();
-				if (zone.isCongestable(newZone)) {
-					zone.join(zone);
+				if(zone!= newZone && zone.isCongestable(newZone)) {
+					zone.join(newZone);
 					removedZone.add(newZone);
 				}
+			}
+			
+			if (zoneQueue.isEmpty()) {
+				zones.add(zone);
+				return zones;
 			}
 			
 			if (removedZone.isEmpty()) {
@@ -155,6 +160,10 @@ public class WukongSystem {
 	
 	public WuDevice getDevice(int wudeviceId) { 
 		return deviceMap.get(wudeviceId);
+	}
+	
+	public void deploy(int wuDeviceId, int wuClassId) {
+		deviceMap.get(wuDeviceId).deployComponent(wuClassId);
 	}
 
 	// read data from file
@@ -218,6 +227,18 @@ public class WukongSystem {
 		}
 
 		return device;
+	}
+	
+	public int getMaxReprogramGateway() {
+		int max = 0;
+		for (Gateway gateway : gateways) {
+			System.out.println("Gateway g " + gateway.getGatewayId() + " has " + gateway.getDeviceNumber() + " reprogam " + gateway.reprogramDeviceNumber() + " devices");
+			if (gateway.reprogramDeviceNumber() > max) {
+				max = gateway.reprogramDeviceNumber();
+			}
+		}
+		
+		return max;
 	}
 
 	/**

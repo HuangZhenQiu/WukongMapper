@@ -34,22 +34,25 @@ public class UniformMapper extends AbstractMapper {
 		List<CongestionZone> zones = this.system.getCongestionZones(this.fbp);
 		for (CongestionZone zone : zones) {
 			Iterator<Region> regIter = zone.getRegions().iterator();
+			System.out.println("Deploy in zone " + zone.getZoneId());
 			while (regIter.hasNext()) {
 				Region region = regIter.next();
 				List<Gateway> gateways = region.getAllGateways();
 				for (WuClass wuClass : this.fbp.getAllComponents()) {
-					int time = 0;
 					while (true) {
-						time += 1;
-						int gatewayIndex = random.nextInt() % gateways.size();
+						int gatewayIndex = Math.abs(random.nextInt()) % gateways.size();
 						Gateway gateway = gateways.get(gatewayIndex);
-						if (gateway.deploy(wuClass) && time <= 10) {
+						if (gateway.deploy(wuClass)) {
 							break;
 						}
 					}
 					
-					success = false;
-					System.out.println("Can't find mapping for Component " + wuClass.getWuClassId());
+					if (wuClass.getDeviceId() == -1) {
+						success = false;
+						System.out.println("Can't find mapping for Component "
+								+ wuClass.getWuClassId() + " in region " + region.getRegionId()
+								+ " congestion zone " + zone.getZoneId());
+					}
 				}	
 			}
 		}

@@ -18,7 +18,7 @@ public class Gateway {
 		this.devices = new HashMap<Integer, WuDevice> ();
 	}
 	
-	public int getRegionId() {
+	public int getGatewayId() {
 		return gatewayId;
 	}
 	
@@ -35,10 +35,15 @@ public class Gateway {
 			WuDevice device = deviceIter.next();
 			if (device.deployComponent(wuClass.getWuClassId())) {
 				wuClass.deploy(device.getWuDeviceId());
+				System.out.println("Deploy wuClassId " + wuClass.getWuClassId() + " at device" + device.getWuDeviceId());
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	public int getDeviceNumber() {
+		return this.devices.size();
 	}
 	
 	public int reprogramDeviceNumber() {
