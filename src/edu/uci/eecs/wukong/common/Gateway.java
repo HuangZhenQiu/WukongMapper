@@ -75,14 +75,14 @@ public class Gateway {
 	}
 	
 	public List<WuDevice> getTargetDevice(FlowBasedProcess process) {
-		List<WuDevice> devices = new ArrayList<WuDevice> ();
+		List<WuDevice> result = new ArrayList<WuDevice> ();
 		
-		for (WuDevice device : devices) {
+		for (WuDevice device : devices.values()) {
 			if (process.isTarget(device)) {
-				devices.add(device);
+				result.add(device);
 			}
 		}
 		
-		return devices;
+		return result;
 	}
 }

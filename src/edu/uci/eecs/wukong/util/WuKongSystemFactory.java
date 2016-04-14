@@ -168,7 +168,7 @@ public class WuKongSystemFactory {
 	}
 	
 	public WukongSystem createRandomWuKongSystem() {
-		return createRandomWukongSystem(3, 1);
+		return createRandomWukongSystem(2, 1);
 	}
 	
 	public WukongSystem createRandomMultiProtocolWuKongSystem(int numberChannel){

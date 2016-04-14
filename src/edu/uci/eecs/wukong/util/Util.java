@@ -46,6 +46,14 @@ public class Util {
 		return builder.toString();
 	}
 	
+	public static boolean isDeviceVariable(String name) {
+		if(name.startsWith("d")){
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public static boolean isTransformedVariable(String name) {
 		if(name.startsWith("y")){
 			return true;
