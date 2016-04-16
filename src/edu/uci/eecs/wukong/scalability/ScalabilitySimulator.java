@@ -16,8 +16,8 @@ public class ScalabilitySimulator {
 	
 	public ScalabilitySimulator() {
 		//WukongProperties.getProperty();
-		this.fbpFactory = new FlowBasedProcessFactory(10, 20, 100 /**distance range**/, 100 /**weight**/);
-		this.wukongFactory = new WuKongSystemFactory(20, 100, 10, 100, 5, 5, false);
+		this.fbpFactory = new FlowBasedProcessFactory(30, 10, 100 /**distance range**/, 100 /**weight**/);
+		this.wukongFactory = new WuKongSystemFactory(30, 300, 10, 100, 10, 10, false);
 	}
 	
 	public void run() {
@@ -25,8 +25,8 @@ public class ScalabilitySimulator {
 		int uniformMax = 0;
 		int optimalMax = 0;
 		
-		for (int i = 0; i < 10; i ++) {
-			FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(TYPE.LINEAR);
+		for (int i = 0; i < 100; i ++) {
+			FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(TYPE.STAR);
 			WukongSystem system = wukongFactory.createRandomWuKongSystem();
 			
 			System.out.println("===================================================");

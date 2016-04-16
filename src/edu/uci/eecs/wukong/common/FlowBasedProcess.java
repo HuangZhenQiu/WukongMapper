@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import java.util.Collection;
+import java.util.ArrayDeque;
 import java.util.Set;
 import java.util.Iterator;
 import java.io.BufferedReader;
@@ -21,7 +23,9 @@ import java.io.IOException;
 import com.google.common.collect.ImmutableList;
 
 import edu.uci.eecs.wukong.util.Util;
+import edu.uci.eecs.wukong.util.FlowBasedProcessFactory;
 import edu.uci.eecs.wukong.util.GraphGenerator;
+import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
 
 
 /**
@@ -35,6 +39,8 @@ public class FlowBasedProcess {
 	private SimpleDirectedGraph<Object, DefaultEdge> graph;
 
 	private List<FlowBasedProcessEdge> edges;
+	
+	private HashMap<Object, WuClass> nodeMap;
 	
 	private HashMap<Integer, WuClass> wuClassMap;
 	
@@ -52,11 +58,13 @@ public class FlowBasedProcess {
 	private GraphGenerator.TYPE type;
 	
 	
-	public FlowBasedProcess(SimpleDirectedGraph<Object, DefaultEdge> graph, HashMap<Integer, WuClass> wuClassMap, List<FlowBasedProcessEdge> edges, GraphGenerator.TYPE type) {
+	public FlowBasedProcess(SimpleDirectedGraph<Object, DefaultEdge> graph, HashMap<Object, WuClass> nodeMap,
+			HashMap<Integer, WuClass> wuClassMap, List<FlowBasedProcessEdge> edges, GraphGenerator.TYPE type) {
 		this.type = type;
 		this.graph = graph;
 		this.edges = edges;
 		this.wuClassMap = wuClassMap;
+		this.nodeMap = nodeMap;
 		this.inEdgeMap = new HashMap<Integer, List<FlowBasedProcessEdge>>();
 		this.outEdgeMap = new HashMap<Integer, List<FlowBasedProcessEdge>>();
 		this.locationConstraints = new HashMap<Integer, LocationConstraint>();
@@ -500,9 +508,71 @@ public class FlowBasedProcess {
 	 * 
 	 * @return
 	 */
-	public List<Path> getDominatePaths() {
+	public List<Path> getDominatePaths(int maxHop) {
 		List<Path> paths = new ArrayList<Path> ();
+		List<Object> startNodes = new ArrayList<Object> ();
+		for (Object node : nodeMap.keySet()) {
+			if (isStartNode(node)) {
+				startNodes.add(node);
+			}
+		}
+		
+		Queue<NodePath> nodePaths = new ArrayDeque<NodePath> ();
+		for (Object object : startNodes) {
+			NodePath path = new NodePath();
+			nodePaths.add(path.addNode(object));
+		}
+		
+		while(!nodePaths.isEmpty()) {
+			NodePath path = nodePaths.poll();
+			Object lastNode = path.getLastNode();
+			if (isEndNode(lastNode)) {
+				if ((path.getLength() - 1) * 2 < maxHop) {
+					// Don't need to consider the nondominant path
+					System.out.println("Find a too short path:" + transformToPath(path).toString());
+				} else if (path.getLength() <= maxHop + 1) {
+					paths.add(transformToPath(path));
+				} else {
+					System.out.println("Find a too long path:" + transformToPath(path).toString());
+				}
+			} else {
+				for (DefaultEdge edge : graph.outgoingEdgesOf(lastNode)) {
+					Object sink = graph.getEdgeTarget(edge);
+					if (!path.contains(sink)) {
+						NodePath nodePath = path.copy();
+						nodePath.addNode(sink);
+						nodePaths.add(nodePath);
+					}
+				}
+			}
+		}
 		
 		return paths;
+	}
+	
+	public boolean isStartNode(Object node) {
+		return graph.inDegreeOf(node) == 0;
+	}
+	
+	public boolean isEndNode(Object node) {
+		return graph.outDegreeOf(node) == 0;
+	}
+	
+	public Path transformToPath(NodePath nodePath) {
+		Path path = new Path();
+		for (Object node : nodePath.getNodes()) {
+			path.addNode(this.nodeMap.get(node));
+		}
+		
+		return path;
+	}
+	
+	public static void main(String[] args) {
+		FlowBasedProcessFactory factory = new FlowBasedProcessFactory(10, 50, 10, 20);
+		FlowBasedProcess fbp = factory.createFlowBasedProcess(TYPE.RANDOM);
+		List<Path> paths = fbp.getDominatePaths(10);
+		for (Path path : paths) {
+			System.out.println(path.toString());
+		}
 	}
 }

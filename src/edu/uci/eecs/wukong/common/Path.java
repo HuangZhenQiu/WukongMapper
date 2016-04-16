@@ -13,4 +13,17 @@ public class Path {
 	public void addNode(WuClass wuClass) {
 		pathNodes.add(wuClass);
 	}
+	
+	public String toString() {
+		StringBuilder builder = new StringBuilder("[");
+		for (WuClass wuClass : pathNodes) {
+			if (!wuClass.equal(pathNodes.get(pathNodes.size() - 1))) {
+				builder.append(wuClass.getWuClassId() + ",");
+			} else {
+				builder.append(wuClass.getWuClassId() + "]");
+			}
+		}
+		
+		return builder.toString();
+	}
 }

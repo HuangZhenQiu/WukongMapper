@@ -9,6 +9,7 @@ import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.Gateway;
 import edu.uci.eecs.wukong.common.Region;
 import edu.uci.eecs.wukong.common.WuClass;
+import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
 import edu.uci.eecs.wukong.mapper.AbstractMapper;
 
@@ -39,19 +40,41 @@ public class UniformMapper extends AbstractMapper {
 				Region region = regIter.next();
 				List<Gateway> gateways = region.getAllGateways();
 				for (WuClass wuClass : this.fbp.getAllComponents()) {
-					while (!wuClass.isDeployed()) {
+					int time = 0;
+					while (!wuClass.isDeployed() &&  time < 50) {
 						int gatewayIndex = Math.abs(random.nextInt() % gateways.size());
 						Gateway gateway = gateways.get(gatewayIndex);
 						if (gateway.deploy(wuClass)) {
 							break;
 						}
+						time ++;
+					}
+					
+					List<WuDevice> devices = region.getHostableDevice(wuClass.getWuClassId());
+					time = 0;
+					while(!wuClass.isDeployed() && time < 50) {
+						int deviceIndex = Math.abs(random.nextInt() % devices.size());
+						WuDevice device = devices.get(deviceIndex);
+						if (device.deployComponent(wuClass.getWuClassId())) {
+							break;
+						}
+						time ++;
 					}
 					
 					if (!wuClass.isDeployed()) {
-						success = false;
-						System.out.println("Can't find mapping for Component "
-								+ wuClass.getWuClassId() + " in region " + region.getRegionId()
-								+ " congestion zone " + zone.getZoneId());
+						// In worst case
+						for (WuDevice device : devices) {
+							if (device.deployComponent(wuClass.getWuClassId())) {
+								break;
+							}
+						}
+						
+						if (!wuClass.isDeployed()) {
+							success = false;
+							System.out.println("Can't find mapping for Component "
+									+ wuClass.getWuClassId() + " in region " + region.getRegionId()
+									+ " congestion zone " + zone.getZoneId());
+						}
 					}
 				}
 				

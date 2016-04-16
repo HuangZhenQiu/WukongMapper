@@ -19,6 +19,16 @@ public class Region {
 	private List<WuDevice> devices;
 	private Map<Integer, List<WuDevice>> classToDeviceMap;
 	private Set<Gateway> gateways;
+	
+	public static class DevicePair {
+		public WuDevice start;
+		public WuDevice end;
+		
+		public DevicePair(WuDevice start, WuDevice end) {
+			this.start = start;
+			this.end = end;
+		}
+	}
 	   
 	public Region() {
 		this.regionId = id ++;
@@ -36,6 +46,34 @@ public class Region {
 	
 	public int getDeviceNumber() {
 		return deviceMap.size();
+	}
+	
+	public List<DevicePair> getInnerGatewayHostPair(WuClass start, WuClass end) {
+		List<DevicePair> pairs = new ArrayList<DevicePair>();
+		List<WuDevice> startDevices = classToDeviceMap.get(start.getWuClassId());
+		for (WuDevice startDevice : startDevices) {
+			for (WuDevice endDevice : classToDeviceMap.get(end.getWuClassId())) {
+				if (startDevice.getGateway().equals(endDevice.getGateway())) {
+					pairs.add(new DevicePair(startDevice, endDevice));
+				}
+			}
+		}
+		
+		return pairs;
+	}
+	
+	public List<DevicePair> getCrossGatewayHostPair(WuClass start, WuClass end) {
+		List<DevicePair> pairs = new ArrayList<DevicePair>();
+		List<WuDevice> startDevices = classToDeviceMap.get(start.getWuClassId());
+		for (WuDevice startDevice : startDevices) {
+			for (WuDevice endDevice : classToDeviceMap.get(end.getWuClassId())) {
+				if (!startDevice.getGateway().equals(endDevice.getGateway())) {
+					pairs.add(new DevicePair(startDevice, endDevice));
+				}
+			}
+		}
+		
+		return pairs;
 	}
 	
 	public void addDevice(WuDevice device) {

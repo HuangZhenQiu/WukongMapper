@@ -10,6 +10,7 @@ import java.util.Set;
 import edu.uci.eecs.wukong.common.CongestionZone;
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.Gateway;
+import edu.uci.eecs.wukong.common.Path;
 import edu.uci.eecs.wukong.common.Region;
 import edu.uci.eecs.wukong.common.WuClass;
 import edu.uci.eecs.wukong.common.WuDevice;
@@ -208,6 +209,8 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 	
 	@Override
 	protected void applyEndToEndLatencyConstraints(CongestionZone zone, Problem problem) {
-		
+		List<Path> paths = this.fbp.getDominatePaths(10);
+		for (Region region : zone.getRegions()) {
+		}
 	}
 }

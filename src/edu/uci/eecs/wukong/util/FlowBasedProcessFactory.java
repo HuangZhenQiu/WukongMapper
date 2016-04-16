@@ -64,7 +64,6 @@ public class FlowBasedProcessFactory {
 		
 		HashMap<Object, WuClass> nodeMap = assignClassIdToGraphNode(graph);
 		List<FlowBasedProcessEdge> edges = buildEdges(nodeMap, graph);
-		
 		HashMap<Integer, WuClass> classMap =  new HashMap<Integer, WuClass>();
 		Iterator<WuClass> classIterator = nodeMap.values().iterator();
 		while(classIterator.hasNext()) {
@@ -74,7 +73,7 @@ public class FlowBasedProcessFactory {
 			}
 		}
 		
-		return new FlowBasedProcess(graph, classMap, edges, type);
+		return new FlowBasedProcess(graph, nodeMap, classMap, edges, type);
 	}
 	
 	
