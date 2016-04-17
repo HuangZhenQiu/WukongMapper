@@ -544,7 +544,7 @@ public class FlowBasedProcess {
 			NodePath path = nodePaths.poll();
 			Object lastNode = path.getLastNode();
 			if (isEndNode(lastNode)) {
-				if ((path.getLength() - 1) * 2 < maxHop) {
+				if ((path.getLength() - 1) * 2 <= maxHop) {
 					// Don't need to consider the nondominant path
 					System.out.println("Find a too short path:" + transformToPath(path).toString());
 				} else if (path.getLength() <= maxHop + 1) {

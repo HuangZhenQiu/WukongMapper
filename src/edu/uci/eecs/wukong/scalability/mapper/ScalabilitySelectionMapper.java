@@ -255,7 +255,9 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 					}
 				}
 			}
-			problem.add(linear, Operator.LE, 10);
+			if (!paths.isEmpty()) {
+				problem.add(linear, Operator.LE, 11);
+			}
 		}
 	}
 }
