@@ -12,6 +12,7 @@ import edu.uci.eecs.wukong.common.FlowBasedProcess;
 import edu.uci.eecs.wukong.common.Gateway;
 import edu.uci.eecs.wukong.common.Path;
 import edu.uci.eecs.wukong.common.Region;
+import edu.uci.eecs.wukong.common.Region.DevicePair;
 import edu.uci.eecs.wukong.common.WuClass;
 import edu.uci.eecs.wukong.common.WuDevice;
 import edu.uci.eecs.wukong.common.WukongSystem;
@@ -181,8 +182,12 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 				Integer wuDeviceId = Util.getWuDeviceIdFromVariableId(variableId);
 				System.out.println("Deploy wuClassId " + wuClassId + " at device" + wuDeviceId);
 				system.deployComponent(wuDeviceId, wuClassId);
+				fbp.getWuClass(wuClassId).deploy(system.getDevice(wuDeviceId));
 			}
 		}
+		
+		latencyHops.add(fbp.getLatencyHop(MAX_HOP));
+		fbp.reset();
 		
 		System.out.println("g value : " + result.get('g'));
 		
@@ -207,10 +212,50 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 		}
 	}
 	
-	@Override
+	/**
+	 * Latency(Path) = Sigma(Latency(Link_i_j))    for Link_i_j belongs to Path
+	 * O(L_i_j) represents the inner gateway device pair set that can host link L_i_j
+	 * R(L_i_j) represetns the cross gateway device pair set that can host link L_i_j
+	 * 
+	 * Latency(L_i_j) =     Sigma(X_i_n *X_j_m)     +    2 * Sigma(X_i_n * X_j_m)
+	 *                  P_n_m belongs tp O(L_i_j)      P_n_m belongs tp R(L_i_j) 
+	 * 
+	 */
 	protected void applyEndToEndLatencyConstraints(CongestionZone zone, Problem problem) {
 		List<Path> paths = this.fbp.getDominatePaths(10);
 		for (Region region : zone.getRegions()) {
+			Linear linear = new Linear();
+			for (Path path : paths) {
+				List<WuClass> classes = path.getPathNodes();
+				for (int i = 0; i < classes.size() - 1; i++) {
+					List<DevicePair> innerPair = region.getInnerGatewayHostPair(classes.get(i), classes.get(i+1));
+					for (DevicePair pair : innerPair) {
+						String sourceVariable =
+								Util.generateVariableId(classes.get(i).getWuClassId(), pair.start.getWuDeviceId());
+						String destVariable =
+								Util.generateVariableId(classes.get(i + 1).getWuClassId(), pair.end.getWuDeviceId());
+						String transformed = Util.generateTransformedVariableId(classes.get(i).getWuClassId(), pair.start.getWuDeviceId(),
+								classes.get(i+1).getWuClassId(), pair.end.getWuDeviceId());
+						Util.applyTransformedConstraints(problem, sourceVariable, destVariable, transformed);
+						linear.add(1, transformed);
+					}
+					
+					
+					List<DevicePair> crossPair = region.getCrossGatewayHostPair(classes.get(i), classes.get(i+1));
+					
+					for (DevicePair pair : crossPair) {
+						String sourceVariable =
+								Util.generateVariableId(classes.get(i).getWuClassId(), pair.start.getWuDeviceId());
+						String destVariable =
+								Util.generateVariableId(classes.get(i + 1).getWuClassId(), pair.end.getWuDeviceId());
+						String transformed = Util.generateTransformedVariableId(classes.get(i).getWuClassId(), pair.start.getWuDeviceId(),
+								classes.get(i+1).getWuClassId(), pair.end.getWuDeviceId());
+						Util.applyTransformedConstraints(problem, sourceVariable, destVariable, transformed);
+						linear.add(2, transformed);
+					}
+				}
+			}
+			problem.add(linear, Operator.LE, 10);
 		}
 	}
 }

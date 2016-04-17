@@ -37,7 +37,7 @@ public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper
 				Integer wuClassId = Util.getWuClassIdFromVariableId(variableId);
 				Integer wuDeviceId = Util.getWuDeviceIdFromVariableId(variableId);
 				if(!classes.contains(wuClassId)) {
-					this.fbp.deploy(wuClassId, wuDeviceId);
+					this.fbp.deploy(wuClassId, this.system.getDevice(wuDeviceId));
 					this.system.deploy(wuDeviceId, wuClassId);
 				}
 			}
@@ -125,13 +125,15 @@ public class DistanceUnawareSelectionBasedMapper extends AbstractSelectionMapper
 		for(FlowBasedProcessEdge edge : edges) {
 			
 			Linear inNodeLinear = new Linear();
-			String varName = Util.generateVariableId(edge.getInWuClass().getWuClassId(), edge.getInWuClass().getDeviceId());
+			String varName = Util.generateVariableId(
+					edge.getInWuClass().getWuClassId(), edge.getInWuClass().getDevice().getWuDeviceId());
 			inNodeLinear.add(1, varName);
 			variables.put(varName, varName);
 			problem.add(inNodeLinear, Operator.EQ, 1);
 			
 			Linear outNodeLinear = new Linear();
-			varName = Util.generateVariableId(edge.getOutWuClass().getWuClassId(), edge.getOutWuClass().getDeviceId());
+			varName = Util.generateVariableId(
+					edge.getOutWuClass().getWuClassId(), edge.getOutWuClass().getDevice().getWuDeviceId());
 			outNodeLinear.add(1, varName);
 			variables.put(varName, varName);
 			problem.add(outNodeLinear, Operator.EQ, 1);

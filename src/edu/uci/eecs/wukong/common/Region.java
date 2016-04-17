@@ -108,7 +108,7 @@ public class Region {
 			for (WuDevice device : classToDeviceMap.get(wuClass.getWuClassId())) {
 				if (device.deployComponent(wuClass.getWuClassId())) {
 					System.out.println("Deploy wuClassId " + wuClass.getWuClassId() + " at device" + device.getWuDeviceId());
-					wuClass.deploy(device.getWuDeviceId());
+					wuClass.deploy(device);
 					return true;
 				}
 			}

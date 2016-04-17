@@ -1,5 +1,6 @@
 package edu.uci.eecs.wukong.scalability.mapper;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -25,7 +26,6 @@ public class UniformMapper extends AbstractMapper {
 
 	public UniformMapper(WukongSystem system, FlowBasedProcess fbp, MapType type) {
 		super(system, fbp, type);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -77,7 +77,8 @@ public class UniformMapper extends AbstractMapper {
 						}
 					}
 				}
-				
+
+				latencyHops.add(fbp.getLatencyHop(MAX_HOP));
 				fbp.reset();
 			}
 		}

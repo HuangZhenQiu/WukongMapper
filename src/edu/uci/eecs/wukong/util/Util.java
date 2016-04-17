@@ -11,6 +11,9 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import edu.uci.eecs.wukong.common.WuClass;
+import net.sf.javailp.Linear;
+import net.sf.javailp.Operator;
+import net.sf.javailp.Problem;
 
 public class Util {
 	
@@ -165,6 +168,40 @@ public class Util {
 		}
 		
 		return distance;
+	}
+	
+	/**
+	 * 
+	 * @param problem
+	 * @param source   x_i_n
+	 * @param desct    x_j_m
+	 * @param transformed   y_i_n_j_m
+	 */
+	public static void applyTransformedConstraints(Problem problem, String source, String desct, String transformed) {
+		
+		// 1) y_i_n_j_m >= 0
+		Linear linear = new Linear();
+		linear.add(1, transformed);
+		problem.add(linear, Operator.GE, 0);
+		
+		// 2) x_i - y_i_n_j_m >= 0
+		linear = new Linear();
+		linear.add(1, source);
+		linear.add(-1, transformed);
+		problem.add(linear, Operator.GE, 0);
+		
+		// 3) x_j - y_i_n_j_m >= 0
+		linear = new Linear();
+		linear.add(1, desct);
+		linear.add(-1, transformed);
+		problem.add(linear, Operator.GE, 0);
+		
+		// 4) 1 - x_i_n - x_j_m + y_i_n_j_m  >=0
+		linear = new Linear();
+		linear.add(-1, source);
+		linear.add(-1, desct);
+		linear.add(1, transformed);
+		problem.add(linear, Operator.GE, -1);
 	}
 
 }

@@ -5,7 +5,7 @@ import edu.uci.eecs.wukong.common.LocationConstraint;
 public class WuClass {
 
 	private int wuClassId;
-	private int deviceId;
+	private WuDevice wudevice;
 	private LocationConstraint locationConstraint;
 	private boolean deployed;
 	private Double energyCost; //It is used after merge.
@@ -14,20 +14,21 @@ public class WuClass {
 	
 	public WuClass(int wuClassId, LocationConstraint locationConstraint) {
 		this.wuClassId = wuClassId;
-		this.deviceId = -1;
+		this.wudevice = null;
 		this.locationConstraint = locationConstraint;
 		this.deployed = false;
 		this.energyCost = 0.0;
 	}
 	
 	public void reset() {
-		this.deviceId = -1;
+		this.wudevice = null;
 		this.deployed = false;
+		this.wudevice = null;
 		this.energyCost = 0.0;
 	}
 	
-	public void deploy(int deviceId) {
-		this.deviceId = deviceId;
+	public void deploy(WuDevice device) {
+		this.wudevice = device;
 		this.deployed = true;
 	}
 	
@@ -43,12 +44,12 @@ public class WuClass {
 		this.wuClassId = wuClassId;
 	}
 
-	public int getDeviceId() {
-		return deviceId;
+	public WuDevice getDevice() {
+		return this.wudevice;
 	}
 
-	public void setDeviceId(int deviceId) {
-		this.deviceId = deviceId;
+	public void setDevice(WuDevice device) {
+		this.wudevice = device;
 	}
 
 	public boolean isDeployed() {

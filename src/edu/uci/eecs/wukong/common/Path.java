@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Path {
-	List<WuClass> pathNodes;
+	private List<WuClass> pathNodes;
 	
 	public Path() {
-		pathNodes = new ArrayList<WuClass> ();
+		this.pathNodes = new ArrayList<WuClass> ();
 	}
 	
 	public void addNode(WuClass wuClass) {
 		pathNodes.add(wuClass);
+	}
+	
+	public List<WuClass> getPathNodes() {
+		return this.pathNodes;
 	}
 	
 	public String toString() {
@@ -25,5 +29,20 @@ public class Path {
 		}
 		
 		return builder.toString();
+	}
+	
+	public int getHops() {
+		int hops = 0;
+		for (int i = 0; i < pathNodes.size() - 1; i++) {
+			if (pathNodes.get(i).getDevice().equals(pathNodes.get(i + 1).getDevice())) {
+				hops += 0;
+			} else if (pathNodes.get(i).getDevice().getGateway().equals(pathNodes.get(i + 1).getDevice().getGateway())) {
+				hops += 1;
+			} else {
+				hops += 2;
+			}
+		}
+		
+		return hops;
 	}
 }

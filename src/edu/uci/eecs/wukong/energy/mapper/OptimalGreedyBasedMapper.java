@@ -64,16 +64,16 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 				for(FlowBasedProcessEdge edge: node.getMergingEdges()){
 					
 					if(!(greedyType == GreedyType.LIKE_NAIVE)){
-						edge.getInWuClass().deploy(device.getWuDeviceId());
-						edge.getOutWuClass().deploy(device.getWuDeviceId());
+						edge.getInWuClass().deploy(device);
+						edge.getOutWuClass().deploy(device);
 						
 						device.deploy(edge.getInWuClass().getWuClassId());
 						device.deploy(edge.getOutWuClass().getWuClassId());
 					}
 					else{
 						if (edge.isUndeployed()) {
-							edge.getInWuClass().deploy(device.getWuDeviceId());
-							edge.getOutWuClass().deploy(device.getWuDeviceId());
+							edge.getInWuClass().deploy(device);
+							edge.getOutWuClass().deploy(device);
 							
 							device.deploy(edge.getInWuClass().getWuClassId());
 							device.deploy(edge.getOutWuClass().getWuClassId());
@@ -90,8 +90,8 @@ public class OptimalGreedyBasedMapper extends AbstractMapper {
 //							edge.getInWuClass().deploy(device1.getWuDeviceId());
 //							edge.getOutWuClass().deploy(device1.getWuDeviceId());
 							if (device1.deploy(undeployedClassId)) {
-								edge.getInWuClass().deploy(device1.getWuDeviceId());
-								edge.getOutWuClass().deploy(device1.getWuDeviceId());
+								edge.getInWuClass().deploy(device1);
+								edge.getOutWuClass().deploy(device1);
 							}
 							
 							

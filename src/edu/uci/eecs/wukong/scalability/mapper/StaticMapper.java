@@ -39,10 +39,12 @@ public class StaticMapper extends AbstractMapper {
 						break;
 					}
 				}	
+				
+				latencyHops.add(fbp.getLatencyHop(MAX_HOP));
+				fbp.reset();
 			}
 		}
 		
 		return success;
 	}
-
 }

@@ -258,9 +258,9 @@ public class WuDevice implements Comparable<WuDevice>{
 				if(energyConsumption < this.energyConstraint) {
 				
 					inNode.activate();
-					system.getCurrentFBP().deploy(inNodeId, wuDeviceId);
+					system.getCurrentFBP().deploy(inNodeId, this);
 					outNode.activate();
-					system.getCurrentFBP().deploy(outNodeId, wuDeviceId);
+					system.getCurrentFBP().deploy(outNodeId, this);
 					
 					//update the current energy consumption
 					currentConsumption = energyConsumption;
@@ -305,7 +305,7 @@ public class WuDevice implements Comparable<WuDevice>{
 			nodes.add(nodeId);
 			Double energyConsumption = getAfterDeploymentEngeryConsumption(nodes);
 			node.activate();
-			system.getCurrentFBP().deploy(nodeId, wuDeviceId);
+			system.getCurrentFBP().deploy(nodeId, this);
 				
 				//update the current energy consumption
 			currentConsumption = energyConsumption;
@@ -326,7 +326,7 @@ public class WuDevice implements Comparable<WuDevice>{
 			nodes.add(nodeId);
 			Double energyConsumption = getAfterDeploymentEngeryConsumption(nodes);
 			node.activate();
-			system.getCurrentFBP().deploy(nodeId, wuDeviceId);
+			system.getCurrentFBP().deploy(nodeId, this);
 				
 			//update the current energy consumption
 			currentConsumption = energyConsumption;

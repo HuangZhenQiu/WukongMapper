@@ -442,9 +442,9 @@ public class WukongSystem {
 							.getWuClassId(), currentEdge.getOutWuClass()
 							.getWuClassId())) {
 						currentEdge.getInWuClass().deploy(
-								currentDevice.getWuDeviceId());
+								currentDevice);
 						currentEdge.getOutWuClass().deploy(
-								currentDevice.getWuDeviceId());
+								currentDevice);
 						currentEdge.merge();
 						deviceQueue.remove(currentDevice);
 						deviceQueue.add(currentDevice);// reorder the priority
@@ -467,9 +467,9 @@ public class WukongSystem {
 
 					if (device.deploy(undeployedClassId)) {
 						currentEdge.getInWuClass().deploy(
-								device.getWuDeviceId());
+								device);
 						currentEdge.getOutWuClass().deploy(
-								device.getWuDeviceId());
+								device);
 						currentEdge.merge();
 						deviceQueue.remove(device);
 						deviceQueue.add(device);
@@ -603,9 +603,9 @@ public class WukongSystem {
 			if (currentDevice.deploy(wuclassId)) {
 
 				if (edge.getInWuClass().getWuClassId() == wuclassId) {
-					edge.getInWuClass().deploy(currentDevice.getWuDeviceId());
+					edge.getInWuClass().deploy(currentDevice);
 				} else {
-					edge.getOutWuClass().deploy(currentDevice.getWuDeviceId());
+					edge.getOutWuClass().deploy(currentDevice);
 				}
 				deviceQueue.remove(currentDevice);
 				deviceQueue.add(currentDevice);// reorder the priority queue.
@@ -623,9 +623,9 @@ public class WukongSystem {
 				// System.out.println("Deploying "+ wuclassId + " to " +
 				// device.getWuDeviceId());
 				if (edge.getInWuClass().getWuClassId() == wuclassId) {
-					edge.getInWuClass().deploy(device.getWuDeviceId());
+					edge.getInWuClass().deploy(device);
 				} else {
-					edge.getOutWuClass().deploy(device.getWuDeviceId());
+					edge.getOutWuClass().deploy(device);
 				}
 				return true;
 			}

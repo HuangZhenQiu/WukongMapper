@@ -16,23 +16,27 @@ public class ScalabilitySimulator {
 	
 	public ScalabilitySimulator() {
 		//WukongProperties.getProperty();
-		this.fbpFactory = new FlowBasedProcessFactory(30, 10, 100 /**distance range**/, 100 /**weight**/);
-		this.wukongFactory = new WuKongSystemFactory(30, 300, 10, 100, 10, 10, false);
+		this.fbpFactory = new FlowBasedProcessFactory(30, 20, 100 /**distance range**/, 100 /**weight**/);
+		this.wukongFactory = new WuKongSystemFactory(20, 100, 10, 100, 10, 10, false);
 	}
 	
 	public void run() {
 		int staticMax = 0;
 		int uniformMax = 0;
 		int optimalMax = 0;
+		float staticMissRatio = 0;
+		float uniformMissRatio = 0;
+		float optimalMissRatio = 0;
 		
 		for (int i = 0; i < 100; i ++) {
-			FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(TYPE.STAR);
+			FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(TYPE.SCALE_FREE);
 			WukongSystem system = wukongFactory.createRandomWuKongSystem();
 			
 			System.out.println("===================================================");
 			
 			StaticMapper staticMapper = new StaticMapper(system, fbp, MapType.WITHOUT_LATENCY);
 			staticMapper.map();
+			staticMissRatio += staticMapper.getMissDeadlineRatio();
 			staticMax += system.getMaxReprogramGateway();
 			
 			System.out.println("===================================================");
@@ -43,6 +47,7 @@ public class ScalabilitySimulator {
 
 			UniformMapper uniformMapper = new UniformMapper(system, fbp, MapType.WITHOUT_LATENCY);
 			uniformMapper.map();
+			uniformMissRatio += uniformMapper.getMissDeadlineRatio();
 			uniformMax += system.getMaxReprogramGateway();
 			
 			System.out.println("===================================================");
@@ -52,12 +57,16 @@ public class ScalabilitySimulator {
 			ScalabilitySelectionMapper optimalMapper = new ScalabilitySelectionMapper(
 					system, fbp, MapType.WITHOUT_LATENCY, false, 20000);
 			optimalMapper.map();
+			optimalMissRatio += optimalMapper.getMissDeadlineRatio();
 			optimalMax += system.getMaxReprogramGateway();
 		}
 		
 		System.out.println("Static Max:" + staticMax);
+		System.out.println("Static Miss Ratio:" + staticMissRatio);
 		System.out.println("Uniform Max:" + uniformMax);
+		System.out.println("Uniform Miss Ratio:" + uniformMissRatio);
 		System.out.println("Optimal Max:" + optimalMax);
+		System.out.println("Optimal Miss Ratio:" + optimalMissRatio);
 	}
 	
 	public static void main(String[] args) {

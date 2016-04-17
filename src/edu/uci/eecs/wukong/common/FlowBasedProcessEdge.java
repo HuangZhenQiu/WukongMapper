@@ -37,7 +37,7 @@ public class FlowBasedProcessEdge implements Comparable<FlowBasedProcessEdge>{
 	public void merge() {
 		
 		if(inWuClass.isDeployed() && outWuClass.isDeployed() 
-				&& inWuClass.getDeviceId() == outWuClass.getDeviceId()) {
+				&& inWuClass.getDevice().getWuDeviceId() == outWuClass.getDevice().getWuDeviceId()) {
 			//this.transmissionEnergy = 0.0;
 			//this.receivingEnergy = 0.0;
 			//this.weight = 0.0;
@@ -111,8 +111,8 @@ public class FlowBasedProcessEdge implements Comparable<FlowBasedProcessEdge>{
 	}
 	
 	public boolean isMerged() {
-		if( (this.getInWuClass().getDeviceId() != -1 )&& (this.getOutWuClass().getDeviceId() != -1)){
-			return this.isMerged || this.getInWuClass().getDeviceId() == this.getOutWuClass().getDeviceId();
+		if( (this.getInWuClass().getDevice().getWuDeviceId() != -1 )&& (this.getOutWuClass().getDevice().getWuDeviceId() != -1)){
+			return this.isMerged || this.getInWuClass().getDevice().getWuDeviceId() == this.getOutWuClass().getDevice().getWuDeviceId();
 		}
 		return false;
 	}
@@ -122,9 +122,9 @@ public class FlowBasedProcessEdge implements Comparable<FlowBasedProcessEdge>{
 			return null;
 		} else {
 			if(inWuClass.isDeployed()) {
-				return inWuClass.getDeviceId();
+				return inWuClass.getDevice().getWuDeviceId();
 			} else {
-				return outWuClass.getDeviceId();
+				return outWuClass.getDevice().getWuDeviceId();
 			}
 		}
 	}

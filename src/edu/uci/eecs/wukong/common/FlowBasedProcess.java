@@ -131,7 +131,8 @@ public class FlowBasedProcess {
 	
 	public void merge() {
 		for(FlowBasedProcessEdge edge : edges) {
-			if(edge.isFullDeployed() && edge.getInWuClass().getDeviceId() == edge.getOutWuClass().getDeviceId())  {
+			if(edge.isFullDeployed() && edge.getInWuClass().getDevice().getWuDeviceId()
+					== edge.getOutWuClass().getDevice().getWuDeviceId())  {
 				edge.merge();
 			}
 		}
@@ -239,7 +240,7 @@ public class FlowBasedProcess {
 				 if (!deviceNeighbor.contains(inEdge.getInWuClass().getWuClassId())) {
 					 
 					 if(!inEdge.isMerged()) {
-						 energyConsumption += channels[inEdge.getInWuClass().getDeviceId()][nodeId] * inEdge.dataVolumn;
+						 energyConsumption += channels[inEdge.getInWuClass().getDevice().getWuDeviceId()][nodeId] * inEdge.dataVolumn;
 					 } 
 				 }
 			}
@@ -253,7 +254,7 @@ public class FlowBasedProcess {
 				 if (!deviceNeighbor.contains(outEdge.getOutWuClass().getWuClassId())) {
 					 
 					 if(!outEdge.isMerged()) {
-						 energyConsumption += channels[nodeId][outEdge.getOutWuClass().getDeviceId()] * outEdge.dataVolumn;
+						 energyConsumption += channels[nodeId][outEdge.getOutWuClass().getDevice().getWuDeviceId()] * outEdge.dataVolumn;
 					 }
 				 }
 			}
@@ -262,10 +263,10 @@ public class FlowBasedProcess {
 		return energyConsumption;
 	}
 	
-	public boolean deploy(int wuClassId, int deviceId) {
+	public boolean deploy(int wuClassId, WuDevice device) {
 		WuClass wuClass = wuClassMap.get(wuClassId);
 		if (wuClass != null) {
-			wuClass.deploy(deviceId);
+			wuClass.deploy(device);
 			return true;
 		}
 		
@@ -286,11 +287,27 @@ public class FlowBasedProcess {
 		return true;
 	}
 	
+	public int getLatencyHop(int maxHop) {
+		if (isDeployed()) {
+			List<Path> paths = getDominatePaths(maxHop);
+			int max = 0;
+			for (Path path : paths) {
+				if (path.getHops() > max) {
+					max = path.getHops();
+				}
+			}
+			
+			return max;
+		}
+		
+		return -1;
+	}
+	
 	public void print() {
 		for(FlowBasedProcessEdge edge : edges) {
 			System.out.println("Edge<" + edge.getInWuClass().getWuClassId() + ", "
 					+ edge.getOutWuClass().getWuClassId() + ">  -->   Device<"
-					+ edge.getInWuClass().getDeviceId() +", " + edge.getOutWuClass().getDeviceId() + ">" + ", data volumn " + edge.getDataVolumn());
+					+ edge.getInWuClass().getDevice().getWuDeviceId() +", " + edge.getOutWuClass().getDevice().getWuDeviceId() + ">" + ", data volumn " + edge.getDataVolumn());
 		}
 	}
 	
@@ -326,8 +343,8 @@ public class FlowBasedProcess {
 		for(FlowBasedProcessEdge edge: getEdges()){
 			if(!edge.isMerged()){
 				
-				int src_device = edge.getInWuClass().getDeviceId();
-				int dst_device = edge.getOutWuClass().getDeviceId();
+				int src_device = edge.getInWuClass().getDevice().getWuDeviceId();
+				int dst_device = edge.getOutWuClass().getDevice().getWuDeviceId();
 				
 				if(src_device != -1 && dst_device != -1) {
 					total += channel[src_device-1] [dst_device-1] * edge.dataVolumn;
@@ -351,7 +368,7 @@ public class FlowBasedProcess {
 			if(edge.getInWuClass().isDeployed() && edge.getOutWuClass().isDeployed()) {
 				if(!edge.isMerged()) {
 					total += Util.getTransmissionEnergyConsumption(edge.getDataVolumn(),
-							system.getDistance(edge.getInWuClass().getDeviceId(), edge.getOutWuClass().getDeviceId()));
+							system.getDistance(edge.getInWuClass().getDevice().getWuDeviceId(), edge.getOutWuClass().getDevice().getWuDeviceId()));
 					total += Util.getReceivingEnergyConsumption(edge.getDataVolumn());
 				}
 			}

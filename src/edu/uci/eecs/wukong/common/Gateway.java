@@ -34,7 +34,7 @@ public class Gateway {
 		while(deviceIter.hasNext()) {
 			WuDevice device = deviceIter.next();
 			if (device.deployComponent(wuClass.getWuClassId())) {
-				wuClass.deploy(device.getWuDeviceId());
+				wuClass.deploy(device);
 				System.out.println("Deploy wuClassId " + wuClass.getWuClassId() + " at device" + device.getWuDeviceId());
 				return true;
 			}
