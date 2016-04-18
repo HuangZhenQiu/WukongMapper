@@ -117,14 +117,7 @@ public class WuKongSystemFactory {
 		/* initial all devices */ 
 		for(int i = 0; i < deviceNumber; i++) {
 			List<Integer> objectIds = new ArrayList<Integer>();
-			WuDevice device;
-			if (withDistance) {
-				device = new WuDevice(i + 1, Double.MAX_VALUE, objectIds,
-					getRandomDistance(landMarkNumber, distanceRange), new ArrayList<Double>(Arrays.asList(distances[i])), system);
-			} else {
-				device = new WuDevice(i + 1, Double.MAX_VALUE, objectIds,
-					getRandomDistance(landMarkNumber, distanceRange), null, system);
-			}
+			WuDevice device = createDevice(i, system, objectIds, distances);
 			devices.add(device);
 			
 			// set gateway
@@ -136,6 +129,28 @@ public class WuKongSystemFactory {
 			ran.setSeed(System.nanoTime() + i * i);
 			int regionId = Math.abs(ran.nextInt()) % regionNumber;
 			regions.get(regionId).addDevice(devices.get(i));
+			
+			// Check out if every region reach average device number
+			if (i % 10 == 0) {
+				int avr =  i / regions.size();
+				for (Region region : regions) {
+					if (region.getDeviceNumber() < avr) {
+						i ++;
+						
+						objectIds = new ArrayList<Integer>();
+						device = createDevice(i, system, objectIds, distances);
+						devices.add(device);
+						
+						// set gateway
+						ran.setSeed(System.nanoTime() + i * i);
+						gatewayId = Math.abs(ran.nextInt()) % gatewayNumber;
+						gateways.get(gatewayId).addDevice(device);
+						
+						// set region
+						region.addDevice(device);
+					}
+				}
+			} 
 		}
 		
 		
@@ -185,6 +200,20 @@ public class WuKongSystemFactory {
 		
 		system.initialize(devices, regions, gateways, distances, false, classNumber, landMarkNumber);
 		return system;
+	}
+	
+	
+	private WuDevice createDevice(int i, WukongSystem system, List<Integer> objectIds, Double[][] distances) {
+		WuDevice device;
+		if (withDistance) {
+			device = new WuDevice(i + 1, Double.MAX_VALUE, objectIds,
+				getRandomDistance(landMarkNumber, distanceRange), new ArrayList<Double>(Arrays.asList(distances[i])), system);
+		} else {
+			device = new WuDevice(i + 1, Double.MAX_VALUE, objectIds,
+				getRandomDistance(landMarkNumber, distanceRange), null, system);
+		}
+		
+		return device;
 	}
 	
 	public WukongSystem createRandomWuKongSystem() {

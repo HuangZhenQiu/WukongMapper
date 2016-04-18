@@ -34,7 +34,7 @@ public class StaticMapper extends AbstractMapper {
 				Region region = regIter.next();
 				for (WuClass wuClass : this.fbp.getAllComponents()) {
 					if (!region.hostFirstDevice(wuClass)) {
-						System.out.println("Mapping fail in Region " + region.getRegionId());
+						// System.out.println("Mapping fail in Region " + region.getRegionId());
 						success = false;
 						break;
 					}

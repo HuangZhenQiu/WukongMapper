@@ -546,11 +546,14 @@ public class FlowBasedProcess {
 			if (isEndNode(lastNode)) {
 				if ((path.getLength() - 1) * 2 <= maxHop) {
 					// Don't need to consider the nondominant path
-					System.out.println("Find a too short path:" + transformToPath(path).toString());
+					//System.out.println("Find a too short path:" + transformToPath(path).toString());
 				} else if (path.getLength() <= maxHop + 1) {
 					paths.add(transformToPath(path));
+					// System.out.println("Find dominant path:" + transformToPath(path).toString());
 				} else {
-					System.out.println("Find a too long path:" + transformToPath(path).toString());
+					// System.out.println("Find a too long path:" + transformToPath(path).toString());
+					paths.clear(); // In this case, we don't consider runtime latency constraint
+					return paths;
 				}
 			} else {
 				for (DefaultEdge edge : graph.outgoingEdgesOf(lastNode)) {

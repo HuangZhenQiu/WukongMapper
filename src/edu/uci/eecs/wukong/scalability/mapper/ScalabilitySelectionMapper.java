@@ -180,10 +180,13 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 			if(result.getBoolean(variableId) && Util.isMappingVariable(variableId)) {
 				Integer wuClassId = Util.getWuClassIdFromVariableId(variableId);
 				Integer wuDeviceId = Util.getWuDeviceIdFromVariableId(variableId);
-				System.out.println("Deploy wuClassId " + wuClassId + " at device" + wuDeviceId);
+				// System.out.println("Deploy wuClassId " + wuClassId + " at device" + wuDeviceId);
 				system.deployComponent(wuDeviceId, wuClassId);
 				fbp.getWuClass(wuClassId).deploy(system.getDevice(wuDeviceId));
 			}
+		}
+		if (!fbp.isDeployed()) {
+			System.out.println("Didn't find feasible solution!!!");
 		}
 		
 		latencyHops.add(fbp.getLatencyHop(MAX_HOP));
@@ -236,6 +239,9 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 								Util.generateVariableId(classes.get(i + 1).getWuClassId(), pair.end.getWuDeviceId());
 						String transformed = Util.generateTransformedVariableId(classes.get(i).getWuClassId(), pair.start.getWuDeviceId(),
 								classes.get(i+1).getWuClassId(), pair.end.getWuDeviceId());
+						this.variables.put(sourceVariable, sourceVariable);
+						this.variables.put(destVariable, destVariable);
+						this.transformedVariables.put(transformed, transformed);
 						Util.applyTransformedConstraints(problem, sourceVariable, destVariable, transformed);
 						linear.add(1, transformed);
 					}
@@ -250,6 +256,9 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 								Util.generateVariableId(classes.get(i + 1).getWuClassId(), pair.end.getWuDeviceId());
 						String transformed = Util.generateTransformedVariableId(classes.get(i).getWuClassId(), pair.start.getWuDeviceId(),
 								classes.get(i+1).getWuClassId(), pair.end.getWuDeviceId());
+						this.variables.put(sourceVariable, sourceVariable);
+						this.variables.put(destVariable, destVariable);
+						this.transformedVariables.put(transformed, transformed);
 						Util.applyTransformedConstraints(problem, sourceVariable, destVariable, transformed);
 						linear.add(2, transformed);
 					}

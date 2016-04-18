@@ -17,7 +17,7 @@ public class ScalabilitySimulator {
 	public ScalabilitySimulator() {
 		//WukongProperties.getProperty();
 		this.fbpFactory = new FlowBasedProcessFactory(30, 30, 100 /**distance range**/, 100 /**weight**/);
-		this.wukongFactory = new WuKongSystemFactory(30, 300, 10, 100, 10, 10, false);
+		this.wukongFactory = new WuKongSystemFactory(30, 100, 10, 100, 10, 10, false);
 	}
 	
 	public void run() {
@@ -30,46 +30,64 @@ public class ScalabilitySimulator {
 		float optimalMissRatio = 0;
 		float optimalWithRunTimeMissRatio = 0;
 		
-		for (int i = 0; i < 10; i ++) {
-			FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(TYPE.SCALE_FREE);
+		for (int i = 0; i < 100;) {
+			FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(TYPE.RANDOM);
 			WukongSystem system = wukongFactory.createRandomWuKongSystem();
 			
-			System.out.println("===================================================");
+			if (!fbp.getDominatePaths(10).isEmpty()) {
 			
-			StaticMapper staticMapper = new StaticMapper(system, fbp, MapType.WITHOUT_LATENCY);
-			staticMapper.map();
-			staticMissRatio += staticMapper.getMissDeadlineRatio();
-			staticMax += system.getMaxReprogramGateway();
-			
-			System.out.println("===================================================");
-			
-			fbp.reset();
-			system.reset();
-			
+				System.out.println("===================================================");
+				
+				
+				ScalabilitySelectionMapper optimalRunTimeMapper = new ScalabilitySelectionMapper(
+						system, fbp, MapType.WITH_LATENCY, false, 20000);
+				
+				optimalRunTimeMapper.map();
+				optimalRunTimeMapper.printLatencyHops();
+				// If there is a tractable result
+				if (optimalRunTimeMapper.getMissDeadlineRatio() == 0) {
 
-			UniformMapper uniformMapper = new UniformMapper(system, fbp, MapType.WITHOUT_LATENCY);
-			uniformMapper.map();
-			uniformMissRatio += uniformMapper.getMissDeadlineRatio();
-			uniformMax += system.getMaxReprogramGateway();
-			
-			System.out.println("===================================================");
-			
-			fbp.reset();
-			system.reset();
-			ScalabilitySelectionMapper optimalMapper = new ScalabilitySelectionMapper(
-					system, fbp, MapType.WITHOUT_LATENCY, false, 20000);
-			optimalMapper.map();
-			optimalMissRatio += optimalMapper.getMissDeadlineRatio();
-			optimalMax += system.getMaxReprogramGateway();
-			
-			
-			fbp.reset();
-			system.reset();
-			optimalMapper = new ScalabilitySelectionMapper(
-					system, fbp, MapType.WITH_LATENCY, false, 20000);
-			optimalMapper.map();
-			optimalWithRunTimeMissRatio += optimalMapper.getMissDeadlineRatio();
-			optimalWithRunTime += system.getMaxReprogramGateway();
+					optimalWithRunTimeMissRatio += optimalRunTimeMapper.getMissDeadlineRatio();
+					optimalWithRunTime += system.getMaxReprogramGateway();
+					
+					System.out.println("===================================================");
+					
+					
+					fbp.reset();
+					system.reset();
+					
+					StaticMapper staticMapper = new StaticMapper(system, fbp, MapType.WITHOUT_LATENCY);
+					staticMapper.map();
+					staticMapper.printLatencyHops();
+					staticMissRatio += staticMapper.getMissDeadlineRatio();
+					staticMax += system.getMaxReprogramGateway();
+					
+					System.out.println("===================================================");
+					
+					fbp.reset();
+					system.reset();
+					
+		
+					UniformMapper uniformMapper = new UniformMapper(system, fbp, MapType.WITHOUT_LATENCY);
+					uniformMapper.map();
+					uniformMapper.printLatencyHops();
+					uniformMissRatio += uniformMapper.getMissDeadlineRatio();
+					uniformMax += system.getMaxReprogramGateway();
+					
+					System.out.println("===================================================");
+					
+					fbp.reset();
+					system.reset();
+					ScalabilitySelectionMapper optimalMapper = new ScalabilitySelectionMapper(
+							system, fbp, MapType.WITHOUT_LATENCY, false, 20000);
+					optimalMapper.map();
+					optimalMapper.printLatencyHops();
+					optimalMissRatio += optimalMapper.getMissDeadlineRatio();
+					optimalMax += system.getMaxReprogramGateway();
+					
+					i++;
+				}
+			}
 		}
 		
 		System.out.println("Static Max:" + staticMax);

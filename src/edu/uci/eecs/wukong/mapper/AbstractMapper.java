@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.uci.eecs.wukong.common.FlowBasedProcess;
+import edu.uci.eecs.wukong.common.WuClass;
 import edu.uci.eecs.wukong.common.WukongSystem;
 
 public abstract class AbstractMapper implements Mapper {
@@ -37,6 +38,19 @@ public abstract class AbstractMapper implements Mapper {
 		}
 		
 		return missCounter / latencyHops.size();
+	}
+	
+	public void printLatencyHops() {
+		StringBuilder builder = new StringBuilder("[");
+		for (int i = 0; i < latencyHops.size(); i++) {
+			if (i != latencyHops.size() - 1) {
+				builder.append(latencyHops.get(i) + ",");
+			} else {
+				builder.append(latencyHops.get(i) + "]");
+			}
+		}
+		
+		System.out.println(builder.toString());
 	}
 
 }
