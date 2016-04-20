@@ -169,8 +169,8 @@ public class WukongSystem {
 		return deviceMap.get(wudeviceId);
 	}
 	
-	public void deployComponent(int wuDeviceId, int wuClassId) {
-		deviceMap.get(wuDeviceId).deployComponent(wuClassId);
+	public void deployComponent(int wuDeviceId, WuClass wuClass) {
+		deviceMap.get(wuDeviceId).deployComponent(wuClass);
 	}
 
 	// read data from file

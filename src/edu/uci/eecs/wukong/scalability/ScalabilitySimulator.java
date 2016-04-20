@@ -16,8 +16,8 @@ public class ScalabilitySimulator {
 	
 	public ScalabilitySimulator() {
 		//WukongProperties.getProperty();
-		this.fbpFactory = new FlowBasedProcessFactory(30, 30, 100 /**distance range**/, 100 /**weight**/);
-		this.wukongFactory = new WuKongSystemFactory(30, 100, 10, 100, 10, 10, false);
+		this.fbpFactory = new FlowBasedProcessFactory(10, 10, 2, 100 /**distance range**/, 100 /**weight**/);
+		this.wukongFactory = new WuKongSystemFactory(30, 200, 10, 100, 10, 10, false);
 	}
 	
 	public void run() {
@@ -25,10 +25,12 @@ public class ScalabilitySimulator {
 		int uniformMax = 0;
 		int optimalMax = 0;
 		int optimalWithRunTime = 0;
+		int roundUpMax = 0;
 		float staticMissRatio = 0;
 		float uniformMissRatio = 0;
 		float optimalMissRatio = 0;
 		float optimalWithRunTimeMissRatio = 0;
+		float roundUpMissRatio = 0;
 		
 		for (int i = 0; i < 100;) {
 			FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(TYPE.RANDOM);
@@ -85,6 +87,15 @@ public class ScalabilitySimulator {
 					optimalMissRatio += optimalMapper.getMissDeadlineRatio();
 					optimalMax += system.getMaxReprogramGateway();
 					
+					System.out.println("===================================================");
+					fbp.reset();
+					system.reset();
+					ScalabilitySelectionMapper roundUpMapper = new ScalabilitySelectionMapper(
+							system, fbp, MapType.WITH_LATENCY, true, 20000);
+					roundUpMapper.map();
+					roundUpMissRatio += roundUpMapper.getMissDeadlineRatio();
+					roundUpMax += system.getMaxReprogramGateway();
+					
 					i++;
 				}
 			}
@@ -98,6 +109,8 @@ public class ScalabilitySimulator {
 		System.out.println("Optimal Miss Ratio:" + optimalMissRatio);
 		System.out.println("Optimal With Runtime Max:" + optimalWithRunTime);
 		System.out.println("Optimal With Runtime Miss Ratio:" + optimalWithRunTimeMissRatio);
+		System.out.println("Roundup Max:" + roundUpMax);
+		System.out.println("Roundup Runtime Miss Ratio:" + roundUpMissRatio);
 	}
 	
 	public static void main(String[] args) {

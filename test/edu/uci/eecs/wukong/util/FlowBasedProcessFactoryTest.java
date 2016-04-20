@@ -19,7 +19,7 @@ public class FlowBasedProcessFactoryTest extends TestCase{
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		factory = new FlowBasedProcessFactory(20, 20, 10, 50);
+		factory = new FlowBasedProcessFactory(20, 20, 4, 10, 50);
 	}
 	
 	@Test

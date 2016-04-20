@@ -38,48 +38,50 @@ public class UniformMapper extends AbstractMapper {
 			System.out.println("Deploy in zone " + zone.getZoneId());
 			while (regIter.hasNext()) {
 				Region region = regIter.next();
-				List<Gateway> gateways = region.getAllGateways();
-				for (WuClass wuClass : this.fbp.getAllComponents()) {
-					int time = 0;
-					while (!wuClass.isDeployed() &&  time < 50) {
-						int gatewayIndex = Math.abs(random.nextInt() % gateways.size());
-						Gateway gateway = gateways.get(gatewayIndex);
-						if (gateway.deploy(wuClass)) {
-							break;
-						}
-						time ++;
-					}
-					
-					List<WuDevice> devices = region.getHostableDevice(wuClass.getWuClassId());
-					time = 0;
-					while(!wuClass.isDeployed() && time < 50) {
-						int deviceIndex = Math.abs(random.nextInt() % devices.size());
-						WuDevice device = devices.get(deviceIndex);
-						if (device.deployComponent(wuClass.getWuClassId())) {
-							break;
-						}
-						time ++;
-					}
-					
-					if (!wuClass.isDeployed()) {
-						// In worst case
-						for (WuDevice device : devices) {
-							if (device.deployComponent(wuClass.getWuClassId())) {
+				if (region.deployable(fbp)) { 
+					List<Gateway> gateways = region.getAllGateways();
+					for (WuClass wuClass : this.fbp.getAllComponents()) {
+						int time = 0;
+						while (!wuClass.isDeployed() &&  time < 50) {
+							int gatewayIndex = Math.abs(random.nextInt() % gateways.size());
+							Gateway gateway = gateways.get(gatewayIndex);
+							if (gateway.deploy(wuClass)) {
 								break;
 							}
+							time ++;
+						}
+						
+						List<WuDevice> devices = region.getHostableDevice(wuClass.getWuClassId());
+						time = 0;
+						while(!wuClass.isDeployed() && time < 50) {
+							int deviceIndex = Math.abs(random.nextInt() % devices.size());
+							WuDevice device = devices.get(deviceIndex);
+							if (device.deployComponent(wuClass)) {
+								break;
+							}
+							time ++;
 						}
 						
 						if (!wuClass.isDeployed()) {
-							success = false;
-							System.out.println("Can't find mapping for Component "
-									+ wuClass.getWuClassId() + " in region " + region.getRegionId()
-									+ " congestion zone " + zone.getZoneId());
+							// In worst case
+							for (WuDevice device : devices) {
+								if (device.deployComponent(wuClass)) {
+									break;
+								}
+							}
+							
+							if (!wuClass.isDeployed()) {
+								success = false;
+								System.out.println("Can't find mapping for Component "
+										+ wuClass.getWuClassId() + " in region " + region.getRegionId()
+										+ " congestion zone " + zone.getZoneId());
+							}
 						}
 					}
+	
+					latencyHops.add(fbp.getLatencyHop(MAX_HOP));
+					fbp.reset();
 				}
-
-				latencyHops.add(fbp.getLatencyHop(MAX_HOP));
-				fbp.reset();
 			}
 		}
 		

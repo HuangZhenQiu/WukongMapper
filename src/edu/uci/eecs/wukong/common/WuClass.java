@@ -7,11 +7,11 @@ public class WuClass {
 	private int wuClassId;
 	private WuDevice wudevice;
 	private LocationConstraint locationConstraint;
+	private boolean virtual;
 	private boolean deployed;
 	private Double energyCost; //It is used after merge.
 
 
-	
 	public WuClass(int wuClassId, LocationConstraint locationConstraint) {
 		this.wuClassId = wuClassId;
 		this.wudevice = null;
@@ -25,6 +25,14 @@ public class WuClass {
 		this.deployed = false;
 		this.wudevice = null;
 		this.energyCost = 0.0;
+	}
+	
+	public boolean isVirtual() {
+		return this.virtual;
+	}
+	
+	public void setVirtual(boolean virtual) {
+		this.virtual = virtual;
 	}
 	
 	public void deploy(WuDevice device) {

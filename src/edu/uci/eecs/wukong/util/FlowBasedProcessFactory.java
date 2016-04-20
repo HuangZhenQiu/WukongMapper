@@ -1,6 +1,7 @@
 package edu.uci.eecs.wukong.util;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,15 +22,18 @@ public class FlowBasedProcessFactory {
 	
 	private int landMarkNumber;
 	private int classNumber;
+	private int virtualNumber;
 	private int distanceRange;
 	private int dataVolumnRange;
+	private Random random = new Random();
 	
 	private GraphGenerator generator;
 	
-	public FlowBasedProcessFactory(int landMarkNumber, int classNumber,
+	public FlowBasedProcessFactory(int landMarkNumber, int classNumber, int virtualNumber,
 			int distanceRange, int dataVolumnRange) {
 		this.landMarkNumber = landMarkNumber;
 		this.classNumber = classNumber;
+		this.virtualNumber = virtualNumber;
 		this.distanceRange = distanceRange;
 		this.dataVolumnRange = dataVolumnRange;
 		this.generator = new GraphGenerator();
@@ -43,22 +47,23 @@ public class FlowBasedProcessFactory {
 	public FlowBasedProcess createFlowBasedProcess(TYPE type) {
 		
 		SimpleDirectedGraph<Object, DefaultEdge> graph;
-		
+
+		int number = Math.abs(random.nextInt() %(classNumber / 2));
 		switch (type) {
 			case LINEAR:
-				graph = generator.generateLinearGraph(classNumber / 2);
+				graph = generator.generateLinearGraph(classNumber / 2 + number);
 				break;
 			case STAR:
-				graph = generator.generateStarGraph(classNumber / 2);
+				graph = generator.generateStarGraph(classNumber / 2 + number);
 				break;
 			case RANDOM:
-				graph = generator.generateRandomGraph(classNumber / 2 , classNumber / 2 - 1);			
+				graph = generator.generateRandomGraph(classNumber / 2 + number , classNumber / 2 + number - 1);			
 				break;
 			case SCALE_FREE:
-				graph = generator.generateScaleFreeGraph(classNumber / 2);
+				graph = generator.generateScaleFreeGraph(classNumber / 2 + number);
 				break;
 			default:
-				graph = generator.generateRandomGraph(classNumber, classNumber - 1);
+				graph = generator.generateRandomGraph(classNumber/2 + number, classNumber/ 2 + number - 1);
 			
 		}
 		
@@ -70,6 +75,16 @@ public class FlowBasedProcessFactory {
 			WuClass wuclass = classIterator.next();
 			if(ifExistInEdges(wuclass, edges)){
 				classMap.put(wuclass.getWuClassId(), wuclass);
+			}
+		}
+		
+		Object[] wuclasses = classMap.values().toArray();
+		for(int i = 0; i < virtualNumber;) {
+			int index = Math.abs(random.nextInt() % wuclasses.length);
+			WuClass wuClass = (WuClass) wuclasses[index];
+			if(!wuClass.isVirtual()) {
+				wuClass.setVirtual(true);
+				i++;
 			}
 		}
 		

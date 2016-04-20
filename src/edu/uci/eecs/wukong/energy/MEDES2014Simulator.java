@@ -61,7 +61,7 @@ public class MEDES2014Simulator {
 	public void run(int iteration, int deviceNumber, int classNumber, int transmissionWeight, TYPE fbpType, int K) {
 		
 		this.fbpFactory =
-				new FlowBasedProcessFactory(10 /* landmark number */, classNumber /* class number */, 100 /* distance range */, transmissionWeight /* weight */);
+				new FlowBasedProcessFactory(10 /* landmark number */, classNumber /* class number */, 4, 100 /* distance range */, transmissionWeight /* weight */);
 		this.wukongFactory =
 				new WuKongSystemFactory(classNumber /* class number */, deviceNumber /* device number */, 10 /* landmark number */, 100 /* distance range */, 0, 0, true);
 		

@@ -104,7 +104,7 @@ public class WuKongSystemFactory {
 		
 		// create regions
 		for (int i = 0; i < regionNumber; i++) {
-			Region region = new Region();
+			Region region = new Region(system);
 			regions.add(region);
 		}
 		
@@ -217,7 +217,7 @@ public class WuKongSystemFactory {
 	}
 	
 	public WukongSystem createRandomWuKongSystem() {
-		return createRandomWukongSystem(5, 3);
+		return createRandomWukongSystem(3, 2);
 	}
 	
 	public WukongSystem createRandomMultiProtocolWuKongSystem(int numberChannel){

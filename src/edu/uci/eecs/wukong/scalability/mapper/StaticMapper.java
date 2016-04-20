@@ -32,16 +32,18 @@ public class StaticMapper extends AbstractMapper {
 			Iterator<Region> regIter = zone.getRegions().iterator();
 			while (regIter.hasNext()) {
 				Region region = regIter.next();
-				for (WuClass wuClass : this.fbp.getAllComponents()) {
-					if (!region.hostFirstDevice(wuClass)) {
-						// System.out.println("Mapping fail in Region " + region.getRegionId());
-						success = false;
-						break;
-					}
-				}	
-				
-				latencyHops.add(fbp.getLatencyHop(MAX_HOP));
-				fbp.reset();
+				if (region.deployable(fbp)) { 
+					for (WuClass wuClass : this.fbp.getAllComponents()) {
+						if (!region.hostFirstDevice(wuClass)) {
+							// System.out.println("Mapping fail in Region " + region.getRegionId());
+							success = false;
+							break;
+						}
+					}	
+					
+					latencyHops.add(fbp.getLatencyHop(MAX_HOP));
+					fbp.reset();
+				}
 			}
 		}
 		

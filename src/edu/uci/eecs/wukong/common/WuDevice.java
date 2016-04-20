@@ -20,7 +20,7 @@ public class WuDevice implements Comparable<WuDevice>{
 
 	private int wuDeviceId;
 	private List<WuObject> wuObjects;
-//	private HashMap<Integer, WuObject> wuObjectMap;
+	private List<WuObject> virtualObjects;
 	private WukongSystem system;
 	private Gateway gateway;
 	private Region region;
@@ -48,7 +48,7 @@ public class WuDevice implements Comparable<WuDevice>{
 		this.initialConsumption = 0.0;
 		this.currentConsumption = 0.0;
 		this.wuObjects = new ArrayList<WuObject>();
-//		this.wuObjectMap = new HashMap<Integer, WuObject>();
+		this.virtualObjects = new ArrayList<WuObject>();
 		this.distances = new ArrayList<Double>();
 		this.deviceDistances = new ArrayList<Double>();
 		this.system = system;
@@ -71,10 +71,14 @@ public class WuDevice implements Comparable<WuDevice>{
 	}
 	
 	public boolean isEnabled() {
-		for(WuObject object : wuObjects) {
+		for (WuObject object : wuObjects) {
 			if (object.isActive()) {
 				return true;
 			}
+		}
+		
+		if (!this.virtualObjects.isEmpty()) {
+			return true;
 		}
 		
 		return false;
@@ -94,7 +98,7 @@ public class WuDevice implements Comparable<WuDevice>{
 		this.currentConsumption = 0.0;
 		this.initialConsumption = 0.0;
 		this.wuObjects = new ArrayList<WuObject>();
-//		this.wuObjectMap = new HashMap<Integer, WuObject>();
+		this.virtualObjects = new ArrayList<WuObject>();
 		this.distances = distances;
 		this.deviceDistances = deviceDistances;
 		this.system = system;
@@ -102,7 +106,6 @@ public class WuDevice implements Comparable<WuDevice>{
 		for (Integer wuclassId: wuClassIds) {
 			WuObject wuObject = new WuObject(wuclassId, this);
 			wuObjects.add(wuObject);
-//			wuObjectMap.put(id, object);
 		}
 		
 	}
@@ -115,6 +118,13 @@ public class WuDevice implements Comparable<WuDevice>{
 			}
 		}
 		
+		// add the consideration of virtual wuclass
+		for (WuClass wuClass : fbp.getAllComponents()) {
+			if (wuClass.isVirtual()) {
+				builder.add(wuClass);
+			}
+		}
+		
 		return builder.build();
 	}
 	
@@ -123,12 +133,18 @@ public class WuDevice implements Comparable<WuDevice>{
 			object.deactivate();
 		}
 		
+		this.virtualObjects.clear();
 		this.currentConsumption = 0.0;
 	}
 	
-	public boolean deployComponent(Integer wuClassId) {
+	public boolean deployComponent(WuClass wuClass) {
+		if (wuClass.isVirtual()) {
+			this.virtualObjects.add(new WuObject(wuClass.getWuClassId(), this));
+			return true;
+		}
+		
 		for (WuObject object : wuObjects) {
-			if (object.getWuClassId() == wuClassId &&
+			if (object.getWuClassId() == wuClass.getWuClassId() &&
 					! object.isActive()) {
 				object.activate();
 				return true;
@@ -295,8 +311,6 @@ public class WuDevice implements Comparable<WuDevice>{
 			this.wuObjects.add(object);
 		}
 	}
-	
-	
 	
 	public boolean deploy(Integer nodeId, int[][] channels) {
 		WuObject node = getWuObject(nodeId);

@@ -138,6 +138,18 @@ public class FlowBasedProcess {
 		}
 	}
 	
+	public ImmutableList<WuClass> getVirtualWuClasses() {
+		ImmutableList.Builder<WuClass> builder = ImmutableList.<WuClass>builder();
+		
+		for (WuClass wuclass : this.wuClassMap.values()) {
+			if (wuclass.isVirtual()) {
+				builder.add(wuclass);
+			}
+		}
+		
+		return builder.build();
+	}
+	
 	public ImmutableList<FlowBasedProcessEdge> getMergedEdges() {
 		ImmutableList.Builder<FlowBasedProcessEdge> builder = ImmutableList.<FlowBasedProcessEdge>builder();
 		
@@ -588,7 +600,7 @@ public class FlowBasedProcess {
 	}
 	
 	public static void main(String[] args) {
-		FlowBasedProcessFactory factory = new FlowBasedProcessFactory(10, 50, 10, 20);
+		FlowBasedProcessFactory factory = new FlowBasedProcessFactory(10, 50, 10, 10, 20);
 		FlowBasedProcess fbp = factory.createFlowBasedProcess(TYPE.RANDOM);
 		List<Path> paths = fbp.getDominatePaths(10);
 		for (Path path : paths) {

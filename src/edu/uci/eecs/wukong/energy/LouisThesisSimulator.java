@@ -20,7 +20,7 @@ public class LouisThesisSimulator {
 	public LouisThesisSimulator() {
 		// WukongProperties.getProperty();
 		this.fbpFactory =
-				new FlowBasedProcessFactory(10 /* landmark number */, 20 /* class number */, 100 /* distance range */, 100 /* weight */);
+				new FlowBasedProcessFactory(10 /* landmark number */, 20 /* class number */, 4, 100 /* distance range */, 100 /* weight */);
 		this.wukongFactory =
 				new WuKongSystemFactory(20 /* class number */, 10 /* device number */, 10 /* landmark number */, 100 /* distance range */, 0, 0, true);
 	}

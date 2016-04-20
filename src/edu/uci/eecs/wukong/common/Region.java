@@ -15,6 +15,7 @@ import java.util.Set;
 public class Region {
 	private static int id = 0;
 	private int regionId;
+	private WukongSystem system;
 	private Map<Integer, WuDevice> deviceMap;
 	private List<WuDevice> devices;
 	private Map<Integer, List<WuDevice>> classToDeviceMap;
@@ -30,12 +31,24 @@ public class Region {
 		}
 	}
 	   
-	public Region() {
+	public Region(WukongSystem system) {
 		this.regionId = id ++;
 		this.deviceMap = new HashMap<Integer, WuDevice> ();
 		this.devices = new ArrayList<WuDevice> ();
 		this.gateways = new HashSet<Gateway> ();
+		this.system = system;
 		this.classToDeviceMap = new HashMap<Integer, List<WuDevice>> ();
+	}
+	
+	public boolean deployable(FlowBasedProcess fbp) {
+		
+		for (WuClass wuClass : fbp.getAllComponents()) {
+			if (!classToDeviceMap.containsKey(wuClass.getWuClassId())) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	
@@ -106,7 +119,7 @@ public class Region {
 	public boolean hostFirstDevice(WuClass wuClass) {
 		if (classToDeviceMap.containsKey(wuClass.getWuClassId())) {
 			for (WuDevice device : classToDeviceMap.get(wuClass.getWuClassId())) {
-				if (device.deployComponent(wuClass.getWuClassId())) {
+				if (device.deployComponent(wuClass)) {
 					System.out.println("Deploy wuClassId " + wuClass.getWuClassId() + " at device" + device.getWuDeviceId());
 					wuClass.deploy(device);
 					return true;
