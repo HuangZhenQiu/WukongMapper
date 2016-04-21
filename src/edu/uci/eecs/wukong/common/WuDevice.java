@@ -62,6 +62,18 @@ public class WuDevice implements Comparable<WuDevice>{
 		return this.region;
 	}
 	
+	public void removeObject(WuClass wuclass) {
+		List<WuObject> removed = new ArrayList<WuObject> ();
+		for (WuObject object : wuObjects) {
+			if (object.getWuClassId().equals(wuclass.getWuClassId())) {
+				removed.add(object);
+			}
+		}
+		
+		wuObjects.removeAll(removed);
+		this.region.removeDeviceForClass(wuclass.getWuClassId(), this);
+	}
+	
 	public void setGateway(Gateway gateway) {
 		this.gateway = gateway;
 	}

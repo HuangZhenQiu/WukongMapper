@@ -217,7 +217,7 @@ public class WuKongSystemFactory {
 	}
 	
 	public WukongSystem createRandomWuKongSystem() {
-		return createRandomWukongSystem(3, 2);
+		return createRandomWukongSystem(5, 3);
 	}
 	
 	public WukongSystem createRandomMultiProtocolWuKongSystem(int numberChannel){

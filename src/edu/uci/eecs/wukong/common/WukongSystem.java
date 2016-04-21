@@ -117,6 +117,14 @@ public class WukongSystem {
 		}
 	}
 	
+	public void removeVirtualWuClass(FlowBasedProcess fbp) {
+		for (WuClass wuClass : fbp.getVirtualWuClasses()) {
+			for (WuDevice device : devices) {
+				device.removeObject(wuClass);
+			}
+		}
+	}
+	
 	/**
 	 * Given a FlowBasedProcess, find out all of the distinguish congestion zones
 	 * that each of them will be mapping target.

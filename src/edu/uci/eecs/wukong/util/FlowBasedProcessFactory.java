@@ -79,7 +79,7 @@ public class FlowBasedProcessFactory {
 		}
 		
 		Object[] wuclasses = classMap.values().toArray();
-		for(int i = 0; i < virtualNumber;) {
+		for(int i = 0; i < Math.min(wuclasses.length, virtualNumber);) {
 			int index = Math.abs(random.nextInt() % wuclasses.length);
 			WuClass wuClass = (WuClass) wuclasses[index];
 			if(!wuClass.isVirtual()) {

@@ -16,7 +16,7 @@ public class ScalabilityWithoutRuntimeConstraintSimulator {
 	
 	public ScalabilityWithoutRuntimeConstraintSimulator() {
 		//WukongProperties.getProperty();
-		this.fbpFactory = new FlowBasedProcessFactory(30, 10, 2, 100 /**distance range**/, 100 /**weight**/);
+		this.fbpFactory = new FlowBasedProcessFactory(30, 30, 6, 100 /**distance range**/, 100 /**weight**/);
 		this.wukongFactory = new WuKongSystemFactory(30, 100, 10, 100, 10, 10, false);
 	}
 	
@@ -31,6 +31,8 @@ public class ScalabilityWithoutRuntimeConstraintSimulator {
 		for (int i = 0; i < 100; i++) {
 			FlowBasedProcess fbp = fbpFactory.createFlowBasedProcess(TYPE.RANDOM);
 			WukongSystem system = wukongFactory.createRandomWuKongSystem();
+			
+			system.removeVirtualWuClass(fbp);
 					
 			StaticMapper staticMapper = new StaticMapper(system, fbp, MapType.WITHOUT_LATENCY);
 			staticMapper.map();

@@ -134,11 +134,21 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 			for (WuDevice device : devices) {
 				String deviceVariable = Util.generateDeviceVariable(device.getWuDeviceId());
 				List<String> wuClassVariables = new ArrayList<String> ();
+				
+				// Physical WuObjects needed in the fbp
 				for (WuClass wuClass : device.getHostableWuClass(fbp)) {
 					String wuClassVariable = Util.generateVariableId(wuClass.getWuClassId(), device.getWuDeviceId());
 					wuClassVariables.add(wuClassVariable);
 					variables.put(wuClassVariable, wuClassVariable);
 				}
+				
+				// Virtual WuClass can be deployed to any wuclass
+				for (WuClass virtualClass : fbp.getVirtualWuClasses()) {
+					String wuClassVariable = Util.generateVariableId(virtualClass.getWuClassId(), device.getWuDeviceId());
+					wuClassVariables.add(wuClassVariable);
+					variables.put(wuClassVariable, wuClassVariable);
+				}
+				
 				applyDeviceConstraint(deviceVariable, wuClassVariables, problem);
 				variables.put(deviceVariable, deviceVariable);
 				linear.add(1, deviceVariable);
@@ -206,7 +216,7 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 			}	
 		}
 
-		if (!fbp.isDeployed()) {
+		if (!fbp.isPhyscallyDeployed()) {
 			System.out.println("Didn't find feasible solution!!!");
 		}
 		
@@ -257,31 +267,34 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 	protected void applyRegionWuClassConstraints(CongestionZone zone, Problem problem) {
 		Iterator<Region> regIter = zone.getRegions().iterator();
 		
-		// Physical WuClass
+
 		while (regIter.hasNext()) {
 			Region region = regIter.next();
 			Map<Integer, List<WuDevice>> map = region.getWuClassToDeviceMap();
+			// Physical WuClass
 			for(WuClass wuClass : fbp.getAllComponents()) {
-				List<WuDevice> devices = map.get(wuClass.getWuClassId());
+				if (!wuClass.isVirtual()) {
+					List<WuDevice> devices = map.get(wuClass.getWuClassId());
+					Linear linear = new Linear();
+					for(WuDevice device : devices) {
+						String varName = Util.generateVariableId(wuClass.getWuClassId(), device.getWuDeviceId());
+						linear.add(1, varName);
+						variables.put(varName, varName);
+					}
+					problem.add(linear, Operator.EQ, 1);
+				}
+			}
+			
+			// Virtual WuClass
+			for (WuClass virtualClass : fbp.getVirtualWuClasses()) {
 				Linear linear = new Linear();
-				for(WuDevice device : devices) {
-					String varName = Util.generateVariableId(wuClass.getWuClassId(), device.getWuDeviceId());
+				for (WuDevice device : region.getAllDevices()) {
+					String varName = Util.generateVariableId(virtualClass.getWuClassId(), device.getWuDeviceId());
 					linear.add(1, varName);
 					variables.put(varName, varName);
 				}
 				problem.add(linear, Operator.EQ, 1);
 			}
-		}
-		
-		// Virtual WuClass
-		for (WuClass virtualClass : fbp.getVirtualWuClasses()) {
-			Linear linear = new Linear();
-			for (WuDevice device : system.getDevices()) {
-				String varName = Util.generateVariableId(virtualClass.getWuClassId(), device.getWuDeviceId());
-				linear.add(1, varName);
-				variables.put(varName, varName);
-			}
-			problem.add(linear, Operator.EQ, 1);
 		}
 	}
 	

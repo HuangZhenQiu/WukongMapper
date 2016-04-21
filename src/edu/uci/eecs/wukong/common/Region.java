@@ -5,6 +5,7 @@ import edu.uci.eecs.wukong.common.WuDevice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -14,6 +15,7 @@ import java.util.Set;
 
 public class Region {
 	private static int id = 0;
+	private static Random random = new Random();
 	private int regionId;
 	private WukongSystem system;
 	private Map<Integer, WuDevice> deviceMap;
@@ -40,9 +42,15 @@ public class Region {
 		this.classToDeviceMap = new HashMap<Integer, List<WuDevice>> ();
 	}
 	
+	public void removeDeviceForClass(Integer wuClassId, WuDevice device) {
+		if (classToDeviceMap.containsKey(wuClassId)) {
+			classToDeviceMap.get(wuClassId).remove(device);
+		}
+	}
+	
 	public boolean deployable(FlowBasedProcess fbp) {
 		
-		for (WuClass wuClass : fbp.getAllComponents()) {
+		for (WuClass wuClass : fbp.getPhysicalWuClasses()) {
 			if (!classToDeviceMap.containsKey(wuClass.getWuClassId())) {
 				return false;
 			}
@@ -112,12 +120,20 @@ public class Region {
 		}
 	}
 	
+	public void deployAtRondomDevice(WuClass wuClass) {
+		if (wuClass.isVirtual()) {
+			int index = Math.abs(random.nextInt() % this.devices.size());
+			this.devices.get(index).deployComponent(wuClass);
+			wuClass.deploy(this.devices.get(index));
+		}
+	}
+	
 	public WuDevice getWuDevice(int index) {
 		return this.devices.get(index);
 	}
 	
 	public boolean hostFirstDevice(WuClass wuClass) {
-		if (classToDeviceMap.containsKey(wuClass.getWuClassId())) {
+		if (!wuClass.isVirtual() && classToDeviceMap.containsKey(wuClass.getWuClassId())) {
 			for (WuDevice device : classToDeviceMap.get(wuClass.getWuClassId())) {
 				if (device.deployComponent(wuClass)) {
 					System.out.println("Deploy wuClassId " + wuClass.getWuClassId() + " at device" + device.getWuDeviceId());
@@ -125,6 +141,10 @@ public class Region {
 					return true;
 				}
 			}
+		} else if (wuClass.isVirtual()) {
+			this.devices.get(0).deployComponent(wuClass);
+			wuClass.deploy(this.devices.get(0));
+			return true;
 		}
 		
 		System.out.println("Fail to find host device for WuClass " + wuClass.getWuClassId());
@@ -137,6 +157,10 @@ public class Region {
 	
 	public List<WuDevice> getHostableDevice(Integer wuClassId) {
 		return classToDeviceMap.get(wuClassId);
+	}
+	
+	public List<WuDevice> getAllDevices() {
+		return this.devices;
 	}
 	
 	public List<Gateway> getAllGateways() {

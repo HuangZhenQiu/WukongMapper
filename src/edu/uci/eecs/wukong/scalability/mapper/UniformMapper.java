@@ -1,6 +1,5 @@
 package edu.uci.eecs.wukong.scalability.mapper;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -41,41 +40,48 @@ public class UniformMapper extends AbstractMapper {
 				if (region.deployable(fbp)) { 
 					List<Gateway> gateways = region.getAllGateways();
 					for (WuClass wuClass : this.fbp.getAllComponents()) {
-						int time = 0;
-						while (!wuClass.isDeployed() &&  time < 50) {
-							int gatewayIndex = Math.abs(random.nextInt() % gateways.size());
-							Gateway gateway = gateways.get(gatewayIndex);
-							if (gateway.deploy(wuClass)) {
-								break;
-							}
-							time ++;
-						}
 						
-						List<WuDevice> devices = region.getHostableDevice(wuClass.getWuClassId());
-						time = 0;
-						while(!wuClass.isDeployed() && time < 50) {
-							int deviceIndex = Math.abs(random.nextInt() % devices.size());
-							WuDevice device = devices.get(deviceIndex);
-							if (device.deployComponent(wuClass)) {
-								break;
+						if (!wuClass.isVirtual()) {
+							int time = 0;
+							while (!wuClass.isDeployed() &&  time < 50) {
+								int gatewayIndex = Math.abs(random.nextInt() % gateways.size());
+								Gateway gateway = gateways.get(gatewayIndex);
+								if (gateway.deploy(wuClass)) {
+									break;
+								}
+								time ++;
 							}
-							time ++;
-						}
-						
-						if (!wuClass.isDeployed()) {
-							// In worst case
-							for (WuDevice device : devices) {
+							
+							List<WuDevice> devices = region.getHostableDevice(wuClass.getWuClassId());
+							time = 0;
+							while(!wuClass.isDeployed() && time < 50) {
+								int deviceIndex = Math.abs(random.nextInt() % devices.size());
+								WuDevice device = devices.get(deviceIndex);
 								if (device.deployComponent(wuClass)) {
 									break;
 								}
+								time ++;
 							}
 							
 							if (!wuClass.isDeployed()) {
-								success = false;
-								System.out.println("Can't find mapping for Component "
-										+ wuClass.getWuClassId() + " in region " + region.getRegionId()
-										+ " congestion zone " + zone.getZoneId());
+								// In worst case
+								for (WuDevice device : devices) {
+									if (device.deployComponent(wuClass)) {
+										wuClass.deploy(device);
+										break;
+									}
+								}
+								if (!wuClass.isDeployed()) {
+									success = false;
+									System.out.println("Can't find mapping for Component "
+											+ wuClass.getWuClassId() + " in region " + region.getRegionId()
+											+ " congestion zone " + zone.getZoneId());
+								}
 							}
+							
+							
+						} else {
+							region.deployAtRondomDevice(wuClass);
 						}
 					}
 	

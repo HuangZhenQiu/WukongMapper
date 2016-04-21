@@ -150,6 +150,18 @@ public class FlowBasedProcess {
 		return builder.build();
 	}
 	
+	public ImmutableList<WuClass> getPhysicalWuClasses() {
+		ImmutableList.Builder<WuClass> builder = ImmutableList.<WuClass>builder();
+		
+		for (WuClass wuclass : this.wuClassMap.values()) {
+			if (!wuclass.isVirtual()) {
+				builder.add(wuclass);
+			}
+		}
+		
+		return builder.build();
+	}
+	
 	public ImmutableList<FlowBasedProcessEdge> getMergedEdges() {
 		ImmutableList.Builder<FlowBasedProcessEdge> builder = ImmutableList.<FlowBasedProcessEdge>builder();
 		
@@ -291,6 +303,19 @@ public class FlowBasedProcess {
 		for (WuClass wuclass : classes) {
 			
 			if (!wuclass.isDeployed()) {
+				System.out.println("wuclass " + wuclass.getWuClassId() + " undeployed");
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public boolean isPhyscallyDeployed() {
+		Collection<WuClass> classes= wuClassMap.values();
+		for (WuClass wuclass : classes) {
+			
+			if (!wuclass.isVirtual() && !wuclass.isDeployed()) {
 				System.out.println("wuclass " + wuclass.getWuClassId() + " undeployed");
 				return false;
 			}
