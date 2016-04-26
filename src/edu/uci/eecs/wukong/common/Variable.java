@@ -34,11 +34,11 @@ public class Variable implements Comparable<Variable> {
 	@Override
 	public int compareTo(Variable variable) {
 		if (value > variable.value) {
-			return 1;
+			return -1;
 		} else if (value.equals(variable.value)) {
 			return 0;
 		} else {
-			return -1;
+			return 1;
 		}
 	}
 }

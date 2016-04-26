@@ -71,9 +71,9 @@ public class Region {
 	
 	public List<DevicePair> getInnerGatewayHostPair(WuClass start, WuClass end) {
 		List<DevicePair> pairs = new ArrayList<DevicePair>();
-		List<WuDevice> startDevices = classToDeviceMap.get(start.getWuClassId());
+		List<WuDevice> startDevices = getHostableDevices(start);
 		for (WuDevice startDevice : startDevices) {
-			for (WuDevice endDevice : classToDeviceMap.get(end.getWuClassId())) {
+			for (WuDevice endDevice : getHostableDevices(end)) {
 				if (startDevice.getGateway().equals(endDevice.getGateway())) {
 					pairs.add(new DevicePair(startDevice, endDevice));
 				}
@@ -83,11 +83,20 @@ public class Region {
 		return pairs;
 	}
 	
+	private List<WuDevice> getHostableDevices(WuClass wuClass) {
+		if (wuClass.isVirtual()) {
+			// All of the devices can host a virtual wuclass
+			return this.devices;
+		} else {
+			return classToDeviceMap.get(wuClass.getWuClassId());
+		}
+	}
+	
 	public List<DevicePair> getCrossGatewayHostPair(WuClass start, WuClass end) {
 		List<DevicePair> pairs = new ArrayList<DevicePair>();
-		List<WuDevice> startDevices = classToDeviceMap.get(start.getWuClassId());
+		List<WuDevice> startDevices = getHostableDevices(start);
 		for (WuDevice startDevice : startDevices) {
-			for (WuDevice endDevice : classToDeviceMap.get(end.getWuClassId())) {
+			for (WuDevice endDevice : getHostableDevices(end)) {
 				if (!startDevice.getGateway().equals(endDevice.getGateway())) {
 					pairs.add(new DevicePair(startDevice, endDevice));
 				}

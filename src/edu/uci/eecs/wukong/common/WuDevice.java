@@ -150,6 +150,7 @@ public class WuDevice implements Comparable<WuDevice>{
 	}
 	
 	public boolean deployComponent(WuClass wuClass) {
+		
 		if (wuClass.isVirtual()) {
 			this.virtualObjects.add(new WuObject(wuClass.getWuClassId(), this));
 			return true;
@@ -158,6 +159,23 @@ public class WuDevice implements Comparable<WuDevice>{
 		for (WuObject object : wuObjects) {
 			if (object.getWuClassId() == wuClass.getWuClassId() &&
 					! object.isActive()) {
+				object.activate();
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean undeployComponent(WuClass wuClass) {
+		if (wuClass.isVirtual()) {
+			this.virtualObjects.remove(wuClass);
+			return true;
+		}
+		
+		for (WuObject object : wuObjects) {
+			if (object.getWuClassId() == wuClass.getWuClassId() &&
+					object.isActive()) {
 				object.activate();
 				return true;
 			}
@@ -311,6 +329,16 @@ public class WuDevice implements Comparable<WuDevice>{
 	public boolean isWuObjectExist(Integer wuclassId) {
 		for (WuObject wuobject : getWuObjects()) {
 			if (wuobject.getWuClassId() == wuclassId) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean deployable(Integer wuClassId) {
+		for (WuObject wuobject : getWuObjects()) {
+			if (wuobject.getWuClassId() == wuClassId &&
+					!wuobject.isActive()) {
 				return true;
 			}
 		}

@@ -3,7 +3,7 @@ package edu.uci.eecs.wukong.common;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Path {
+public class Path implements Comparable<Path> {
 	private List<WuClass> pathNodes;
 	
 	public Path() {
@@ -44,5 +44,16 @@ public class Path {
 		}
 		
 		return hops;
+	}
+
+	@Override
+	public int compareTo(Path path) {
+		if (this.getHops() > path.getHops()) {
+			return -1;
+		} else if (this.getHops() == path.getHops()) {
+			return 0;
+		} else {
+			return 1;
+		}
 	}
 }

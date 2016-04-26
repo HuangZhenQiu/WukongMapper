@@ -16,8 +16,8 @@ public class ScalabilityWithoutRuntimeConstraintSimulator {
 	
 	public ScalabilityWithoutRuntimeConstraintSimulator() {
 		//WukongProperties.getProperty();
-		this.fbpFactory = new FlowBasedProcessFactory(30, 30, 6, 100 /**distance range**/, 100 /**weight**/);
-		this.wukongFactory = new WuKongSystemFactory(30, 100, 10, 100, 10, 10, false);
+		this.fbpFactory = new FlowBasedProcessFactory(30, 20, 4, 100 /**distance range**/, 100 /**weight**/);
+		this.wukongFactory = new WuKongSystemFactory(30, 500, 10, 100, 10, 50, false);
 	}
 	
 	public void run() {

@@ -35,13 +35,16 @@ public class WuClass {
 		this.virtual = virtual;
 	}
 	
-	public void deploy(WuDevice device) {
+	public synchronized void deploy(WuDevice device) {
 		this.wudevice = device;
 		this.deployed = true;
 	}
 	
-	public void undeploy() {
-		this.deployed = false;
+	public synchronized void undeploy() {
+		if (deployed) {
+			this.wudevice.undeployComponent(this);
+			this.deployed = false;
+		}
 	}
 
 	public int getWuClassId() {
