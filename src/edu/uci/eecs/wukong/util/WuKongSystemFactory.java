@@ -21,14 +21,14 @@ import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
 
 public class WuKongSystemFactory {
 
-	private int landMarkNumber;
-	private int classNumber;
-	private int deviceNumber;
-	private int gatewayNumber;
-	private int regionNumber;
-	private int distanceRange;
-	private int K; /** Colocation Parameter **/
-	private boolean withDistance;
+	protected int landMarkNumber;
+	protected int classNumber;
+	protected int deviceNumber;
+	protected int gatewayNumber;
+	protected int regionNumber;
+	protected int distanceRange;
+	protected int K; /** Colocation Parameter **/
+	protected boolean withDistance;
 	
 	public WuKongSystemFactory(int classNumber, int deviceNumber, int landMarkNumber, int distanceRange,
 			int gatewayNumber, int regionNumber, boolean withDistance) {

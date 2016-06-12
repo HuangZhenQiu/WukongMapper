@@ -3,11 +3,16 @@ package edu.uci.eecs.wukong.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -18,79 +23,54 @@ import edu.uci.eecs.wukong.common.LocationConstraint;
 import edu.uci.eecs.wukong.common.WuClass;
 import edu.uci.eecs.wukong.util.GraphGenerator.TYPE;
 
-public class FlowBasedProcessFactory {
-	
-	protected int landMarkNumber;
-	protected int classNumber;
-	protected int virtualNumber;
-	protected int distanceRange;
-	protected int dataVolumnRange;
-	protected Random random = new Random();
-	
-	private GraphGenerator generator;
-	
-	public FlowBasedProcessFactory(int landMarkNumber, int classNumber, int virtualNumber,
-			int distanceRange, int dataVolumnRange) {
-		this.landMarkNumber = landMarkNumber;
-		this.classNumber = classNumber;
-		this.virtualNumber = virtualNumber;
-		this.distanceRange = distanceRange;
-		this.dataVolumnRange = dataVolumnRange;
-		this.generator = new GraphGenerator();
+public class FlowBasedProcessVerificationFactory extends FlowBasedProcessFactory {
+		
+	private int sensorNumber;
+	public FlowBasedProcessVerificationFactory(int landMarkNumber, int classNumber, int virtualNumber,
+			int distanceRange, int dataVolumnRange, int sensorNumber) {
+		super(landMarkNumber, classNumber, virtualNumber, distanceRange, dataVolumnRange);
+		this.sensorNumber = 3;
+		this.classNumber = 4;
 	}
 	
-	/**
-	 * By default the size of fbp is of half of total number of wuclasses.
-	 * @param type
-	 * @return
-	 */
-	public FlowBasedProcess createFlowBasedProcess(TYPE type) {
+	public FlowBasedProcess createFlowBasedProcess(){		
 		
-		SimpleDirectedGraph<Object, DefaultEdge> graph;
+		SimpleDirectedGraph<Object, DefaultEdge> g =
+	            new SimpleDirectedGraph<Object, DefaultEdge>(DefaultEdge.class);
+		HashMap<Object, WuClass> nodeMap = new HashMap<Object, WuClass>();
 
-		int number = Math.abs(random.nextInt() %(classNumber / 2));
-		switch (type) {
-			case LINEAR:
-				graph = generator.generateLinearGraph(classNumber / 2 + number);
-				break;
-			case STAR:
-				graph = generator.generateStarGraph(classNumber / 2 + number);
-				break;
-			case RANDOM:
-				graph = generator.generateRandomGraph(classNumber / 2 + number , classNumber / 2 + number - 1);			
-				break;
-			case SCALE_FREE:
-				graph = generator.generateScaleFreeGraph(classNumber / 2 + number);
-				break;
-			default:
-				graph = generator.generateRandomGraph(classNumber/2 + number, classNumber/ 2 + number - 1);
-			
-		}
+		// 3 to 1 tree graph
+		Object currentObject = new Object();
+		g.addVertex(currentObject);
+		WuClass wuclass = new WuClass(0, generatRandomLocationConstraint(distanceRange));
+		wuclass.setVirtual(false);
+		nodeMap.put(currentObject, wuclass);
 		
-		HashMap<Object, WuClass> nodeMap = assignClassIdToGraphNode(graph);
+		for (int i = 0; i < sensorNumber; ++i){
+			Object leafObject = new Object();
+			g.addVertex(leafObject);
+			g.addEdge(leafObject, currentObject);
+			wuclass = new WuClass(i+1, generatRandomLocationConstraint(distanceRange));
+			wuclass.setVirtual(false);
+			nodeMap.put(leafObject, wuclass);
+		}	
+		
+		
+		// graph generated complete
+		SimpleDirectedGraph<Object, DefaultEdge> graph = g;
+				
 		List<FlowBasedProcessEdge> edges = buildEdges(nodeMap, graph);
 		HashMap<Integer, WuClass> classMap =  new HashMap<Integer, WuClass>();
 		Iterator<WuClass> classIterator = nodeMap.values().iterator();
 		while(classIterator.hasNext()) {
-			WuClass wuclass = classIterator.next();
+			wuclass = classIterator.next();
 			if(ifExistInEdges(wuclass, edges)){
 				classMap.put(wuclass.getWuClassId(), wuclass);
 			}
 		}
 		
-		Object[] wuclasses = classMap.values().toArray();
-		for(int i = 0; i < Math.min(wuclasses.length, virtualNumber);) {
-			int index = Math.abs(random.nextInt() % wuclasses.length);
-			WuClass wuClass = (WuClass) wuclasses[index];
-			if(!wuClass.isVirtual()) {
-				wuClass.setVirtual(true);
-				i++;
-			}
-		}
-		
-		return new FlowBasedProcess(graph, nodeMap, classMap, edges, type);
+		return new FlowBasedProcess(graph, nodeMap, classMap, edges, TYPE.RANDOM);
 	}
-	
 	
 	private List<FlowBasedProcessEdge> buildEdges(HashMap<Object, WuClass> objectMap, SimpleDirectedGraph<Object, DefaultEdge> graph) {
 		Iterator<DefaultEdge> edgeIterator = graph.edgeSet().iterator();
@@ -116,27 +96,6 @@ public class FlowBasedProcessFactory {
 		return edges;
 	}
 
-	public boolean ifExistInEdges(WuClass wuclass, List<FlowBasedProcessEdge> edges) {
-		for( FlowBasedProcessEdge edge : edges) {
-			if(edge.getInWuClass().equal(wuclass) || edge.getOutWuClass().equal(wuclass)){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean isEdgeExist(List<FlowBasedProcessEdge> edges, FlowBasedProcessEdge fbpedge) { 
-		for(FlowBasedProcessEdge edge: edges) { 
-			if(fbpedge.getInWuClass().equal(edge.getInWuClass()) && fbpedge.getOutWuClass().equal(edge.getOutWuClass())) {
-				return true;
-			}
-			else if(fbpedge.getInWuClass().equal(edge.getOutWuClass()) && fbpedge.getOutWuClass().equal(edge.getInWuClass())){
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	private HashMap<Object, WuClass> assignClassIdToGraphNode(SimpleDirectedGraph<Object, DefaultEdge> graph) {
 		
 		HashMap<Object, WuClass> idMap = new HashMap<Object, WuClass>();

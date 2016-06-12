@@ -22,6 +22,11 @@ public class Gateway {
 		return gatewayId;
 	}
 	
+	public List<WuDevice> getAllDevices(){
+		List<WuDevice> ds = new ArrayList<WuDevice>(this.devices.values());
+		return ds;
+	}
+	
 	public void addDevice(WuDevice device) {
 		if (!devices.containsKey(device.getWuDeviceId())) {
 			this.devices.put(device.getWuDeviceId(), device);
@@ -35,7 +40,7 @@ public class Gateway {
 			WuDevice device = deviceIter.next();
 			if (device.deployComponent(wuClass)) {
 				wuClass.deploy(device);
-				System.out.println("Deploy wuClassId " + wuClass.getWuClassId() + " at device" + device.getWuDeviceId());
+				System.out.println("Deploy wuClassId " + wuClass.getWuClassId() + " at device " + device.getWuDeviceId());
 				return true;
 			}
 		}

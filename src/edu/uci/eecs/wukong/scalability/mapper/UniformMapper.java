@@ -39,18 +39,17 @@ public class UniformMapper extends AbstractMapper {
 				Region region = regIter.next();
 				if (region.deployable(fbp)) { 
 					List<Gateway> gateways = region.getAllGateways();
-					for (WuClass wuClass : this.fbp.getAllComponents()) {
-						
+					for (WuClass wuClass : this.fbp.getAllComponents()) {						
 						if (!wuClass.isVirtual()) {
 							int time = 0;
-							while (!wuClass.isDeployed() &&  time < 50) {
-								int gatewayIndex = Math.abs(random.nextInt() % gateways.size());
-								Gateway gateway = gateways.get(gatewayIndex);
-								if (gateway.deploy(wuClass)) {
-									break;
-								}
-								time ++;
-							}
+//							while (!wuClass.isDeployed() &&  time < 50) {
+//								int gatewayIndex = Math.abs(random.nextInt() % gateways.size());
+//								Gateway gateway = gateways.get(gatewayIndex);
+//								if (gateway.deploy(wuClass)) {
+//									break;
+//								}
+//								time ++;
+//							}
 							
 							List<WuDevice> devices = region.getHostableDevice(wuClass.getWuClassId());
 							time = 0;
@@ -58,6 +57,8 @@ public class UniformMapper extends AbstractMapper {
 								int deviceIndex = Math.abs(random.nextInt() % devices.size());
 								WuDevice device = devices.get(deviceIndex);
 								if (device.deployComponent(wuClass)) {
+									System.out.println("Deploy wuClassId " + wuClass.getWuClassId() + " at device " + device.getWuDeviceId());
+									wuClass.deploy(device);
 									break;
 								}
 								time ++;

@@ -21,7 +21,7 @@ public class BasicMapperTest extends TestCase {
 			FileReader inputStream = new FileReader(new File(root + "/data/fbp.txt"));
 			FlowBasedProcess fbp = new FlowBasedProcess(TYPE.LINEAR);
 			fbp.initialize(new BufferedReader(inputStream));
-			TestCase.assertEquals(fbp.getEdgeNumber().intValue(), 2);
+			TestCase.assertEquals(fbp.getEdgeNumber().intValue(), 8);
 			
 		} catch (Exception e) {
 			System.out.println(e.toString());
@@ -36,7 +36,7 @@ public class BasicMapperTest extends TestCase {
 			FileReader inputStream = new FileReader(new File(root + "/data/wukong.txt"));
 			WukongSystem system = new WukongSystem(true);
 			system.initialize(new BufferedReader(inputStream));
-			TestCase.assertEquals(system.getDeviceNumber(), 4);
+			TestCase.assertEquals(system.getDeviceNumber(), 5);
 			
 		} catch (Exception e) {
 			System.out.println(e.toString());
