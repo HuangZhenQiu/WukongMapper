@@ -30,6 +30,7 @@ public class UniformMapper extends AbstractMapper {
 	@Override
 	public boolean map() {
 		boolean success = true;
+		int seed = 1;
 		Random random = new Random();
 		List<CongestionZone> zones = this.system.getCongestionZones(this.fbp);
 		for (CongestionZone zone : zones) {
@@ -39,7 +40,7 @@ public class UniformMapper extends AbstractMapper {
 				Region region = regIter.next();
 				if (region.deployable(fbp)) { 
 					List<Gateway> gateways = region.getAllGateways();
-					for (WuClass wuClass : this.fbp.getAllComponents()) {						
+					for (WuClass wuClass : this.fbp.getAllComponents()) {					
 						if (!wuClass.isVirtual()) {
 							int time = 0;
 //							while (!wuClass.isDeployed() &&  time < 50) {
@@ -54,7 +55,8 @@ public class UniformMapper extends AbstractMapper {
 							List<WuDevice> devices = region.getHostableDevice(wuClass.getWuClassId());
 							time = 0;
 							while(!wuClass.isDeployed() && time < 50) {
-								int deviceIndex = Math.abs(random.nextInt() % devices.size());
+								random.setSeed(System.nanoTime() + (seed) * (seed++));
+								int deviceIndex = random.nextInt(devices.size());
 								WuDevice device = devices.get(deviceIndex);
 								if (device.deployComponent(wuClass)) {
 									System.out.println("Deploy wuClassId " + wuClass.getWuClassId() + " at device " + device.getWuDeviceId());
@@ -69,6 +71,7 @@ public class UniformMapper extends AbstractMapper {
 								for (WuDevice device : devices) {
 									if (device.deployComponent(wuClass)) {
 										wuClass.deploy(device);
+										System.out.println("Guess wrong for more than " + time);
 										break;
 									}
 								}

@@ -136,6 +136,89 @@ public class WuKongSystemVerificationFactory extends WuKongSystemFactory {
 		return system;
 	}
 	
+	private WukongSystem createWukongSystemWithDistance_Circular(int K, int replica, Double[][] distances, boolean withDistance){
+		
+//		if(replica * classNumber >= K * deviceNumber) {
+//			System.out.println("Not creatable");
+//			return null;
+//		}
+		
+		WukongSystem system = new WukongSystem(false);
+		List<WuDevice> devices = new ArrayList<WuDevice>();
+		List<Region> regions = new ArrayList<Region>();
+		List<Gateway> gateways = new ArrayList<Gateway>();	
+		
+		// create regions
+		for (int i = 0; i < regionNumber; i++) {
+			Region region = new Region(system);
+			regions.add(region);
+		}
+		
+		// create gateways
+		for (int i = 0; i < gatewayNumber; i++) {
+			Gateway gateway = new Gateway();
+			gateways.add(gateway);
+		}
+		
+		/* initial all devices */ 
+		for(int i = 0; i < deviceNumber; i++) {
+			List<Integer> objectIds = new ArrayList<Integer>();
+			WuDevice device = createDevice(i, system, objectIds, distances);
+			devices.add(device);
+			
+			// set gateway
+			int gatewayId;
+			if (i < 4 * regionNumber){
+				if (i <= 1){
+					gatewayId = 0;
+				} else if (i < 4 * regionNumber - 2){
+					gatewayId = (i+2)/4;
+				} else {
+					gatewayId = 0;
+				}
+			} else {
+				gatewayId = (i - 4 * regionNumber) + regionNumber;
+			}
+			gateways.get(gatewayId).addDevice(devices.get(i));
+			
+			// set region
+			int regionId;
+			if (i < 4 * (regionNumber)){
+				regionId= i/4;
+			} else {
+				regionId = (i - 4 * regionNumber);
+			}
+			regions.get(regionId).addDevice(devices.get(i));
+			
+			// set wuobjects
+			if (i < 4 * regionNumber){
+				switch(i%4){
+					case 0:
+						device.addWuObject(1);
+						break;
+					case 1:
+						device.addWuObject(2);
+						break;
+					case 2:
+						device.addWuObject(3);
+						device.addWuObject(2);
+						break;
+					case 3:
+						device.addWuObject(0);
+						break;						
+				}
+			} else {
+				device.addWuObject(0);
+			}
+		}
+		
+		for (int i = 0; i < regionNumber; i++) {
+			regions.get(i).loadClassMap();
+		}
+		
+		system.initialize(devices, regions, gateways, distances, false, classNumber, landMarkNumber);
+		return system;
+	}
 	
 	private WuDevice createDevice(int i, WukongSystem system, List<Integer> objectIds, Double[][] distances) {
 		WuDevice device;
@@ -150,7 +233,11 @@ public class WuKongSystemVerificationFactory extends WuKongSystemFactory {
 		return device;
 	}
 	
-	public WukongSystem createRandomWuKongSystem() {
-		return createWukongSystemWithDistance_Base(0, 0, null, withDistance);
+	public WukongSystem createRandomWuKongSystem_Base() {
+		return createWukongSystemWithDistance_Base(0, 0, null, withDistance);		
+	}
+	
+	public WukongSystem createRandomWuKongSystem_Circular(){
+		return createWukongSystemWithDistance_Circular(0, 0, null, withDistance);
 	}
 }

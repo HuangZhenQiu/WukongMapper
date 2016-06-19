@@ -76,7 +76,8 @@ public class ScalabilitySelectionMapper extends AbstractRegionMapper {
 			} else {
 				System.out.println("Can't find solution");
 				latencyHops.add(-1);
-				break;
+//				break;
+				return false;
 			}
 		}
 		

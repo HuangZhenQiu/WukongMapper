@@ -27,20 +27,18 @@ public class VerificationScalabilitySimulator {
 //	private int[] sensorNumbers = new int[]{8};
 //	private int[] gatewayNumbers = new int[]{20, 60, 100};
 //	private int[] devicePerGateways = new int[]{20, 60, 100};
-	private int regionNumber = 2;
+	private int regionNumber;
 	private int objectPerDevice = 5;
-	private int classNumber = 4;
+	private int classNumber;
 	private int sampleNumber = 10000;
 	private int sensorNumber;
 	private int dominantPath;
-	private String directory;
 	
-	public VerificationScalabilitySimulator(int sensorNumber, String dir) {
+	public VerificationScalabilitySimulator(int sensorNumber) {
 		//WukongProperties.getProperty();
 
 		this.sensorNumber = sensorNumber;
 		this.dominantPath = 10;//(int) Math.ceil(Math.log(sensorNumber)/Math.log(2));
-		this.directory = dir;
 		
 //		this.fbpFactory = new FlowBasedProcessFactory(30, classNumber, 4, 100 /**distance range**/, 100 /**weight**/, sensorNumber);
 //		this.wukongFactory = new WuKongSystemFactory(classNumber, devicePerGateway*gatewayNumber, objectPerDevice, 10, 100, gatewayNumber, regionNumber, false);
@@ -62,13 +60,27 @@ public class VerificationScalabilitySimulator {
 //		}
 		
 
-		int gatewayNumber = 3;
-		int deviceNumber = 8;
+		// Base case
+//		this.regionNumber = 2;
+//		this.classNumber = 4;
+//		int gatewayNumber = 3;
+//		int deviceNumber = 8;
+//		
+//		this.wukongFactory = new WuKongSystemVerificationFactory(classNumber, deviceNumber, objectPerDevice, 10, 100, gatewayNumber, regionNumber, false);
+//		AbstractMapper.MAX_HOP = this.dominantPath;
+//		this.fbpFactory = new FlowBasedProcessVerificationFactory(30, classNumber, 4, 100 /**distance range**/, 100 /**weight**/, sensorNumber);
+		
+		// Circular case
+		this.regionNumber = 10;
+		int gatewayNumber = regionNumber * 2;
+		int deviceNumber = regionNumber * 4 + regionNumber;
+		this.classNumber = 4;
 		
 		this.wukongFactory = new WuKongSystemVerificationFactory(classNumber, deviceNumber, objectPerDevice, 10, 100, gatewayNumber, regionNumber, false);
 		AbstractMapper.MAX_HOP = this.dominantPath;
 		this.fbpFactory = new FlowBasedProcessVerificationFactory(30, classNumber, 4, 100 /**distance range**/, 100 /**weight**/, sensorNumber);
 
+		
 		int staticMax = 0;
 		long staticExecutionTime = 0;
 		float staticMissRatio = 0;
@@ -94,7 +106,8 @@ public class VerificationScalabilitySimulator {
 //			if (!fbp.getDominatePaths(this.dominantPath).isEmpty()){
 			if (true) {
 				FlowBasedProcess fbp = this.fbpFactory.createFlowBasedProcess();
-				WukongSystem system = wukongFactory.createRandomWuKongSystem();
+//				WukongSystem system = wukongFactory.createRandomWuKongSystem_Base();
+				WukongSystem system = wukongFactory.createRandomWuKongSystem_Circular();
 				ScalabilitySelectionMapper optimalRunTimeMapper = new ScalabilitySelectionMapper(
 						system, fbp, MapType.WITH_LATENCY, false, 1800);
 
@@ -193,7 +206,7 @@ public class VerificationScalabilitySimulator {
 	
 	public static void main(String[] args) {		
 //		TreeScalabilitySimulator simulator = new TreeScalabilitySimulator(Integer.parseInt(args[0]), args[1]);
-		VerificationScalabilitySimulator simulator = new VerificationScalabilitySimulator(3, "/home/l");
+		VerificationScalabilitySimulator simulator = new VerificationScalabilitySimulator(3);
 		simulator.run();
 	}
 }
